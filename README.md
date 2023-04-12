@@ -17,7 +17,7 @@ There are two possible config files in `configs`. Recommended for reanalysis is 
 ```
 # Check a dry run first
 snakemake --configfile configs/laptop_config.yaml -n
-# Run with a single core (should take )
+# Run with a single core (should take about 30 minutes) TODO: fix multi-threading 
 snakemake --configfile configs/laptop_config.yaml --cores 1
 ``` 
 
