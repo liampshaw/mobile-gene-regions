@@ -1,0 +1,12 @@
+version: "default"
+fastadir : "/Users/Liam/Downloads/betalactamase-contigs"
+panx_export : False
+bandage : True
+snp_threshold : "25"
+region_upstream : "5000"
+region_downstream : "5000"
+pangraph_polish : False
+pangraph_aligner : "minimap2"
+pangraph_minblocklength : "100"
+pangraph_edgeminlength : "0"
+

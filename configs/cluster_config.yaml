@@ -1,0 +1,11 @@
+version: "cluster"
+fastadir : "/well/shaw/users/amu125/data/CARD/betalactamases/fasta/"
+panx_export : False
+bandage : False
+snp_threshold : "25"
+region_upstream : "5000"
+region_downstream : "5000"
+pangraph_polish : False
+pangraph_aligner : "minimap2"
+pangraph_minblocklength : "100"
+pangraph_edgeminlength : "0"
