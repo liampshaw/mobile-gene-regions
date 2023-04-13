@@ -8,16 +8,14 @@ GENES = ["CMY",\
 			"TEM",\
 			"VEB",\
 			"VIM",
-			"IMP",
-			"OXA"]
+			"IMP"]#,
+			#"OXA"]
 #DB = ["NCBI", "CARD"]
 DB = ["CARD"]
 FOCAL_GENES = ['CMY-2', 'CTX-M-15', 
 			'CTX-M-65', 'GES-24', 
 			'IMP-4', 'KPC-2', 
-			'NDM-1', 'PER-1', 
-			#'TEM-1', 
-			'VIM-1',"OXA-10", 'OXA-48']
+			'NDM-1', 'PER-1', 'VIM-1']
 FOCAL_GENE_DICT = {"CMY-2": "CMY", 
 					"CTX-M-15": "CTX-M",
 					"CTX-M-65":"CTX-M",
@@ -26,10 +24,9 @@ FOCAL_GENE_DICT = {"CMY-2": "CMY",
 					"KPC-2": "KPC",
 					"NDM-1":"NDM",
 					"PER-1":"PER",	
-					#"TEM-1":"TEM",
-					"VIM-1":"VIM",
-					"OXA-10": "OXA",
-					"OXA-48":"OXA"}
+					"VIM-1":"VIM"}#,"TEM-1"
+					#"OXA-10": "OXA",
+					#"OXA-48":"OXA"}
 #FOCAL_GENE_DICT = {"CMY-2": "CMY",
 #					"GES-24": "GES"}#,
 					#"CTX-M-15": "CTX-M"}
@@ -347,7 +344,7 @@ rule plot_positional_entropies_real_relative:
 	output:
 		"output/pangraph/{focal_gene}/plots/positional_entropies_relative.pdf"
 	run:
-		shell("Rscript scripts/plot_entropies.R {input} --relatiev T --output_pdf {output}")
+		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
 
 
 rule plot_breakpoint_distances:

@@ -20,9 +20,7 @@ suppressMessages(library(cowplot, quietly=TRUE))
 suppressMessages(library(dplyr, quietly=TRUE))
 
 args <- docopt(doc, version = 'Plot entropies v1.0')
-print(args)
 entropy.df = read.csv(args$entropies, sep=' ', header=F, stringsAsFactors = F)
-print(entropy.df)
 if (args$relative=="F"){
   p = ggplot(entropy.df, aes(V1, V2))+
     geom_line()+
@@ -34,7 +32,6 @@ if (args$relative=="F"){
     theme(axis.line = element_line())
 }
 if (args$relative=="T"){
-  head(entropy.df)
   p = ggplot(entropy.df, aes(V2, V3, colour=V1))+
     geom_line()+
     theme_bw()+
