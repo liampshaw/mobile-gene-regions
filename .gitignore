@@ -8,3 +8,5 @@ scripts/__pycache__/*pyc
 *.txt
 *pdf
 *csv
+*svg
+*lst
