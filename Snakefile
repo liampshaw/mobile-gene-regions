@@ -19,7 +19,7 @@ rule all:
 
 rule gene_db:
 	input:
-		expand("DB/gene_alns/{gene}_{db}.tsv", gene=set(FOCAL_GENE_DICT.values()), db=DB)
+		expand("DB/gene_alns/{gene}_{db}.tsv", gene=set(FOCAL_GENE_DICT.values()), db=DB),
 		expand("DB/genes_plots/{db}-variants/{gene}.pdf", gene=set(FOCAL_GENE_DICT.values()), db=DB),
 
 
@@ -63,6 +63,7 @@ rule plots:
 		#expand("output/pangraph/{focal_gene}/positional_entropies.txt", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/positional_entropies.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/{db}_NJ_tree_central_gene.pdf", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
 		expand("output/pangraph/{focal_gene}/plots/{db}_breakpoint_and_NJ.logfile", focal_gene=FOCAL_GENE_DICT.keys(), db=DB)
 
