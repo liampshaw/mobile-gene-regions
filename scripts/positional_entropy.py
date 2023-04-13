@@ -123,14 +123,22 @@ def main():
                 pass
             else:
                 upstream_block_vector = [g[starting_point_upstream[j]-i] for j, g in enumerate(genomes_as_int)]# this is the vector we want
-                output_string = args.name+',upstream,'+str(len(upstream_block_vector))+','+str(i)+','+str(shannonEntropy(upstream_block_vector, normalise=args.normalise))
+                if args.name!="":
+                    output_string = args.name+" "
+                else:
+                    output_string = ""
+                output_string = output_string+'upstream '+str(i)+' '+str(shannonEntropy(upstream_block_vector, normalise=args.normalise))
                 print(output_string)
         for i in range(0, 5000, 100):
             if starting_point_downstream[0]+i>max(len(g) for g in genomes_as_int):
                 pass
             else:
                 downstream_block_vector = [g[starting_point_downstream[j]+i] for j, g in enumerate(genomes_as_int)]# this is the vector we want
-                output_string = args.name+',downstream,'+str(len(downstream_block_vector))+','+str(i)+','+str(shannonEntropy(downstream_block_vector, normalise=args.normalise))
+                if args.name!="":
+                    output_string = args.name+" "
+                else:
+                    output_string = ""
+                output_string = output_string+'downstream '+str(i)+' '+str(shannonEntropy(downstream_block_vector, normalise=args.normalise))
                 print(output_string)
             
     else: # otherwise, just print absolute positions

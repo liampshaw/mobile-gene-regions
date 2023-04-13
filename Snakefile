@@ -16,7 +16,7 @@ FOCAL_GENES = ['CMY-2', 'CTX-M-15',
 			'CTX-M-65', 'GES-24', 
 			'IMP-4', 'KPC-2', 
 			'NDM-1', 'PER-1', 
-			'TEM-1', 
+			#'TEM-1', 
 			'VIM-1',"OXA-10", 'OXA-48']
 FOCAL_GENE_DICT = {"CMY-2": "CMY", 
 					"CTX-M-15": "CTX-M",
@@ -26,7 +26,7 @@ FOCAL_GENE_DICT = {"CMY-2": "CMY",
 					"KPC-2": "KPC",
 					"NDM-1":"NDM",
 					"PER-1":"PER",	
-					"TEM-1":"TEM",
+					#"TEM-1":"TEM",
 					"VIM-1":"VIM",
 					"OXA-10": "OXA",
 					"OXA-48":"OXA"}
@@ -62,6 +62,8 @@ rule all:
 		expand("output/pangraph/{focal_gene}/plots/{focal_gene}_bandage_and_linear.logfile", focal_gene=FOCAL_GENES),
 		expand("output/pangraph/{focal_gene}/positional_entropies.txt", focal_gene=FOCAL_GENES),
 		expand("output/pangraph/{focal_gene}/plots/positional_entropies.pdf", focal_gene=FOCAL_GENES),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus.pdf", focal_gene=FOCAL_GENES),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_relative.pdf", focal_gene=FOCAL_GENES),
 		expand("output/pangraph/{focal_gene}/plots/{db}_NJ_tree_central_gene.pdf", focal_gene=FOCAL_GENES, db=DB),
 		expand("output/pangraph/{focal_gene}/plots/{db}_breakpoint_and_NJ.logfile", focal_gene=FOCAL_GENES, db=DB)
 
@@ -300,26 +302,53 @@ rule compute_distances:
 											--snps {input.snps}\
 											--output {output}"
 
-
 rule positional_entropies:
 	input:
-		json="output/pangraph/{focal_gene}/{focal_gene}_pangraph.json"
+		"output/pangraph/{focal_gene}/{focal_gene}_pangraph.json"
+	params:
+		blastdb_fasta="output/pangraph/{focal_gene}/{focal_gene}_extracted.fa",
+		gene_query="data/focal_genes/{focal_gene}.fa",
+		gene_locations="output/pangraph/{focal_gene}/{focal_gene}_gene_locations.txt"
 	output:
-		"output/pangraph/{focal_gene}/positional_entropies.txt"
-	shell:
-		"python scripts/positional_entropy.py --json {input.json} --normalise > {output}"
+		real="output/pangraph/{focal_gene}/positional_entropies.txt",
+		consensus="output/pangraph/{focal_gene}/positional_entropies_consensus.txt",
+		real_relative="output/pangraph/{focal_gene}/positional_entropies_relative.txt"
+	run:
+		shell("makeblastdb -in {params.blastdb_fasta} -dbtype 'nucl'")
+		shell("blastn -query {params.gene_query} -db {params.blastdb_fasta} -outfmt '6 sseqid sstart send' > {params.gene_locations}")
+		shell("python scripts/positional_entropy.py --json {input} --normalise > {output.real}")
+		shell("python scripts/positional_entropy.py --json {input} --normalise --genelocations {params.gene_locations} > {output.real_relative}")
+		shell("python scripts/positional_entropy.py --json {input} --normalise --consensus > {output.consensus}")
 
 #############################
 ##### PLOTTING OUTPUTS  #####
 #############################
 
-rule plot_positional_entropies:
+
+rule plot_positional_entropies_real:
 	input:
 		"output/pangraph/{focal_gene}/positional_entropies.txt"
 	output:
 		"output/pangraph/{focal_gene}/plots/positional_entropies.pdf"
-	shell:
-		"Rscript scripts/plot_entropies.R {input} --output_pdf {output}"
+	run:
+		shell("Rscript scripts/plot_entropies.R {input} --output_pdf {output}")
+
+rule plot_positional_entropies_consensus:
+	input:
+		"output/pangraph/{focal_gene}/positional_entropies_consensus.txt"
+	output:
+		"output/pangraph/{focal_gene}/plots/positional_entropies_consensus.pdf"
+	run:
+		shell("Rscript scripts/plot_entropies.R {input} --output_pdf {output} ")
+
+rule plot_positional_entropies_real_relative:
+	input:
+		"output/pangraph/{focal_gene}/positional_entropies_relative.txt"
+	output:
+		"output/pangraph/{focal_gene}/plots/positional_entropies_relative.pdf"
+	run:
+		shell("Rscript scripts/plot_entropies.R {input} --relatiev T --output_pdf {output}")
+
 
 rule plot_breakpoint_distances:
 	input:
