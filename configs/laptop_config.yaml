@@ -9,4 +9,5 @@ pangraph_polish : False
 pangraph_aligner : "minimap2"
 pangraph_minblocklength : "100"
 pangraph_edgeminlength : "0"
+DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
 

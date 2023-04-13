@@ -1,5 +1,6 @@
-#DB = ["NCBI", "CARD"]
-DB = ["CARD"]
+# See configfile in e.g. configs/laptop_config.yaml for parameters
+DB = config["DB"]
+#FOCAL_GENE_DICT = config["focal_gene_dict"]
 FOCAL_GENE_DICT = {"CMY-2": "CMY", 
 					"CTX-M-15": "CTX-M",
 					"CTX-M-65":"CTX-M",
@@ -7,47 +8,65 @@ FOCAL_GENE_DICT = {"CMY-2": "CMY",
 					"IMP-4":"IMP",
 					"KPC-2": "KPC",
 					"NDM-1":"NDM",
-					"PER-1":"PER",	
+					"PER-1":"PER",  
 					"VIM-1":"VIM",
 					"TEM-1": "TEM",
 					"OXA-10": "OXA",
 					"OXA-48":"OXA"}
-#FOCAL_GENE_DICT = {"CMY-2": "CMY",
-#					"GES-24": "GES"}#,
-					#"CTX-M-15": "CTX-M"}
-
-print(config['fastadir'])
-
-
 rule all:
 	input:
+		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.fa", focal_gene=FOCAL_GENE_DICT.keys()),
+
+rule gene_db:
+	input:
+		expand("DB/gene_alns/{gene}_{db}.tsv", gene=set(FOCAL_GENE_DICT.values()), db=DB)
 		expand("DB/genes_plots/{db}-variants/{gene}.pdf", gene=set(FOCAL_GENE_DICT.values()), db=DB),
-		expand("DB/gene_alns/{gene}_{db}.tsv", gene=set(FOCAL_GENE_DICT.values()), db=DB),
-		expand("output/analysis/{gene}_accessions.txt", gene=set(FOCAL_GENE_DICT.values())),
-		expand("output/analysis/sequence_assignments/{focal_gene}_{db}.csv", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
-		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.snps.tsv", focal_gene=FOCAL_GENE_DICT.keys()),
-		expand("data/{db}_db.fa", db=DB),	
+
+
+rule accessions:
+	input:
+		expand("output/analysis/{gene}_accessions.txt", gene=set(FOCAL_GENE_DICT.values()))
+
+rule gene_db_assignments:
+	input:
+		expand("output/analysis/sequence_assignments/{focal_gene}_{db}.csv", focal_gene=FOCAL_GENE_DICT.keys(), db=DB)
+
+rule seqs_extracted_snps:
+	input:
+		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.snps.tsv", focal_gene=FOCAL_GENE_DICT.keys())
+
+rule db:
+	input:
+		expand("data/{db}_db.fa", db=DB)
+
+rule combined_contigs:
+	input:
 		expand("output/contigs/{gene}_combined_contigs.fa", gene=set(FOCAL_GENE_DICT.values())),
 		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa.dedup.aln", focal_gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.fa", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre", focal_gene=FOCAL_GENE_DICT.keys()),
+
+rule pangraph:
+	input:
 		expand("output/pangraph/{focal_gene}/{focal_gene}_extracted.fa", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.gfa.coloured.gfa", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/{focal_gene}_{db}.output_dists.csv", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
 		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.json", focal_gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{focal_gene}/{focal_gene}.gene_block.txt", focal_gene=FOCAL_GENE_DICT.keys()),
-		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/{focal_gene}.gene_block.txt", focal_gene=FOCAL_GENE_DICT.keys())
+
+rule plots:
+	input:
 		expand("output/pangraph/{focal_gene}/plots/{db}_plot_breakpoint_distances-all.pdf", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
-		#expand("output/contigs/{focal_gene}/{focal_gene}_pangraph.gfa", focal_gene=FOCAL_GENES) if config["panx_export"]==True else expand("DB/plots/{db}-variants/{gene}.pdf", gene=GENES, db=DB)
 		expand("output/pangraph/{focal_gene}/plots/bandage.log_file", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/linear_blocks.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/{focal_gene}_bandage_and_linear.logfile", focal_gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{focal_gene}/positional_entropies.txt", focal_gene=FOCAL_GENE_DICT.keys()),
+		#expand("output/pangraph/{focal_gene}/positional_entropies.txt", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/positional_entropies.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{focal_gene}/plots/{db}_NJ_tree_central_gene.pdf", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
 		expand("output/pangraph/{focal_gene}/plots/{db}_breakpoint_and_NJ.logfile", focal_gene=FOCAL_GENE_DICT.keys(), db=DB)
+
+
 
 #############################
 ### SETTING UP DATABASES ####
@@ -131,7 +150,7 @@ rule run_metadata:
 		"scripts/metadata_gene_combinations.py"
 
 
-rule copy_variant_fasta: # highly inelegant - copies files so is wasteful. But I don't understand symbolic links in snakemake
+rule copy_variant_fasta: # highly inelegant - copies files so is wasteful. But I don't understand symbolic links in snakemake...
     input:
         lambda wildcards: f"DB/gene_fasta/{FOCAL_GENE_DICT[wildcards.focal_gene]}"+"_{db}.fa"
     output:
