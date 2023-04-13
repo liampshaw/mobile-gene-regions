@@ -175,11 +175,12 @@ def main():
                 genomes_as_int[genome_i] = genome_as_int
                 genome_i += 1
         for i in range(0, int(args.region_size)*2, int(args.step)):
-            block_vector = [g[i] for g in genomes_as_int]# this is the vector we want
-            if args.name=='':
-                print(i, shannonEntropy(block_vector, normalise=args.normalise))
-            else:
-                print(args.name, i, shannonEntropy(block_vector, normalise=args.normalise))
+            if i<min([len(g) for g in genomes_as_int]):
+                block_vector = [g[i] for g in genomes_as_int]# this is the vector we want
+                if args.name=='':
+                    print(i, shannonEntropy(block_vector, normalise=args.normalise))
+                else:
+                    print(args.name, i, shannonEntropy(block_vector, normalise=args.normalise))
 
 
 
