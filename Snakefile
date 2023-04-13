@@ -1,21 +1,5 @@
-GENES = ["CMY",\
-			"CTX-M",\
-			"GES",\
-			"IMP",\
-			"KPC",\
-			"NDM",\
-			"PER",\
-			"TEM",\
-			"VEB",\
-			"VIM",
-			"IMP"]#,
-			#"OXA"]
 #DB = ["NCBI", "CARD"]
 DB = ["CARD"]
-FOCAL_GENES = ['CMY-2', 'CTX-M-15', 
-			'CTX-M-65', 'GES-24', 
-			'IMP-4', 'KPC-2', 
-			'NDM-1', 'PER-1', 'VIM-1']
 FOCAL_GENE_DICT = {"CMY-2": "CMY", 
 					"CTX-M-15": "CTX-M",
 					"CTX-M-65":"CTX-M",
@@ -24,9 +8,10 @@ FOCAL_GENE_DICT = {"CMY-2": "CMY",
 					"KPC-2": "KPC",
 					"NDM-1":"NDM",
 					"PER-1":"PER",	
-					"VIM-1":"VIM"}#,"TEM-1"
-					#"OXA-10": "OXA",
-					#"OXA-48":"OXA"}
+					"VIM-1":"VIM",
+					"TEM-1": "TEM",
+					"OXA-10": "OXA",
+					"OXA-48":"OXA"}
 #FOCAL_GENE_DICT = {"CMY-2": "CMY",
 #					"GES-24": "GES"}#,
 					#"CTX-M-15": "CTX-M"}
@@ -36,33 +21,33 @@ print(config['fastadir'])
 
 rule all:
 	input:
-		expand("DB/genes_plots/{db}-variants/{gene}.pdf", gene=GENES, db=DB),
-		expand("DB/gene_alns/{gene}_{db}.tsv", gene=GENES, db=DB),
-		expand("output/analysis/{gene}_accessions.txt", gene=GENES),
-		expand("output/analysis/sequence_assignments/{focal_gene}_{db}.csv", focal_gene=FOCAL_GENES, db=DB),
-		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.snps.tsv", focal_gene=FOCAL_GENES),
+		expand("DB/genes_plots/{db}-variants/{gene}.pdf", gene=set(FOCAL_GENE_DICT.values()), db=DB),
+		expand("DB/gene_alns/{gene}_{db}.tsv", gene=set(FOCAL_GENE_DICT.values()), db=DB),
+		expand("output/analysis/{gene}_accessions.txt", gene=set(FOCAL_GENE_DICT.values())),
+		expand("output/analysis/sequence_assignments/{focal_gene}_{db}.csv", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
+		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.snps.tsv", focal_gene=FOCAL_GENE_DICT.keys()),
 		expand("data/{db}_db.fa", db=DB),	
-		expand("output/contigs/{gene}_combined_contigs.fa", gene=GENES),
-		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa", focal_gene=FOCAL_GENES),
-		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa.dedup.aln", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.fa", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/{focal_gene}_extracted.fa", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.gfa.coloured.gfa", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/{focal_gene}_{db}.output_dists.csv", focal_gene=FOCAL_GENES, db=DB),
-		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.json", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/{focal_gene}.gene_block.txt", focal_gene=FOCAL_GENES),
-		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/plots/{db}_plot_breakpoint_distances-all.pdf", focal_gene=FOCAL_GENES, db=DB),
+		expand("output/contigs/{gene}_combined_contigs.fa", gene=set(FOCAL_GENE_DICT.values())),
+		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa.dedup.aln", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.fa", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/{focal_gene}_extracted.fa", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.gfa.coloured.gfa", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/{focal_gene}_{db}.output_dists.csv", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
+		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.json", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/{focal_gene}.gene_block.txt", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/{db}_plot_breakpoint_distances-all.pdf", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
 		#expand("output/contigs/{focal_gene}/{focal_gene}_pangraph.gfa", focal_gene=FOCAL_GENES) if config["panx_export"]==True else expand("DB/plots/{db}-variants/{gene}.pdf", gene=GENES, db=DB)
-		expand("output/pangraph/{focal_gene}/plots/bandage.log_file", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/plots/linear_blocks.pdf", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/plots/{focal_gene}_bandage_and_linear.logfile", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/positional_entropies.txt", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/plots/positional_entropies.pdf", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus.pdf", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/plots/positional_entropies_relative.pdf", focal_gene=FOCAL_GENES),
-		expand("output/pangraph/{focal_gene}/plots/{db}_NJ_tree_central_gene.pdf", focal_gene=FOCAL_GENES, db=DB),
-		expand("output/pangraph/{focal_gene}/plots/{db}_breakpoint_and_NJ.logfile", focal_gene=FOCAL_GENES, db=DB)
+		expand("output/pangraph/{focal_gene}/plots/bandage.log_file", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/linear_blocks.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/{focal_gene}_bandage_and_linear.logfile", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/positional_entropies.txt", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/{db}_NJ_tree_central_gene.pdf", focal_gene=FOCAL_GENE_DICT.keys(), db=DB),
+		expand("output/pangraph/{focal_gene}/plots/{db}_breakpoint_and_NJ.logfile", focal_gene=FOCAL_GENE_DICT.keys(), db=DB)
 
 #############################
 ### SETTING UP DATABASES ####
@@ -309,12 +294,12 @@ rule positional_entropies:
 	output:
 		real="output/pangraph/{focal_gene}/positional_entropies.txt",
 		consensus="output/pangraph/{focal_gene}/positional_entropies_consensus.txt",
-		real_relative="output/pangraph/{focal_gene}/positional_entropies_relative.txt"
+		consensus_relative="output/pangraph/{focal_gene}/positional_entropies_consensus_relative.txt"
 	run:
 		shell("makeblastdb -in {params.blastdb_fasta} -dbtype 'nucl'")
-		shell("blastn -query {params.gene_query} -db {params.blastdb_fasta} -outfmt '6 sseqid sstart send' > {params.gene_locations}")
+		shell("blastn -max_hsps 10000 -query {params.gene_query} -db {params.blastdb_fasta} -outfmt '6 sseqid sstart send' > {params.gene_locations}")
 		shell("python scripts/positional_entropy.py --json {input} --normalise > {output.real}")
-		shell("python scripts/positional_entropy.py --json {input} --normalise --genelocations {params.gene_locations} > {output.real_relative}")
+		shell("python scripts/positional_entropy.py --json {input} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative}")
 		shell("python scripts/positional_entropy.py --json {input} --normalise --consensus > {output.consensus}")
 
 #############################
@@ -338,11 +323,11 @@ rule plot_positional_entropies_consensus:
 	run:
 		shell("Rscript scripts/plot_entropies.R {input} --output_pdf {output} ")
 
-rule plot_positional_entropies_real_relative:
+rule plot_positional_entropies_consensus_relative:
 	input:
-		"output/pangraph/{focal_gene}/positional_entropies_relative.txt"
+		"output/pangraph/{focal_gene}/positional_entropies_consensus_relative.txt"
 	output:
-		"output/pangraph/{focal_gene}/plots/positional_entropies_relative.pdf"
+		"output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative.pdf"
 	run:
 		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
 
