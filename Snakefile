@@ -13,9 +13,9 @@ FOCAL_GENE_DICT = {"CMY-2": "CMY",
 					"TEM-1": "TEM",
 					"OXA-10": "OXA",
 					"OXA-48":"OXA"}
-rule all:
+rule all: # first rule - by default, runs pangraph (assumes have downloaded data etc.)
 	input:
-		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.fa", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.json", focal_gene=FOCAL_GENE_DICT.keys()),
 
 rule gene_db:
 	input:
