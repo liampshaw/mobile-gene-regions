@@ -5,3 +5,6 @@ DB/*
 __pycache__/*
 scripts/__pycache__/
 scripts/__pycache__/*pyc
+*.txt
+*pdf
+*csv
