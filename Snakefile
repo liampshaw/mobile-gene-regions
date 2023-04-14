@@ -304,28 +304,51 @@ rule compute_distances:
 											--snps {input.snps}\
 											--output {output}"
 
+rule copied_assignments:
+	input:
+		expand("output/analysis/sequence_assignments/{focal_gene}.csv", focal_gene=FOCAL_GENE_DICT.keys())
+
+rule copy_assignments:
+	input:
+		"output/analysis/sequence_assignments/{focal_gene}_CARD.csv"
+	output:
+		"output/analysis/sequence_assignments/{focal_gene}.csv"
+	shell:
+		"cp {input} {output}"
+
 rule positional_entropies:
 	input:
-		"output/pangraph/{focal_gene}/{focal_gene}_pangraph.json"
+		pangraph="output/pangraph/{focal_gene}/{focal_gene}_pangraph.json",
 	params:
 		blastdb_fasta="output/pangraph/{focal_gene}/{focal_gene}_extracted.fa",
 		gene_query="data/focal_genes/{focal_gene}.fa",
-		gene_locations="output/pangraph/{focal_gene}/{focal_gene}_gene_locations.txt"
+		gene_locations="output/pangraph/{focal_gene}/{focal_gene}_gene_locations.txt",
+		assignments="output/analysis/sequence_assignments/{focal_gene}.csv"
 	output:
 		real="output/pangraph/{focal_gene}/positional_entropies.txt",
 		consensus="output/pangraph/{focal_gene}/positional_entropies_consensus.txt",
-		consensus_relative="output/pangraph/{focal_gene}/positional_entropies_consensus_relative.txt"
+		consensus_relative="output/pangraph/{focal_gene}/positional_entropies_consensus_relative.txt",
+		consensus_relative_focal="output/pangraph/{focal_gene}/positional_entropies_consensus_relative_focal.txt",
+		focal_subset="output/pangraph/{focal_gene}/{focal_gene}_focal_subset.txt"
 	run:
 		shell("makeblastdb -in {params.blastdb_fasta} -dbtype 'nucl'")
 		shell("blastn -max_hsps 10000 -query {params.gene_query} -db {params.blastdb_fasta} -outfmt '6 sseqid sstart send' > {params.gene_locations}")
-		shell("python scripts/positional_entropy.py --json {input} --normalise > {output.real}")
-		shell("python scripts/positional_entropy.py --json {input} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative}")
-		shell("python scripts/positional_entropy.py --json {input} --normalise --consensus > {output.consensus}")
+		shell("grep $(head -n 1 {params.gene_query} | tr -d '>') {params.assignments} | cut -d ',' -f 1 > {output.focal_subset}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise > {output.real}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --subset {output.focal_subset} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative_focal}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus > {output.consensus}")
 
 #############################
 ##### PLOTTING OUTPUTS  #####
 #############################
 
+rule plot_positional_entropies:
+	input:
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative.pdf", focal_gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative_focal.pdf", focal_gene=FOCAL_GENE_DICT.keys())
 
 rule plot_positional_entropies_real:
 	input:
@@ -350,6 +373,16 @@ rule plot_positional_entropies_consensus_relative:
 		"output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative.pdf"
 	run:
 		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
+
+rule plot_positional_entropies_consensus_relative_focal:
+	input:
+		"output/pangraph/{focal_gene}/positional_entropies_consensus_relative_focal.txt"
+	output:
+		"output/pangraph/{focal_gene}/plots/positional_entropies_consensus_relative_focal.pdf"
+	run:
+		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
+
+
 
 rule breakpoint_distances_plot:
 	input:
