@@ -351,6 +351,10 @@ rule plot_positional_entropies_consensus_relative:
 	run:
 		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
 
+rule breakpoint_distances_plot:
+	input:
+		expand("output/pangraph/{focal_gene}/plots/{db}_plot_breakpoint_distances-all.pdf", 
+			focal_gene=FOCAL_GENE_DICT.keys(), db=DB)
 
 rule plot_breakpoint_distances:
 	input:
