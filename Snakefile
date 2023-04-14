@@ -35,7 +35,7 @@ rule seqs_extracted_snps:
 	input:
 		expand("output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.snps.tsv", focal_gene=FOCAL_GENE_DICT.keys())
 
-rule db:
+rule download_db:
 	input:
 		expand("data/{db}_db.fa", db=DB)
 
