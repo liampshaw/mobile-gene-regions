@@ -87,7 +87,7 @@ makePlots <- function(df){
       xlim(c(-dist.max, 0))+
       theme(plot.title=element_text(hjust=0.5))+
       annotation_custom(tableGrob(snp.comparison.table, theme=table.theme, rows=NULL), 
-                        xmax=-dist.max*3.5/5, ymax=1)
+                        xmax=-dist.max*3.5/5, ymax=1.5)
 
 
     p.downstream <- ggplot(df, aes( dist.down,group=snps.categorical, colour=snps.categorical))+
