@@ -10,3 +10,5 @@ scripts/__pycache__/*pyc
 *csv
 *svg
 *lst
+.Rdata
+.Rhistory

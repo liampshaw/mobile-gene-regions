@@ -68,7 +68,7 @@ makePlots <- function(df){
     colhead = list(fg_params=list(cex = 0.5)),
     rowhead = list(fg_params=list(cex = 0.5)))
 
-    p.upstream <-  ggplot(df, aes( -dist.up, group=snps.categorical, colour=snps.categorical, y = 1 - ..y..))+
+    p.upstream <-  ggplot(df, aes( -dist.up, group=snps.categorical, colour=snps.categorical))+
       stat_ecdf()+
       theme_bw()+
       theme(legend.position = "none")+
@@ -87,8 +87,7 @@ makePlots <- function(df){
       xlim(c(-dist.max, 0))+
       theme(plot.title=element_text(hjust=0.5))+
       annotation_custom(tableGrob(snp.comparison.table, theme=table.theme, rows=NULL), 
-                        xmax=-dist.max*3.5/5, ymax=0.4)+
-      scale_y_reverse()
+                        xmax=-dist.max*3.5/5, ymax=1)
 
 
     p.downstream <- ggplot(df, aes( dist.down,group=snps.categorical, colour=snps.categorical))+
@@ -114,7 +113,9 @@ makePlots <- function(df){
         theme(plot.title=element_text(hjust=0.5))+
       scale_y_reverse()
 
-    p = cowplot::plot_grid(p.upstream, p.downstream, rel_widths = c(0.8, 1))
+    p = cowplot::plot_grid(p.upstream, p.downstream, 
+                           rel_widths  = c(0.855, 1),
+                           align = "h")
 
 
     return(p)
