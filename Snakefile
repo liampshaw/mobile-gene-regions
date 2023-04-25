@@ -1,5 +1,5 @@
 # See configfile in e.g. configs/laptop_config.yaml for parameters
-# DB = config["DB"]
+DB = config["DB"]
 # #FOCAL_GENE_DICT = config["focal_gene_dict"]
 # FOCAL_GENE_DICT = {"CMY-2": "CMY", 
 # 					"CTX-M-15": "CTX-M",
@@ -20,6 +20,10 @@ FOCAL_GENE_DICT = {"GES-24": "GES"}
 rule run_pangraph:
 	input:
 		expand("output/pangraph/{focal_gene}/{focal_gene}_pangraph.json", focal_gene=FOCAL_GENE_DICT.keys())
+
+rule calculate_distances:
+	input:
+		expand("output/pangraph/{focal_gene}/{focal_gene}.output_dists.csv", focal_gene=FOCAL_GENE_DICT.keys())
 
 rule make_plots:
 	input:
@@ -58,9 +62,9 @@ rule extract_genes_from_contigs:
 rule name_observed_genes:
 	input:
 		fasta="output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.fa",
-		variants="DB/variant_fasta/{focal_gene}_{db}.fa"
+		variants="DB/variant_fasta/{focal_gene}.fa"
 	output:
-		"output/analysis/sequence_assignments/{focal_gene}_{db}.csv"
+		"output/analysis/sequence_assignments/{focal_gene}.csv"
 	shell:
 		"python scripts/name_variants.py --variant_fasta {input.variants} --output_file {output} --input_fasta {input.fasta}"
 
@@ -165,7 +169,7 @@ rule compute_distances:
 		gene_block="output/pangraph/{focal_gene}/{focal_gene}.gene_block.txt",
 		snps="output/analysis/sequence/{focal_gene}_seqs_extracted_from_contigs.snps.tsv"
 	output:
-		"output/pangraph/{focal_gene}/{focal_gene}_{db}.output_dists.csv"
+		"output/pangraph/{focal_gene}/{focal_gene}.output_dists.csv"
 	shell:
 		"python scripts/compute_distances.py --block_csv {input.block_csv} \
 											--gene_block_file {input.gene_block} \
