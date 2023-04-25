@@ -20,7 +20,7 @@ rule all: # first rule - by default, runs pangraph (assumes have downloaded data
 rule gene_db:
 	input:
 		expand("DB/gene_alns/{gene}_{db}.tsv", gene=set(FOCAL_GENE_DICT.values()), db=DB),
-		expand("DB/genes_plots/{db}-variants/{gene}.pdf", gene=set(FOCAL_GENE_DICT.values()), db=DB),
+		expand("DB/genes_plots/{db}-variants/{gene}.pdf", gene=set(FOCAL_GENE_DICT.values()), db=DB)
 
 
 rule accessions:
