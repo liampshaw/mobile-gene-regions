@@ -175,3 +175,27 @@ rule compute_distances:
 											--gene_block_file {input.gene_block} \
 											--snps {input.snps}\
 											--output {output}"
+
+rule positional_entropies:
+	input:
+		pangraph="output/pangraph/{focal_gene}/{focal_gene}_pangraph.json",
+	params:
+		blastdb_fasta="output/pangraph/{focal_gene}/{focal_gene}_extracted.fa",
+		gene_query="data/focal_genes/{focal_gene}.fa",
+		gene_locations="output/pangraph/{focal_gene}/{focal_gene}_gene_locations.txt",
+		assignments="output/analysis/sequence_assignments/{focal_gene}.csv"
+	output:
+		real="output/pangraph/{focal_gene}/positional_entropies.txt",
+		consensus="output/pangraph/{focal_gene}/positional_entropies_consensus.txt",
+		consensus_relative="output/pangraph/{focal_gene}/positional_entropies_consensus_relative.txt",
+		consensus_relative_focal="output/pangraph/{focal_gene}/positional_entropies_consensus_relative_focal.txt",
+		focal_subset="output/pangraph/{focal_gene}/{focal_gene}_focal_subset.txt"
+	run:
+		shell("makeblastdb -in {params.blastdb_fasta} -dbtype 'nucl'")
+		shell("blastn -max_hsps 10000 -query {params.gene_query} -db {params.blastdb_fasta} -outfmt '6 sseqid sstart send' > {params.gene_locations}")
+		shell("grep $(head -n 1 {params.gene_query} | tr -d '>') {params.assignments} | cut -d ',' -f 1 > {output.focal_subset}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise > {output.real}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --subset {output.focal_subset} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative_focal}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus > {output.consensus}")
+
