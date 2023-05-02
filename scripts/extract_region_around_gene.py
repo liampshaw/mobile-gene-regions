@@ -95,6 +95,40 @@ def blast_search(query_fasta, db_fasta):
     else:
         blast_output = blast_output[:-1]
         blast_results = np.reshape(blast_output, (-1, 11))
+
+
+        # RESHAPING
+        print(blast_results)
+        blast_results_struc = np.array(blast_results, dtype = np.dtype([('sseqid', np.str_, 16),
+                                ('sstart', np.int32), 
+                                ('send', np.int32),
+                                ('length', np.int32),
+                                ('nident', np.int32),
+                                ('gaps', np.int32),
+                                ('pident', np.float64),
+                                ('qlen', np.int32),
+                                ('qstart', np.int32),
+                                ('qend', np.int32),
+                                ('mismatch', np.int32)]))
+        print(blast_results)
+        # type conversions
+        #blast_results[:, 1:5] = blast_results[:, 1:5].astype(int)
+        #blast_results[:, 6] = blast_results[:, 6].astype(float)
+        #blast_results[:, 7:] = blast_results[:, 7:].astype(float)
+        #print(blast_results.dtype)
+
+        # Only select those with ~full-length hits (allow 95%)
+        print(len(blast_results))
+        #print(blast_results[:, 3])
+        #print(0.95*blast_results[:,7])
+        #mask = blast_results[:, 3] > 0.95 * blast_results[:, 7]
+        #blast_results_mask = blast_results[mask]
+        #print(blast_results[:,6].dtype())
+        blast_results_mask = blast_results[float(blast_results[:, 3]) > 0.95 * float(blast_results[:, 7])]
+        print(len(blast_results_mask))
+        # RESHAPING
+
+
         contigs_with_hits = list(blast_results[:,0])
         contigs_one_hit = [x for x in set(contigs_with_hits) if contigs_with_hits.count(x)==1]
         contigs_multiple_hits = [x for x in set(contigs_with_hits) if contigs_with_hits.count(x)>1]
