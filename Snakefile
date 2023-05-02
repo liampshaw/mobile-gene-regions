@@ -17,7 +17,8 @@ DB = config["DB"]
 FOCAL_GENE_DICT = {"GES-24": "GES",
 					"blah":"blah",
 					"MCR-1.1": "MCR",
-					"acrB": "acrB"}
+					"acrB": "acrB",
+					"catP": "catP"}
 
 
 rule prepare_DB:
