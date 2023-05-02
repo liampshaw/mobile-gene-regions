@@ -15,8 +15,15 @@ DB = config["DB"]
 # 					"OXA-48":"OXA"}
 
 FOCAL_GENE_DICT = {"GES-24": "GES",
-					"blah":"blah"}
+					"blah":"blah",
+					"MCR-1.1": "MCR",
+					"acrB": "acrB"}
 
+
+rule prepare_DB:
+	input:
+		expand("DB/gene_fasta/{gene}.fa", gene=FOCAL_GENE_DICT.values()),
+		expand("output/analysis/sequence_assignments/{gene}.csv", gene=FOCAL_GENE_DICT.keys())
 
 rule run_pangraph:
 	input:
@@ -34,6 +41,17 @@ rule make_plots:
 		#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 		#expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys())
 
+
+rule extract_genes_DB:
+	input:
+		fasta="data/CARD_db.fa"
+	params:
+		gene_name="{gene}"
+	output:
+		"DB/gene_fasta/{gene}.fa"
+	shell:
+		"python scripts/extract_gene_DB.py {input.fasta} {params.gene_name} CARD {output}"
+
 #############################
 # GETTING CONTIG DATA READY #
 #############################
@@ -48,7 +66,7 @@ rule make_plots:
 rule extract_genes_from_contigs:
 	input:
 		gene_fasta="data/focal_genes/{gene}.fa",
-		input_fasta="output/contigs/{gene}_combined_contigs.fa"
+		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_combined_contigs.fa"
 	params:
 		snp_threshold=int(config["snp_threshold"])
 	output:
@@ -61,14 +79,14 @@ rule extract_genes_from_contigs:
 												--downstream 0 \
 												--threshold {params.snp_threshold}"
 
-# rule name_observed_genes:
-# 	input:
-# 		fasta="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa",
-# 		variants="DB/variant_fasta/{gene}.fa"
-# 	output:
-# 		"output/analysis/sequence_assignments/{gene}.csv"
-# 	shell:
-# 		"python scripts/name_variants.py --variant_fasta {input.variants} --output_file {output} --input_fasta {input.fasta}"
+rule assign_variants:
+	input:
+		fasta="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa",
+		variants= lambda wildcards: f"DB/gene_fasta/{FOCAL_GENE_DICT[wildcards.gene]}"+".fa"
+	output:
+		"output/analysis/sequence_assignments/{gene}.csv"
+	shell:
+		"python scripts/name_variants.py --variant_fasta {input.variants} --output_file {output} --input_fasta {input.fasta}"
 
 #############################
 # RUNNING PANGRAPH PIPELINE #
@@ -76,7 +94,7 @@ rule extract_genes_from_contigs:
 
 rule extract_region_around_focal_gene:
 	input:
-		input_fasta="output/contigs/{gene}_combined_contigs.fa"
+		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_combined_contigs.fa"
 	params:
 		gene="data/focal_genes/{gene}.fa",
 		prefix="output/pangraph/{gene}/{gene}_extracted",
@@ -214,9 +232,9 @@ rule plot_breakpoint_distances:
 	output:
 		"output/pangraph/{gene}/plots/plot_breakpoint_distances-all.pdf",
 	shell:
-		"Rscript scripts/plot_output_dists.R {input.dists} {input.deduplicated_focal_gene} {input.variant_assignments}\
+		"Rscript scripts/plot_output_dists.R {input.dists} {input.deduplicated_gene} {input.variant_assignments}\
 						--output_pdf_prefix {params.output_pdf_prefix} \
-						--focal_gene {params.focal_gene}"
+						--focal_gene {params.gene}"
 
 rule plot_linear_blocks:
 	input:
