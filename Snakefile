@@ -14,11 +14,12 @@ DB = config["DB"]
 # 					"OXA-10": "OXA",
 # 					"OXA-48":"OXA"}
 
-FOCAL_GENE_DICT = {"GES-24": "GES",
-					"blah":"blah",
-					"MCR-1.1": "MCR",
-					"acrB": "acrB",
-					"catP": "catP"}
+# FOCAL_GENE_DICT = {"GES-24": "GES",
+# 					"blah":"blah",
+# 					"MCR-1.1": "MCR",
+# 					"acrB": "acrB",
+# 					"catP": "catP",
+FOCAL_GENE_DICT = {				"aaeA": "aaeA"}
 
 
 rule prepare_DB:
