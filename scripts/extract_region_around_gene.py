@@ -130,7 +130,7 @@ def extract_regions(sequences, blast_hits, gene_length, length_threshold=0.99, i
 
     for seq_id, hit in blast_hits.items():
         if hit=="multiple_hits":
-            print('WARNING: Contig '+seq_id+' has multiple blast hits. Not including in output.')
+            print('WARNING: Contig '+seq_id+' has multiple full-length blast hits (>95% coverage). Not including in output.')
         else:
             contig_seq = str(sequences[seq_id].seq)
             #print(region_seq)
