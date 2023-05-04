@@ -19,7 +19,12 @@ DB = config["DB"]
 # 					"MCR-1.1": "MCR",
 # 					"acrB": "acrB",
 # 					"catP": "catP",
-FOCAL_GENE_DICT = {				"aaeA": "aaeA"}
+FOCAL_GENE_DICT = {"MCR-1.1": "MCR", 
+					"aaeA": "aaeA", 
+					"NDM-1": "NDM", 
+					"catP":"catP",
+					"GES-24": "GES",
+					"CTX-M-15": "CTX-M"}
 
 
 rule prepare_DB:
@@ -185,18 +190,43 @@ rule find_focal_gene_block:
 		shell("makeblastdb -in {input.pangraph_fasta} -dbtype 'nucl'"),
 		shell("blastn -query {input.gene} -db {input.pangraph_fasta} -outfmt 6 | cut -f 2 > {output}")
 
+
+rule gene_locations:
+	input:
+		gene="data/focal_genes/{gene}.fa",
+		db="output/pangraph/{gene}/{gene}_extracted.fa",
+		gene_block="output/pangraph/{gene}/{gene}.gene_block.txt"
+	output:
+		"output/pangraph/{gene}/{gene}_gene_locations_block.txt"
+	run:
+		shell("makeblastdb -in {input.db} -dbtype 'nucl'")
+		shell("blastn -max_hsps 10000 -query {input.gene} -db {input.db} -outfmt '6 sseqid sstart send' > {output}")
+		#shell("grep -A 100000 'TSPGOIQZLU' output/pangraph/aaeA/aaeA_pangraph.fa  | grep -B 99999 -m2 ">" | awk '$1!="--"' | head -n -1)")
+
+
 rule compute_distances:
 	input:
+		gene_fasta="data/focal_genes/{gene}.fa",
 		block_csv="output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv",
 		gene_block="output/pangraph/{gene}/{gene}.gene_block.txt",
-		snps="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.snps.tsv"
+		snps="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.snps.tsv",
+		#locations="output/pangraph/{gene}/{gene}_gene_locations.txt",
+		pangraph_fasta="output/pangraph/{gene}/{gene}_pangraph.fa"
 	output:
-		"output/pangraph/{gene}/{gene}.output_dists.csv"
-	shell:
-		"python scripts/compute_distances.py --block_csv {input.block_csv} \
+		gene_block_fasta="output/pangraph/{gene}/{gene}.gene_block.fa",
+		gene_rel_locations="output/pangraph/{gene}/{gene}_relative_locations_block.txt",
+		dists="output/pangraph/{gene}/{gene}.output_dists.csv"
+	run:
+	# This doesn't work well - pipe problems
+	# because what if only one > in the output of first pipe?
+		shell("./scripts/extract_seq_from_fasta.sh {input.pangraph_fasta} $(cat {input.gene_block}) > {output.gene_block_fasta}")
+		shell("makeblastdb -in {output.gene_block_fasta} -dbtype 'nucl'")
+		shell("blastn -max_hsps 10000 -query {input.gene_fasta} -db {output.gene_block_fasta} -outfmt '6 sstart send slen' > {output.gene_rel_locations}")
+		shell("python scripts/compute_distances.py --block_csv {input.block_csv} \
 											--gene_block_file {input.gene_block} \
 											--snps {input.snps}\
-											--output {output}"
+											--output {output.dists}\
+											--gene_offset {output.gene_rel_locations}")
 
 # rule positional_entropies:
 # 	input:
