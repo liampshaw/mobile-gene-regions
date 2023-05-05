@@ -53,7 +53,6 @@ def main():
     with open(args.gene_offset, 'r') as f:
         gene_offset = f.read().strip('\n').split('\t')
         # formatted as balst output of focal gene against the consensus gene block: sstart send slen 
-    print(gene_offset)
     gene_offset_upstream = int(gene_offset[0])
     gene_offset_downstream = int(gene_offset[2])-int(gene_offset[1])
     block_lengths = {}
@@ -70,7 +69,6 @@ def main():
                     block_lengths[line[1]][line[0]] = abs(int(line[4])-int(line[3]))
                 else:
                     block_lengths[line[1]] = {line[0]: abs(int(line[4])-int(line[3]))}
-    print(block_lengths)
     # Generate snp-dists?
     starting_block = open(args.gene_block_file, "r").readline().strip("\n")
 
