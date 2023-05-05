@@ -46,7 +46,8 @@ rule make_plots:
 	input:
 		expand("output/pangraph/{gene}/plots/linear_blocks.pdf", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
-			gene=FOCAL_GENE_DICT.keys())
+			gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys())
 		#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 		#expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys())
 
@@ -303,6 +304,7 @@ rule combine_linear_and_bandage:
 	shell:
 		"Rscript scripts/combine_two_plots.R {input.linear} {params.bandage} --output_pdf {params.output_pdf} > {output}" if config["bandage"]==True else
 		"echo 'Bandage not run' > {output}"
+
 
 # rule plot_NJ_tree_central_gene:
 # 	input:
