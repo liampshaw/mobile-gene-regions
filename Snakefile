@@ -19,8 +19,7 @@ DB = config["DB"]
 # 					"TEM-1": "TEM",
 # 					"OXA-10": "OXA",
 # 					"OXA-48":"OXA"}
-FOCAL_GENE_DICT = {"GES-24":"GES",
-					"MCR-1.1":"MCR"}
+FOCAL_GENE_DICT = {"MCR-1.1":"MCR"}
 
 rule prepare_DB:
 	input:
