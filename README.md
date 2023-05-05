@@ -10,6 +10,13 @@ For the beta-lactamases, using CARD prevalence data, we obtain sequences contain
 
 NEW:
 
+Dependencies should be able to be installed with:
+
+```
+mamba env create -f bl-region-env.yaml
+conda activate bl-region-env
+```
+
 For a given 'focal' gene, there are two input files required:
 
 * `input/focal_genes/{gene}.fa` - the focal gene of interest 
