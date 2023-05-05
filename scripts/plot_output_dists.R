@@ -71,7 +71,7 @@ makePlots <- function(df){
     p.upstream <-  ggplot(df, aes( -dist.up, group=snps.categorical, colour=snps.categorical))+
       stat_ecdf()+
       theme_bw()+
-      geom_vline(xintercept=0, linetype='dashed')+
+    annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')
       theme(legend.position = "none")+
       labs(colour="SNPs")+
       ylab("cdf")+
@@ -94,7 +94,7 @@ makePlots <- function(df){
     p.downstream <- ggplot(df, aes( dist.down,group=snps.categorical, colour=snps.categorical))+
       stat_ecdf()+
       theme_bw()+
-      geom_vline(xintercept=0, linetype='dashed')+
+    annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')
       labs(colour="SNPs")+
       ylab("cdf")+
       xlab("distance from gene (bp)")+
