@@ -24,7 +24,9 @@ FOCAL_GENE_DICT = {"MCR-1.1": "MCR",
 					"NDM-1": "NDM", 
 					"catP":"catP",
 					"GES-24": "GES",
-					"CTX-M-15": "CTX-M"}
+					"CTX-M-15": "CTX-M",
+					"rapA": "rapA",
+					"mefA":"mefA"}
 
 
 rule prepare_DB:
@@ -43,7 +45,7 @@ rule calculate_distances:
 rule make_plots:
 	input:
 		expand("output/pangraph/{gene}/plots/linear_blocks.pdf", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/plot_breakpoint_distances-all.pdf", 
+		expand("output/pangraph/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
 			gene=FOCAL_GENE_DICT.keys())
 		#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 		#expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys())
@@ -260,9 +262,9 @@ rule plot_breakpoint_distances:
 		variant_assignments="output/analysis/sequence_assignments/{gene}.csv"
 	params:
 		gene="{gene}",
-		output_pdf_prefix="output/pangraph/{gene}/plots/plot_breakpoint_distances"
+		output_pdf_prefix="output/pangraph/{gene}/plots/{gene}_breakpoint_distances"
 	output:
-		"output/pangraph/{gene}/plots/plot_breakpoint_distances-all.pdf",
+		"output/pangraph/{gene}/plots/{gene}_breakpoint_distances-all.pdf",
 	shell:
 		"Rscript scripts/plot_output_dists.R {input.dists} {input.deduplicated_gene} {input.variant_assignments}\
 						--output_pdf_prefix {params.output_pdf_prefix} \
