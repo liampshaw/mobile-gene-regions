@@ -1,7 +1,13 @@
 # See configfile in e.g. configs/laptop_config.yaml for parameters
 DB = config["DB"]
 # #FOCAL_GENE_DICT = config["focal_gene_dict"]
-# FOCAL_GENE_DICT = {"CMY-2": "CMY", 
+# FOCAL_GENE_DICT = {"MCR-1.1": "MCR", 
+# 					"aaeA": "aaeA", 
+# 					"catP":"catP",
+# 					"GES-24": "GES",
+# 					"rapA": "rapA",
+# 					"mefA":"mefA",
+# 					"CMY-2": "CMY", 
 # 					"CTX-M-15": "CTX-M",
 # 					"CTX-M-65":"CTX-M",
 # 					"GES-24":"GES",
@@ -13,21 +19,8 @@ DB = config["DB"]
 # 					"TEM-1": "TEM",
 # 					"OXA-10": "OXA",
 # 					"OXA-48":"OXA"}
-
-# FOCAL_GENE_DICT = {"GES-24": "GES",
-# 					"blah":"blah",
-# 					"MCR-1.1": "MCR",
-# 					"acrB": "acrB",
-# 					"catP": "catP",
-FOCAL_GENE_DICT = {"MCR-1.1": "MCR", 
-					"aaeA": "aaeA", 
-					"NDM-1": "NDM", 
-					"catP":"catP",
-					"GES-24": "GES",
-					"CTX-M-15": "CTX-M",
-					"rapA": "rapA",
-					"mefA":"mefA"}
-
+FOCAL_GENE_DICT = {"GES-24":"GES",
+					"MCR-1.1":"MCR"}
 
 rule prepare_DB:
 	input:
@@ -47,7 +40,8 @@ rule make_plots:
 		expand("output/pangraph/{gene}/plots/linear_blocks.pdf", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
 			gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys())
+		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENE_DICT.keys())
 		#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 		#expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys())
 
@@ -75,7 +69,7 @@ rule extract_genes_DB:
 
 rule extract_genes_from_contigs:
 	input:
-		gene_fasta="data/focal_genes/{gene}.fa",
+		gene_fasta="input/focal_genes/{gene}.fa",
 		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_combined_contigs.fa"
 	params:
 		snp_threshold=int(config["snp_threshold"])
@@ -106,13 +100,13 @@ rule extract_region_around_focal_gene:
 	input:
 		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_combined_contigs.fa"
 	params:
-		gene="data/focal_genes/{gene}.fa",
+		gene="input/focal_genes/{gene}.fa",
 		prefix="output/pangraph/{gene}/{gene}_extracted",
 		upstream=config["region_upstream"],
 		downstream=config["region_downstream"],
 		threshold=int(config["snp_threshold"])
 	output:
-		"output/pangraph/{gene}/{gene}_extracted.fa"#,
+		"output/pangraph/{gene}/{gene}_extracted.fa"
 	shell: 
 		"python scripts/extract_region_around_gene.py --gene {params.gene} --input {input.input_fasta} \
 		--upstream {params.upstream} --downstream {params.upstream} --complete --output_fasta {params.prefix}.fa\
@@ -185,7 +179,7 @@ rule convert_pangraph_to_block_list:
 
 rule find_focal_gene_block:
 	input:
-		gene="data/focal_genes/{gene}.fa",
+		gene="input/focal_genes/{gene}.fa",
 		pangraph_fasta="output/pangraph/{gene}/{gene}_pangraph.fa"
 	output:
 		"output/pangraph/{gene}/{gene}.gene_block.txt"
@@ -196,7 +190,7 @@ rule find_focal_gene_block:
 
 rule gene_locations:
 	input:
-		gene="data/focal_genes/{gene}.fa",
+		gene="input/focal_genes/{gene}.fa",
 		db="output/pangraph/{gene}/{gene}_extracted.fa",
 		gene_block="output/pangraph/{gene}/{gene}.gene_block.txt"
 	output:
@@ -204,12 +198,10 @@ rule gene_locations:
 	run:
 		shell("makeblastdb -in {input.db} -dbtype 'nucl'")
 		shell("blastn -max_hsps 10000 -query {input.gene} -db {input.db} -outfmt '6 sseqid sstart send' > {output}")
-		#shell("grep -A 100000 'TSPGOIQZLU' output/pangraph/aaeA/aaeA_pangraph.fa  | grep -B 99999 -m2 ">" | awk '$1!="--"' | head -n -1)")
-
 
 rule compute_distances:
 	input:
-		gene_fasta="data/focal_genes/{gene}.fa",
+		gene_fasta="input/focal_genes/{gene}.fa",
 		block_csv="output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv",
 		gene_block="output/pangraph/{gene}/{gene}.gene_block.txt",
 		snps="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.snps.tsv",
@@ -220,8 +212,6 @@ rule compute_distances:
 		gene_rel_locations="output/pangraph/{gene}/{gene}_relative_locations_block.txt",
 		dists="output/pangraph/{gene}/{gene}.output_dists.csv"
 	run:
-	# This doesn't work well - pipe problems
-	# because what if only one > in the output of first pipe?
 		shell("./scripts/extract_seq_from_fasta.sh {input.pangraph_fasta} $(cat {input.gene_block}) > {output.gene_block_fasta}")
 		shell("makeblastdb -in {output.gene_block_fasta} -dbtype 'nucl'")
 		shell("blastn -max_hsps 10000 -query {input.gene_fasta} -db {output.gene_block_fasta} -outfmt '6 sstart send slen' > {output.gene_rel_locations}")
@@ -231,30 +221,24 @@ rule compute_distances:
 											--output {output.dists}\
 											--gene_offset {output.gene_rel_locations}")
 
-# rule positional_entropies:
-# 	input:
-# 		pangraph="output/pangraph/{gene}/{gene}_pangraph.json",
-# 	params:
-# 		blastdb_fasta="output/pangraph/{gene}/{gene}_extracted.fa",
-# 		gene_query="data/focal_genes/{gene}.fa",
-# 		gene_locations="output/pangraph/{gene}/{gene}_gene_locations.txt",
-# 		assignments="output/analysis/sequence_assignments/{gene}.csv"
-# 	output:
-# 		real="output/pangraph/{gene}/positional_entropies.txt",
-# 		consensus="output/pangraph/{gene}/positional_entropies_consensus.txt",
-# 		consensus_relative="output/pangraph/{gene}/positional_entropies_consensus_relative.txt",
-# 		consensus_relative_focal="output/pangraph/{gene}/positional_entropies_consensus_relative_focal.txt",
-# 		focal_subset="output/pangraph/{gene}/{gene}_focal_subset.txt"
-# 	run:
-# 		shell("makeblastdb -in {params.blastdb_fasta} -dbtype 'nucl'")
-# 		shell("blastn -max_hsps 10000 -query {params.gene_query} -db {params.blastdb_fasta} -outfmt '6 sseqid sstart send' > {params.gene_locations}")
-# 		shell("grep $(head -n 1 {params.gene_query} | tr -d '>') {params.assignments} | cut -d ',' -f 1 > {output.focal_subset}")
-# 		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise > {output.real}")
-# 		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative}")
-# 		shell("python scripts/positional_entropy.py --json {input.pangraph} --subset {output.focal_subset} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative_focal}")
-# 		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus > {output.consensus}")
-
-
+rule positional_entropies:
+	input:
+		pangraph="output/pangraph/{gene}/{gene}_pangraph.json",
+	params:
+		blastdb_fasta="output/pangraph/{gene}/{gene}_extracted.fa",
+		gene_query="input/focal_genes/{gene}.fa",
+		gene_locations="output/pangraph/{gene}/{gene}_gene_locations.txt",
+		assignments="output/analysis/sequence_assignments/{gene}.csv"
+	output:
+		real="output/pangraph/{gene}/positional_entropies.txt",
+		consensus="output/pangraph/{gene}/positional_entropies_consensus.txt",
+		consensus_relative="output/pangraph/{gene}/positional_entropies_consensus_relative.txt"
+	run:
+		shell("makeblastdb -in {params.blastdb_fasta} -dbtype 'nucl'")
+		shell("blastn -max_hsps 10000 -query {params.gene_query} -db {params.blastdb_fasta} -outfmt '6 sseqid sstart send' > {params.gene_locations}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise > {output.real}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative}")
+		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus > {output.consensus}")
 
 rule plot_breakpoint_distances:
 	input:
@@ -292,19 +276,27 @@ rule plot_bandage:
 		"Bandage image {input} {params.output_png} --height 4000 --width 7000 --colour custom > {output}" if config["bandage"]==True else
 		"echo 'Bandage not run' > {output}"
 
-rule combine_linear_and_bandage:
-	input:
-		linear="output/pangraph/{gene}/plots/linear_blocks.pdf",
-		bandage_logfile="output/pangraph/{gene}/plots/bandage.log_file"
-	params:
-		output_pdf = "output/pangraph/{gene}/plots/{gene}_bandage_and_linear.pdf",
-		bandage="output/pangraph/{gene}/plots/{gene}_pangraph.bandage_plot.png"
-	output:
-		"output/pangraph/{gene}/plots/{gene}_bandage_and_linear.logfile"
-	shell:
-		"Rscript scripts/combine_two_plots.R {input.linear} {params.bandage} --output_pdf {params.output_pdf} > {output}" if config["bandage"]==True else
-		"echo 'Bandage not run' > {output}"
+# rule combine_linear_and_bandage:
+# 	input:
+# 		linear="output/pangraph/{gene}/plots/linear_blocks.pdf",
+# 		bandage_logfile="output/pangraph/{gene}/plots/bandage.log_file"
+# 	params:
+# 		output_pdf = "output/pangraph/{gene}/plots/{gene}_bandage_and_linear.pdf",
+# 		bandage="output/pangraph/{gene}/plots/{gene}_pangraph.bandage_plot.png"
+# 	output:
+# 		"output/pangraph/{gene}/plots/{gene}_bandage_and_linear.logfile"
+# 	shell:
+# 		"Rscript scripts/combine_two_plots.R {input.linear} {params.bandage} --output_pdf {params.output_pdf} > {output}" if config["bandage"]==True else
+# 		"echo 'Bandage not run' > {output}"
 
+
+rule plot_positional_entropies_consensus_relative:
+	input:
+		"output/pangraph/{gene}/positional_entropies_consensus_relative.txt"
+	output:
+		"output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf"
+	run:
+		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
 
 # rule plot_NJ_tree_central_gene:
 # 	input:
