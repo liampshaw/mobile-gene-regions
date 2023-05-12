@@ -4,143 +4,16 @@ import json
 import pandas as pd
 # from vega_datasets import data
 
-# source = data.movies.url
-# print(source)
 
-# chart = alt.Chart(source).transform_window(
-#     cumulative_count="count()",
-#     sort=[{"field": "IMDB_Rating"}],
-# ).mark_area().encode(
-#     x="IMDB_Rating:Q",
-#     y="cumulative_count:Q"
-# )
-
-# chart.save('chart.html')
-
-
-# source = data.cars()
-
-# brush = alt.selection_interval()
-# points = alt.Chart(source).mark_point().encode(
-#     x='Horsepower',
-#     y='Miles_per_Gallon',
-#     color=alt.condition(brush, 'Origin', alt.value('lightgray'))
-# ).add_params(
-#     brush
-# )
-
-# bars = alt.Chart(source).mark_bar().encode(
-#     y='Origin',
-#     color='Origin',
-#     x='count(Origin)'
-# ).transform_filter(
-#     brush
-# )
-
-# b = points & bars
-# b.save('both.html')
-
-
-# import csv
-# import json
-# import pandas as pd
-
-# # Open the CSV file for reading
-# with open('GES-24.output_dists.csv', newline='') as csvfile:
-#     # Read the CSV file into a dictionary
-#     reader = csv.DictReader(csvfile)
-
-#     # Convert the dictionary to a list of rows
-#     rows = list(reader)
-
-# # Convert the list of rows to a JSON string
-# json_str = json.dumps(rows)
-
-# # Print the JSON string
-# with open('GES-24.output_dists.json', 'w') as f:
-#         f.write(json_str)
-
-# df = pd.read_json('GES-24.output_dists.json')
-
-# # Convert the data types of the columns to float if necessary
-# df['distup'] = df['dist.up'].astype(float)
-# df['distdown'] = df['dist.down'].astype(float)
-
-# # Create the Altair chart
-# brush = alt.selection_interval()
-
-# scatter = alt.Chart(df).mark_point().encode(
-#     x='distup',
-#     y='distdown',
-#  color=alt.condition(brush, 'snps', alt.value('lightgray'))
-# ).add_params(
-#     brush
-# )
-
-# cdf = alt.Chart(df).transform_window(
-#     cumulative_count='count()',
-#     sort=[{"field": "distup"}],
-# ).mark_area().encode(
-#     x="distup:Q",
-#     y="cumulative_count:Q",
-#     color='snps'
-# )
-
-# print(df)
-# d = pd.crosstab(df.distup, columns=df.snps).cumsum()
-# d = d.stack().reset_index()
-# print(d)
-# d = d.rename(columns={0:'CummulativeCount'})
-# d['snps'] = d['snps'].astype(object)
-
-# print(d)
-# cdf = alt.Chart(
-#     d,
-#     width=120,
-#     height=80
-# ).transform_window(
-#     cumulative_count='count()',
-#     sort=[{"field": "distup"}],
-# ).transform_density(
-#     'cumulative_count',
-#     groupby=['snps'],
-#     as_=['distup', 'density']
-# ).mark_area().encode(
-#     x="distup:Q",
-#     y='density:Q',
-#     tooltip='snps:N'
-# )
-# cdf2 = alt.Chart(d).mark_line().encode(x='distup:T', y='CummulativeCount:Q', color='snps')
-
-
-# chart.save('GES-24-scatter.html')
-# cdf2.save('GES-24-cdf.html')
-
-# import numpy as np
-# from numpy import *
-# sq=df['distup'].value_counts()
-# print(sq.sort_index().cumsum()*1./len(sq))
-
-# # Compute the ECDF
-# x = np.sort(df['distup'])
-# y = np.arange(0, len(df)) / len(df)
-# data_up = pd.DataFrame({'x':x, 'y':1-y})
-
-# x_down = np.sort(df['distdown'])
-# y_down = np.arange(0, len(df)) / len(df)
-# data_down = pd.DataFrame({'x':x_down, 'y':1-y_down})
-
-# #plt.plot(x, y, marker='.')
-# # plt.show()
-# cdf_up = alt.Chart(data_up
-#     ).mark_line(
-#     ).encode(x=alt.X('x:Q', scale=alt.Scale(reverse=True)), 
-#     y='y:Q')
-# cdf_down = alt.Chart(data_down).mark_line().encode(x='x:Q', y='y:Q')
-
-# cdf_combined = cdf_up | cdf_down
-# cdf_combined.save('GES-24-cdf3.html')
-
+def my_theme():
+  return {
+    'config': {
+      'view': {'continuousHeight': 300, 'continuousWidth': 400},  # from the default theme
+      'range': {'category': {'scheme': 'yelloworangered'}}
+    }
+  }
+alt.themes.register('my_theme', my_theme)
+alt.themes.enable('my_theme')
 
 
 # Open the CSV file for reading
@@ -224,7 +97,7 @@ input_dropdown = alt.binding_radio(
 )
 selection = alt.selection_point(
     fields=['snpscategorical'],
-    bind=input_dropdown,
+    bind=input_dropdown
 )
 # input_dropdown = alt.binding_select(options=["0","1","2","3","4","5","6","7",">7"], 
 #     name='SNPs ')
@@ -245,11 +118,13 @@ cdf5_up = alt.Chart(df).transform_window(
         scale=alt.Scale(reverse=True, domain=[0,max_dist])),
     y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True)),
     color=color
-).add_params(
-    selection
-).transform_filter(
-    selection
-)
+)#.add_params(
+  #  selection
+#).transform_filter(
+#    selection
+#)
+
+
 
 cdf5_down = alt.Chart(df).transform_window(
     ecdf="cume_dist()",
@@ -261,16 +136,108 @@ cdf5_down = alt.Chart(df).transform_window(
         scale=alt.Scale(domain=[0, max_dist])),
     y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True)),
     #color='snpscategorical:N'
-    color=alt.Color('snpscategorical:N').scale(domain=options),
+    color=color
+)#.add_params(
+ #   selection
+#).transform_filter(
+#    selection
+#)
+
+
+
+legend = alt.Chart(df).mark_point().encode(
+    alt.Y('snpscategorical:N').axis(orient='right'),
+    color=color
 ).add_params(
-    selection
-).transform_filter(
     selection
 )
 
-cdf5_combined = cdf5_up | cdf5_down
+cdf5_up_selected = alt.Chart(df).transform_filter(
+    selection
+).transform_window(
+    ecdf="cume_dist()",
+    sort=[{"field": "distup"}],
+).mark_line(
+    interpolate="step-before",
+    clip=True,
+    strokeWidth=2,
+    opacity=1,
+).encode(
+    x=alt.X("distup:Q",
+            scale=alt.Scale(reverse=True, domain=[0, max_dist])),
+    y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0,1])),
+    color=alt.Color('snpscategorical:N').legend(None),
+)
+
+cdf5_up_unselected = alt.Chart(df).transform_filter(
+    ~selection
+).transform_window(
+    ecdf="cume_dist()",
+    sort=[{"field": "distup"}],
+).mark_line(
+    interpolate="step-before",
+    clip=True,
+    strokeWidth=2,
+    opacity=0.4,
+).encode(
+    x=alt.X("distup:Q",
+            scale=alt.Scale(reverse=True, domain=[0, max_dist])),
+    y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0, 1])),
+     color=alt.Color('snpscategorical:N', scale=None#, 
+#        sort=alt.EncodingSortField('snpscategorical')),
+)
+)
+
+cdf5_down_selected = alt.Chart(df).transform_filter(
+    selection
+).transform_window(
+    ecdf="cume_dist()",
+    sort=[{"field": "distdown"}],
+).mark_line(
+    interpolate="step-before",
+    clip=True,
+    strokeWidth=2,
+    opacity=1,
+).encode(
+    x=alt.X("distdown:Q",
+            scale=alt.Scale(domain=[0, max_dist])),
+    y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0, 1])),
+    color=alt.Color('snpscategorical:N').legend(None),
+)
+
+cdf5_down_unselected = alt.Chart(df).transform_filter(
+    ~selection
+).transform_window(
+    ecdf="cume_dist()",
+    sort=[{"field": "distdown"}],
+).mark_line(
+    interpolate="step-before",
+    clip=True,
+    strokeWidth=2,
+    opacity=0.4,
+).encode(
+    x=alt.X("distdown:Q",
+            scale=alt.Scale(domain=[0, max_dist])),
+    y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0,1])),
+     color=alt.Color('snpscategorical:N', scale=None#, 
+#        sort=alt.EncodingSortField('snpscategorical')),
+)
+)
+
+cdf5_up = (cdf5_up_unselected+cdf5_up_selected ).add_selection(selection)
+cdf5_down = (cdf5_down_unselected+cdf5_down_selected ).add_selection(selection)
+
+
+
+# alt.layer(
+#   cdf5_up.add_params(selection),
+#   cdf5_up.transform_filter(selection).encode( f"toDate(datum.snpscategorical) == {selection.snpscategorical}")
+# )
+
+cdf5_combined = cdf5_up | cdf5_down | legend
 cdf5_combined.save(GENE+'-cdf-selector.html')
 
 cdf5_down.save(GENE+'-cdf-selector-down.html')
+
 
 
