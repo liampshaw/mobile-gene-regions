@@ -40,9 +40,9 @@ rule make_plots:
 		expand("output/pangraph/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
 			gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENE_DICT.keys())
-		#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
-		#expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys())
+		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys())
+			#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 
 
 rule extract_genes_DB:
@@ -130,7 +130,8 @@ rule tree_for_focal_gene:
 		"output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre"
 	run:
 		shell("FastTree -quiet -nt -gtr {input} > {input}.tre")
-		shell("python scripts/refine_tree.py --aln {input} --tree_in {input}.tre --tree_out {output}")
+		shell("sed -e 's/:.*//g' {input} > {input}.renamed")
+		shell("python scripts/refine_tree.py --aln {input}.renamed --tree_in {input}.tre --tree_out {output}")
 
 
 rule build_pangraph:
@@ -297,20 +298,20 @@ rule plot_positional_entropies_consensus_relative:
 	run:
 		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
 
-# rule plot_NJ_tree_central_gene:
-# 	input:
-# 		tree="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre",
-# 		aln="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln",
-# 		variant_assignments="output/analysis/sequence_assignments/{gene}.csv",
-# 		dup_names="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.txt"
-# 	output:
-# 		"output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf"
-# 	shell:
-# 		"Rscript scripts/plot_tree_variants.R --aln {input.aln} \
-# 											--tree {input.tree} \
-# 											--variants {input.variant_assignments}\
-# 											--dup_names {input.dup_names} \
-# 											--output_pdf {output}"
+rule plot_NJ_tree_central_gene:
+	input:
+		tree="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre",
+		aln="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln",
+		variant_assignments="output/analysis/sequence_assignments/{gene}.csv",
+		dup_names="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.txt"
+	output:
+		"output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf"
+	shell:
+		"Rscript scripts/plot_tree_variants.R --aln {input.aln} \
+											--tree {input.tree} \
+											--variants {input.variant_assignments}\
+											--dup_names {input.dup_names} \
+											--output_pdf {output}"
 
 
 # rule combine_breakpoint_and_NJ:
