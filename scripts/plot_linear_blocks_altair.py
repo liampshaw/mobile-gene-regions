@@ -79,4 +79,78 @@ block_plot.save('blocks.html')
 
 
 
-# Read in gff as well 
+# Read in gff 
+gff_df = pd.read_csv('NZ_PJHN01000019.gff', comment='#', sep='\t', header=None)
+gff_df.columns = ['seqid', 'source', 'type', 'start', 'end', 'score', 'strand', 'phase', 'attributes']
+gff_df_cds = gff_df[gff_df['type']=='CDS']
+
+gff_df_cds = gff_df_cds.assign(product=[re.sub(';.*', '', re.sub('.*product=', '', x)) for x in gff_df_cds['attributes']],
+                              name=[re.sub('ID=', '', re.sub(';.*', '', re.sub('.*Name=', '', x))) for x in gff_df_cds['attributes']])
+
+# Convert the annotations
+# Convert to positive strand for the focal gene
+def convert_annotations(input_df, focal_gene):
+  combined_df = []
+  for genome in set(input_df['seqid']):
+    df = input_df[input_df['seqid']==genome]
+    focal_product = [x for x in list(df['product']) if 'MCR' in x][0]
+    if (len(focal_product)!=0):
+      focal_gene_strand = list(df[df['product']==focal_product]['strand'])[0]
+    if (focal_gene_strand=="+"):
+      focal_gene_start = list(df[df['product']==focal_product]['start'])[0]
+      focal_gene_end = list(df[df['product']==focal_product]['end'])[0]
+      df = df.assign(new_start =df['start']-focal_gene_start,
+                    new_end = df['end']-focal_gene_start,
+                    new_strand = df['strand'])
+  return df
+
+annotation_hits = convert_annotations(gff_df_cds, 'MCR')
+
+# NEED TO ADD THE HANDLING OF NEGATIVE CASE BELOW    
+  #   if (focal.gene.strand=="-"):
+  #     # We are going to reverse-complement everything
+  #     # Choose an arbitrary maximum length D
+  #     # to reverse things from
+  #     # 0...10---20........500 where gene on -ve strand 10-20
+  #     # becomes after reverse-complementing
+  #     # 0.................480+++490...500
+  #     # i.e. we use a maximum length to offset and flip strands
+  #     D = max(df$V5)
+  #     df$new.start = D-df$V5
+  #     df$new.end = D-df$V4
+  #     df$new.strand = ifelse(df$V7=="-", "+", "-")
+  #     focal.gene.start = df$new.start[grep(focal_gene, df$product)]
+  #     df$new.start = df$new.start-focal.gene.start
+  #     df$new.end = df$new.end-focal.gene.start
+    
+  #   df$forward = ifelse(df$new.strand=="+", T, F)
+  #   if (is.null(combined_df)):
+  #     combined_df = df
+  #   else:
+  #     combined_df = rbind(combined_df, df)
+    
+  # return(combined_df)
+
+# 
+
+# Reduce to only those with annotations provided
+#annotation.hits = annotation.hits[which(annotation.hits$V1 %in% GENOMES),]
+
+#genome.blocks = genome.blocks[which(genome.blocks$genome.ordered %in% GENOMES),]
+#genome.blocks$genome.ordered =ordered(genome.blocks$genome.ordered, )
+
+limits = [-max(block_df['end']), max(block_df['end'])]
+
+annotation_hits_filtered = annotation_hits[(annotation_hits['new_start']>limits[0]) & 
+                                          (annotation_hits['new_end']<limits[1]*5)]
+
+
+
+gff_plot = alt.Chart(annotation_hits_filtered).mark_bar().encode(
+    x=alt.X('start:Q', title='Position'),
+    x2=alt.X2('end:Q'),
+    y=alt.Y('seqid:O', title='Genome', sort=ordered_genomes),
+    tooltip=['product:N', 'start:Q', 'end:Q', 'strand:N']
+)
+
+gff_plot.save('gff.html')
