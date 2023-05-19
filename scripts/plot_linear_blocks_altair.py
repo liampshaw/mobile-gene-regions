@@ -143,7 +143,7 @@ def main():
   # If GFF, use it
   if args.gff_file!='':
     # Read in gff 
-    gff_df = pd.read_csv('mcr/all.gff', comment='#', sep='\t', header=None)
+    gff_df = pd.read_csv(args.gff_file, comment='#', sep='\t', header=None)
     gff_df.columns = ['seqid', 'source', 'type', 'start', 'end', 'score', 'strand', 'phase', 'attributes']
     gff_df_cds = gff_df[gff_df['type']=='CDS']
 
