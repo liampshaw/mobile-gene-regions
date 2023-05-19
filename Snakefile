@@ -41,7 +41,8 @@ rule make_plots:
 			gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys())
+		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{gene}/plots/linear_blocks.html", gene=FOCAL_GENE_DICT.keys()),
 			#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 
 
@@ -312,7 +313,15 @@ rule plot_NJ_tree_central_gene:
 											--variants {input.variant_assignments}\
 											--dup_names {input.dup_names} \
 											--output_pdf {output}"
-
+rule plot_linear_blocks_altair:
+	input:
+		"output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
+	params:
+		gene_name="{gene}"
+	output:
+		"output/pangraph/{gene}/plots/linear_blocks.html"
+	shell: # not yet with gff file
+		"python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --output {output}"
 
 # rule combine_breakpoint_and_NJ:
 # 	input:
