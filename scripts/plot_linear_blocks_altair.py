@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import re
 
+import numpy as np
 from itertools import combinations
 import scipy.cluster.hierarchy as sch
 
@@ -30,7 +31,7 @@ def pairwise_jaccard_index(dictionary):
 def my_theme():
   return {
     'config': {
-      'view': {'continuousHeight': 300, 'continuousWidth': 800},  # from the default theme
+      'view': {'continuousHeight': 300, 'continuousWidth': 1200},  # from the default theme
     }
   }
 
@@ -131,35 +132,52 @@ annotation_hits_filtered = annotation_hits_filtered.assign(genome=annotation_hit
 # Selection of gene - aim is to click one and highlight all others on chart
 CDS_selection = alt.selection_point(fields=['product'], empty=True)
 
+# Add a measure of transposase/integrase
+annotation_hits_filtered['annotation_type'] = np.where(annotation_hits_filtered['product'].str.contains('MCR'), 'MCR',
+                              np.where(annotation_hits_filtered['product'].str.contains('transposase|integrase'), 'Mobile (transposase/integrase)',
+                                       np.where(annotation_hits_filtered['product'].str.contains('hypothetical'), 'Hypothetical protein',
+                                        'Other protein')))
+# these colours are custom order for MCR
+annotation_colours = ['gray', 'red', 'black', 'darkgrey' ] 
+
 gff_plot = alt.Chart(annotation_hits_filtered).mark_rule(size=6, clip=True).encode(
-    x=alt.X('new_start:Q', title='Position'),
+    x=alt.X('new_start:Q', title=''),
     x2=alt.X2('new_end:Q'),
     y=alt.Y('genome:O', title='Genome', sort=ordered_genomes),
     #opacity=alt.condition(CDS_selection, alt.value(1), alt.value(0.01)), # doesn't currently work
-    tooltip=['product:N', 'start:Q', 'end:Q', 'strand:N']
+    tooltip=['product:N', 'start:Q', 'end:Q', 'strand:N'],
+    color=alt.Color('annotation_type:O', scale=alt.Scale(range=annotation_colours), legend=alt.Legend(title='Annotation', columns=1, symbolLimit=0)),
 )
+
+gff_plot.configure_legend(
+    titleFontSize=20,  # Adjust the title font size as needed
+    labelFontSize=18  # Adjust the label font size as needed
+)
+
 
 # Add arrowheads
 heads_forward = alt.Chart(annotation_hits_filtered[(annotation_hits_filtered['new_strand']=='+')]).mark_point(
     shape='triangle', 
     size=50, 
-    angle=90,
-    fill='black',
-    color='black').encode(
-    x=alt.X('new_end:Q', title='Position'),
+    angle=90
+).encode(
+    x=alt.X('new_end:Q', title=''),
     y=alt.Y('genome:O', title='Genome', sort=ordered_genomes),
+    color=alt.Color('annotation_type:O', scale=alt.Scale(range=annotation_colours), legend=None),
+    fill=alt.Color('annotation_type:O', scale=alt.Scale(range=annotation_colours), legend=None)
+
     #opacity=alt.condition(CDS_selection, alt.value(1), alt.value(0))
   )
 heads_reverse = alt.Chart(annotation_hits_filtered[(annotation_hits_filtered['new_strand']=='-')]).mark_point(
     shape='triangle', 
     size=50, 
-    angle=270,
-       # opacity=alt.condition(CDS_selection, alt.value(1), alt.value(0)),
-    fill='black',
-    color='black').encode(
-    x=alt.X('new_start:Q', title='Position'),
-    y=alt.Y('genome:O', title='Genome', sort=ordered_genomes)
+    angle=270).encode(
+    color=alt.Color('annotation_type:O', scale=alt.Scale(range=annotation_colours), legend=None),
+        fill=alt.Color('annotation_type:O', scale=alt.Scale(range=annotation_colours), legend=None),
+    x=alt.X('new_start:Q', title=''),
+    y=alt.Y('genome:O', title='Genome', sort=ordered_genomes),
   )
+
 # Combine to get an arrow plot
 gff_plot = (gff_plot+heads_forward+heads_reverse).add_params(
     CDS_selection
@@ -192,8 +210,20 @@ opacity_checkbox_condition_annotations = alt.condition(
 #     alt.value(0.3)
 # )
 
+#brush = alt.selection_interval(encodings=['x'])
 
-block_plot = alt.Chart(block_df).mark_bar().encode(
+# Create the text explanation
+explanation = ["Gene neighbourhood of mcr-1 (+/- 2kb).",
+                "Click on a block to highlight that block (hold shift and click to select multiple blocks).",
+                "Double-click to unselect blocks.",
+                "Annotations of CDSs can be toggled on/off using checkbox at bottom.",
+                "Mouseover of block or CDS annotation gives more information.",
+                "Y-axis order of sequences is determined by pairwise Jaccard index in terms of blocks."]
+
+
+block_plot = alt.Chart(block_df,
+  title=alt.Title("Gene neighbourhood of mcr-1.",
+  subtitle=explanation)).mark_bar().encode(
     x=alt.X('start:Q', title='Position (bp)', scale=alt.Scale(domain=[0, max(block_df['end'])])),
     x2=alt.X2('end:Q'),
     y=alt.Y('genome:O', title='Genome', sort=ordered_genomes),
@@ -201,7 +231,8 @@ block_plot = alt.Chart(block_df).mark_bar().encode(
     opacity=alt.condition(block_selection, alt.value(1), alt.value(0.2)),
     tooltip=['block:N', 'start:Q', 'end:Q', 'strand:N']
 ).add_params(
-    block_selection
+    block_selection,
+    #brush
 ).interactive()#.properties(
  #   width=800,
 #    height=200
@@ -223,7 +254,7 @@ gff_checkbox = gff_plot.add_params(
 
 gff_checkbox.save('blocks_opacity.html')
 
-combined_chart = alt.layer(blocks_plot, gff_checkbox)
+combined_chart = alt.layer(block_plot, gff_checkbox).resolve_scale(color='independent')
 
 # alt.concat(
 #     combined_chart.encode(color='block:N'),
@@ -231,4 +262,18 @@ combined_chart = alt.layer(blocks_plot, gff_checkbox)
 # ).resolve_scale(
 #     color='independent'
 # )
+
+
+# # Create the chart
+# explanation_chart = alt.Chart().mark_text(
+#     align='left', baseline='middle',
+#     dx=5, dy=0, fontSize=12, fontWeight='normal'
+# ).encode(
+#     text=alt.value(explanation),
+#     x=alt.value(0),  # Adjust the x-position as needed
+#     y=alt.value(50),  # Adjust the y-position as needed
+# )
+
+#combined_chart = alt.vconcat(combined_chart, explanation_chart)
+
 combined_chart.save('gff_blocks_checkbox.html')
