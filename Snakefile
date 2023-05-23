@@ -43,6 +43,7 @@ rule make_plots:
 		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/linear_blocks.html", gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENE_DICT.keys())
 			#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 
 
@@ -313,6 +314,16 @@ rule plot_NJ_tree_central_gene:
 											--variants {input.variant_assignments}\
 											--dup_names {input.dup_names} \
 											--output_pdf {output}"
+
+rule plot_output_dists_altair:
+	input:
+		"output/pangraph/{gene}/{gene}.output_dists.csv"
+	output:
+		"output/pangraph/{gene}/plots/{gene}_ecdf.html"
+	shell: 
+		"python scripts/plot_output_dists_altair.py --dist_csv {input} --output_html {output}"
+
+
 rule plot_linear_blocks_altair:
 	input:
 		"output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
