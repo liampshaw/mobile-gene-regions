@@ -127,7 +127,7 @@ def main():
         inverted_genome_block_paths[v] = [k]
     # take first genome entry for each unique path as a representative
     unique_genome_reps = [genomes[0] for genomes in sorted(inverted_genome_block_paths.values())]
-    with open(args.output+'.genomes.txt', 'w') as f:
+    with open(args.output+'.unique_genomes.txt', 'w') as f:
       print('writing unique genome representatives')
       for g in unique_genome_reps:
         f.write(g+'\n')
