@@ -19,6 +19,7 @@ def get_options():
     parser.add_argument("--gff_file", help='GFF of annotations (can be concatenated files)', type=str, default='')
     parser.add_argument("--gene_name", help='Name of focal gene (matched with re from GFF)', type=str)
     parser.add_argument('--output', help='Output html (default: output.html)', type=str, default='output.html')
+    parser.add_argument('--unique', help='Whether to plot unique block configurations (for a simpler/smaller plot)', default=False, action='store_true')
     return parser.parse_args()
 
 def calculate_jaccard_index(set1, set2):
@@ -80,6 +81,8 @@ def my_theme():
       'view': {'continuousHeight': 300, 'continuousWidth': 1200},  # from the default theme
     }
   }
+
+
 alt.themes.register('my_theme', my_theme)
 alt.themes.enable('my_theme')
 
@@ -121,6 +124,21 @@ def main():
   ordered_genomes = [keys[i] for i in dendrogram['leaves']]
   # and use these to order the genomes
   block_df['order'] = pd.Categorical(block_df['genome'], categories=ordered_genomes, ordered=True)
+
+  # If unique plot requested, subset to unique genome block paths
+  if args.unique==True:
+    # definitely this is very slow and could be made faster (encode blocks as ints and use array)
+    genome_block_paths = {x:','.join(block_df['block'][(block_df['genome']==x)]) for x in set(block_df['genome'])}
+    # invert genome
+    inverted_genome_block_paths = {}
+    for k, v in genome_block_paths.items():
+      if v in inverted_genome_block_paths.keys():
+        inverted_genome_block_paths[v] += k
+      else:
+        inverted_genome_block_paths[v] = [k]
+    # take first genome entry for each unique path as a representative
+    unique_genome_reps = [genomes[0] for genomes in inverted_genome_block_paths.values()]
+    block_df = block_df.loc[[i for i in range(len(block_df)) if block_df['genome'][i] in unique_genome_reps]]
 
   # Selection of block - aim is to click one and highlight all others on chart
   block_selection = alt.selection_point(fields=['block'], empty=True)
