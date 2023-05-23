@@ -220,6 +220,17 @@ def main():
   
     # Selection of gene - aim is to click one and highlight all others on chart
     #CDS_selection = alt.selection_point(fields=['product'], empty=True)
+    product_highlight = alt.selection_point(fields=['product'], on='mouseover', nearest=True)
+    #product_highlight_opacity = alt.selection_single(bind=product_highlight, fields=['opacity'], init={'opacity': True})
+
+   # Create a checkbox selection to toggle the CDS annotations from gff on/off
+    input_checkbox_annotations = alt.binding_checkbox(name="CDS annotations (NCBI) ")
+    checkbox_selection_annotations = alt.param(bind=input_checkbox_annotations)
+    opacity_checkbox_condition_annotations = alt.condition(
+        checkbox_selection_annotations,
+        alt.value(1),
+        alt.value(0)
+    )
 
     gff_plot = alt.Chart(annotation_hits_filtered).mark_rule(size=6, clip=True).encode(
         x=alt.X('new_start:Q', title=''),
@@ -227,13 +238,18 @@ def main():
         y=alt.Y('genome:O', title='Genome', sort=ordered_genomes),
         #opacity=alt.condition(CDS_selection, alt.value(1), alt.value(0.01)), # doesn't currently work
         tooltip=['product:N', 'start:Q', 'end:Q', 'strand:N', 'name:N'],
-        color=alt.Color('annotation_type:O', scale=alt.Scale(range=sorted_annotation_colours), legend=alt.Legend(title='Annotation', columns=1, symbolLimit=0)),
-    )
+        color=alt.Color('annotation_type:O', scale=alt.Scale(range=sorted_annotation_colours), legend=alt.Legend(title='Annotation', columns=1, symbolLimit=0))
+        #color=alt.condition(
+        #product_highlight & checkbox_selection_annotations,
+        #alt.value('yellow'),
+        #alt.Color('annotation_type:O', scale=alt.Scale(range=sorted_annotation_colours), legend=alt.Legend(title='Annotation', columns=1, symbolLimit=0)))
+    )#.add_selection(product_highlight)
 
     gff_plot.configure_legend(
         titleFontSize=20,  # Adjust the title font size as needed
         labelFontSize=18  # Adjust the label font size as needed
     )
+
 
 
     # Add arrowheads
@@ -264,15 +280,7 @@ def main():
         #CDS_selection
     ).interactive()
 
-       # Create a checkbox selection to toggle the CDS annotations from gff on/off
-    input_checkbox_annotations = alt.binding_checkbox(name="CDS annotations (NCBI) ")
-    checkbox_selection_annotations = alt.param(bind=input_checkbox_annotations)
-    opacity_checkbox_condition_annotations = alt.condition(
-        checkbox_selection_annotations,
-        alt.value(1),
-        alt.value(0)
-    )
-
+    
     gff_checkbox = gff_plot.add_params(
       checkbox_selection_annotations
       ).encode(
