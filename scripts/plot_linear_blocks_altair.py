@@ -20,6 +20,7 @@ def get_options():
     parser.add_argument("--gene_name", help='Name of focal gene (matched with re from GFF)', type=str)
     parser.add_argument('--output', help='Output html (default: output.html)', type=str, default='output.html')
     parser.add_argument('--unique', help='Whether to plot unique block configurations (for a simpler/smaller plot)', default=False, action='store_true')
+    parser.add_argument('--flanking_width', help='Size of flanking regions', type=int, default=2000)
     return parser.parse_args()
 
 def calculate_jaccard_index(set1, set2):
@@ -185,8 +186,8 @@ def main():
     annotation_hits = convert_annotations(gff_df_cds, args.gene_name)
 
     # Convert plot positions to start 2000bp downstream (should be able to change this...)
-    annotation_hits['new_start'] = annotation_hits['new_start']+2000
-    annotation_hits['new_end'] = annotation_hits['new_end']+2000
+    annotation_hits['new_start'] = annotation_hits['new_start']+args.flanking_width
+    annotation_hits['new_end'] = annotation_hits['new_end']+args.flanking_width
 
     # Reduce to only those within plot limits of linear block plot
     limits = [-100, max(block_df['end'])]
