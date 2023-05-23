@@ -127,6 +127,10 @@ def main():
         inverted_genome_block_paths[v] = [k]
     # take first genome entry for each unique path as a representative
     unique_genome_reps = [genomes[0] for genomes in sorted(inverted_genome_block_paths.values())]
+    with open(args.output+'.genomes.txt', 'w') as f:
+      print('writing unique genome representatives')
+      for g in unique_genome_reps:
+        f.write(g+'\n')
     unique_genome_rep_counts = {g:len(sorted(inverted_genome_block_paths.values())[i]) for i, g in enumerate(unique_genome_reps)}
     block_df = block_df.loc[[i for i in range(len(block_df)) if block_df['genome'][i] in unique_genome_reps]]
     # New genome names
