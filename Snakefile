@@ -326,7 +326,7 @@ rule plot_output_dists_altair:
 
 rule plot_linear_blocks_altair:
 	input:
-		blocks="output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
+		"output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
 	params:
 		gene_name="{gene}"
 	output:
