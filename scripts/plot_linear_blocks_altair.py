@@ -114,6 +114,29 @@ def main():
   sorted_block_colours = list(sorted_block_colour_dict.values())
 
 
+  # If unique plot requested, subset to unique genome block paths
+  if args.unique==True:
+    # definitely this is very slow and could be made faster (encode blocks as ints and use array)
+    genome_block_paths = {x:','.join(block_df['block'][(block_df['genome']==x)]) for x in set(block_df['genome'])}
+    # invert genome
+    inverted_genome_block_paths = {}
+    for k, v in genome_block_paths.items():
+      if v in inverted_genome_block_paths.keys():
+        inverted_genome_block_paths[v] += [k]
+      else:
+        inverted_genome_block_paths[v] = [k]
+    # take first genome entry for each unique path as a representative
+    unique_genome_reps = [genomes[0] for genomes in sorted(inverted_genome_block_paths.values())]
+    unique_genome_rep_counts = {g:len(sorted(inverted_genome_block_paths.values())[i]) for i, g in enumerate(unique_genome_reps)}
+    block_df = block_df.loc[[i for i in range(len(block_df)) if block_df['genome'][i] in unique_genome_reps]]
+    # New genome names
+    #new_genome_name_dict = {g:}
+    #old_genome_names = 
+    #ordered_genomes = 
+    block_df['genome'] = [g+' (n='+str(unique_genome_rep_counts[g])+')' for g in block_df['genome']]
+    # New order (how does it feel?)
+    #block_df['order'] = pd.Categorical(block_df['genome'], categories=ordered_genomes, ordered=True)
+
   # Jaccard distance between sequences in terms of blocks
   # First, get the sets of blocks (don't care about order)
   block_sets = {x:set(block_df[block_df['genome']==x]['block']) for x in set(block_df['genome'])}
@@ -124,21 +147,6 @@ def main():
   ordered_genomes = [keys[i] for i in dendrogram['leaves']]
   # and use these to order the genomes
   block_df['order'] = pd.Categorical(block_df['genome'], categories=ordered_genomes, ordered=True)
-
-  # If unique plot requested, subset to unique genome block paths
-  if args.unique==True:
-    # definitely this is very slow and could be made faster (encode blocks as ints and use array)
-    genome_block_paths = {x:','.join(block_df['block'][(block_df['genome']==x)]) for x in set(block_df['genome'])}
-    # invert genome
-    inverted_genome_block_paths = {}
-    for k, v in genome_block_paths.items():
-      if v in inverted_genome_block_paths.keys():
-        inverted_genome_block_paths[v] += k
-      else:
-        inverted_genome_block_paths[v] = [k]
-    # take first genome entry for each unique path as a representative
-    unique_genome_reps = [genomes[0] for genomes in inverted_genome_block_paths.values()]
-    block_df = block_df.loc[[i for i in range(len(block_df)) if block_df['genome'][i] in unique_genome_reps]]
 
   # Selection of block - aim is to click one and highlight all others on chart
   block_selection = alt.selection_point(fields=['block'], empty=True)
