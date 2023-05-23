@@ -79,7 +79,7 @@ def convert_annotations(input_df, focal_gene_search_name):
 def my_theme():
   return {
     'config': {
-      'view': {'continuousHeight': 300, 'continuousWidth': 1200},  # from the default theme
+      'view': {'continuousHeight': 300, 'continuousWidth': 800},  # from the default theme
     }
   }
 

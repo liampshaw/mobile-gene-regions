@@ -326,7 +326,7 @@ rule plot_output_dists_altair:
 
 rule plot_linear_blocks_altair:
 	input:
-		"output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
+		blocks="output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
 	params:
 		gene_name="{gene}"
 	output:
@@ -334,6 +334,7 @@ rule plot_linear_blocks_altair:
 		unique="output/pangraph/{gene}/plots/{gene}_linear_blocks_deduplicated.html"
 	run: # not yet with gff file
 		shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --output {output.full}")
+		#shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --unique --output {output.unique} --gff_file ")
 		shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --unique --output {output.unique}")
 
 
