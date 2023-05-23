@@ -130,10 +130,11 @@ def main():
     unique_genome_rep_counts = {g:len(sorted(inverted_genome_block_paths.values())[i]) for i, g in enumerate(unique_genome_reps)}
     block_df = block_df.loc[[i for i in range(len(block_df)) if block_df['genome'][i] in unique_genome_reps]]
     # New genome names
-    #new_genome_name_dict = {g:}
+    new_genome_name_dict = {g:g+' (n='+str(unique_genome_rep_counts[g])+')' for g in set(block_df['genome'])}
     #old_genome_names = 
     #ordered_genomes = 
-    block_df['genome'] = [g+' (n='+str(unique_genome_rep_counts[g])+')' for g in block_df['genome']]
+    block_df['old_genome'] = block_df['genome']
+    block_df['genome'] = [new_genome_name_dict[g] for g in block_df['genome']]
     # New order (how does it feel?)
     #block_df['order'] = pd.Categorical(block_df['genome'], categories=ordered_genomes, ordered=True)
 
@@ -188,7 +189,14 @@ def main():
     annotation_hits_filtered = annotation_hits[(annotation_hits['new_start']>limits[0]) & 
                                               (annotation_hits['new_end']<limits[1]*1.1)]
     # add a 'genome' variable for consistency with block_df plot 
-    annotation_hits_filtered = annotation_hits_filtered.assign(genome=annotation_hits_filtered['seqid'])
+    if args.unique==False:
+      annotation_hits_filtered = annotation_hits_filtered.assign(genome=annotation_hits_filtered['seqid'])
+    elif args.unique==True:
+      # hacky fix to make the names of annotation seqids match up with the 'GENOME (n=1)' renaming
+      #print(list(annotation_hits_filtered.index))
+      #print(annotation_hits_filtered.loc[325]['seqid'])
+      annotation_hits_filtered = annotation_hits_filtered.loc[[i for i in list(annotation_hits_filtered.index) if annotation_hits_filtered.loc[i]['seqid'] in unique_genome_reps]]
+      annotation_hits_filtered = annotation_hits_filtered.assign(genome=[new_genome_name_dict[g] for g in annotation_hits_filtered['seqid']])
 
     # Add a measure of transposase/integrase
     annotation_hits_filtered['annotation_type'] = np.where(annotation_hits_filtered['product'].str.contains(args.gene_name), args.gene_name, # hack to make it lexicographically first
@@ -211,7 +219,7 @@ def main():
     annotation_colours = ['gray', 'red', 'black', 'darkgrey' ] 
   
     # Selection of gene - aim is to click one and highlight all others on chart
-    CDS_selection = alt.selection_point(fields=['product'], empty=True)
+    #CDS_selection = alt.selection_point(fields=['product'], empty=True)
 
     gff_plot = alt.Chart(annotation_hits_filtered).mark_rule(size=6, clip=True).encode(
         x=alt.X('new_start:Q', title=''),
@@ -253,7 +261,7 @@ def main():
 
     # Combine to get an arrow plot
     gff_plot = (gff_plot+heads_forward+heads_reverse).add_params(
-        CDS_selection
+        #CDS_selection
     ).interactive()
 
        # Create a checkbox selection to toggle the CDS annotations from gff on/off
