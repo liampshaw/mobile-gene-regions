@@ -65,13 +65,7 @@ done < locations.csv
 
 These contigs should then be combined into a single multi-fasta contig file for the pipeline (`gene_contigs.fa`)
 
-#### Optional: providing GFF files
 
-The pipeline runs without annotation files by default, because pangraph uses only sequence similarity and no annotation information. However, it can be useful and interesting to see how the pangraph blocks correspond to the annotation information. Only `CDS` features will be used. 
-
-If you have your own annotation files then they should be provided as a single gff. 
-
-If you want to use NCBI annotation files, then you can get them with e.g. `ncbi-acc-download -F gff3 {accession}`. These can then be combined into a single gff (`cat *.gff > all.gff`; no need to strip out the headers etc., the pipeline can take care of it).
 
 ### Preparing the pipeline
 
@@ -102,6 +96,39 @@ The snakemake pipeline is split up into different rules. You can run the full pi
 ```
 snakemake --cores 1 --configfile configs/laptop_config.yaml -r prepare_DB run_pangraph calculate_distances make_plots
 ```
+
+Various other options can be specific in the config file e.g. `configs/laptop_config.yaml`
+
+
+```
+version: "default"
+panx_export : False
+bandage : True
+snp_threshold : "25"
+region_upstream : "5000"
+region_downstream : "5000"
+pangraph_polish : False
+pangraph_aligner : "minimap2"
+pangraph_minblocklength : "100"
+pangraph_edgeminlength : "0"
+DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
+include_gff: False
+```
+
+This will produce the main outputs:
+
+*To add: details of main output - html plots*
+
+### Optional: providing GFF files
+
+The pipeline runs without annotation files by default, because pangraph uses only sequence similarity and no annotation information. However, it can be useful and interesting to see how the pangraph blocks correspond to the annotation information. Only `CDS` features will be used. 
+
+If you have your own annotation files then they should be provided as a single gff. 
+
+If you want to use NCBI annotation files, then you can get them with e.g. `ncbi-acc-download -F gff3 {accession}`. These can then be combined into a single gff (`cat *.gff > all.gff`; no need to strip out the headers etc., the pipeline can take care of it).
+
+If you want gff annotations on top of the linear blocks, change `include_gff` to `True` in the config file and put a gff in `input/gffs/{gene}_annotations.gff`.
+
 
 
 
