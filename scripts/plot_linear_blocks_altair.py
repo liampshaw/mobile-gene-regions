@@ -45,31 +45,35 @@ def convert_annotations(input_df, focal_gene_search_name):
     combined_df = []
     for genome in set(input_df['seqid']):
       df = input_df[(input_df['seqid']==genome)]
-      focal_product = [x for x in list(df['product']) if focal_gene_search_name in x][0]
-      if (len(focal_product)!=0):
-        focal_gene_strand = list(df[df['product']==focal_product]['strand'])[0]
-      if (focal_gene_strand=="+"):
-        focal_gene_start = list(df[df['product']==focal_product]['start'])[0]
-        focal_gene_end = list(df[df['product']==focal_product]['end'])[0]
-        df = df.assign(new_start =df['start']-focal_gene_start,
-                      new_end = df['end']-focal_gene_start,
-                      new_strand = df['strand'])
-      if (focal_gene_strand=="-"):
-        # We are going to reverse-complement everything
-        # Choose an arbitrary maximum length D
-        # to reverse things from
-        # 0...10---20........500 where gene on -ve strand 10-20
-        # becomes after reverse-complementing
-        # 0.................480+++490...500
-        # i.e. we use a maximum length to offset and flip strands
-        D = max(df['end'])
-        strand_convert = {'+':'-', '-':'+'}
-        df = df.assign(new_start = D-df['end'],
-                      new_end = D-df['start'],
-                      new_strand = [strand_convert[x] for x in list(df['strand'])])
-        focal_gene_start = focal_gene_start = list(df[df['product']==focal_product]['new_start'])[0]
-        df['new_start'] = df['new_start']-focal_gene_start
-        df['new_end'] = df['new_end']-focal_gene_start
+      focal_product_hits = [x for x in list(df['product']) if focal_gene_search_name in x]
+      if len(focal_product_hits)==0:
+        pass
+      elif len(focal_product_hits)>0:
+        focal_product = focal_product_hits[0]
+        if (len(focal_product)!=0):
+          focal_gene_strand = list(df[df['product']==focal_product]['strand'])[0]
+        if (focal_gene_strand=="+"):
+          focal_gene_start = list(df[df['product']==focal_product]['start'])[0]
+          focal_gene_end = list(df[df['product']==focal_product]['end'])[0]
+          df = df.assign(new_start =df['start']-focal_gene_start,
+                        new_end = df['end']-focal_gene_start,
+                        new_strand = df['strand'])
+        if (focal_gene_strand=="-"):
+          # We are going to reverse-complement everything
+          # Choose an arbitrary maximum length D
+          # to reverse things from
+          # 0...10---20........500 where gene on -ve strand 10-20
+          # becomes after reverse-complementing
+          # 0.................480+++490...500
+          # i.e. we use a maximum length to offset and flip strands
+          D = max(df['end'])
+          strand_convert = {'+':'-', '-':'+'}
+          df = df.assign(new_start = D-df['end'],
+                        new_end = D-df['start'],
+                        new_strand = [strand_convert[x] for x in list(df['strand'])])
+          focal_gene_start = focal_gene_start = list(df[df['product']==focal_product]['new_start'])[0]
+          df['new_start'] = df['new_start']-focal_gene_start
+          df['new_end'] = df['new_end']-focal_gene_start
       if (len(combined_df)==0):
         combined_df = df
       else:
