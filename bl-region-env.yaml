@@ -24,3 +24,4 @@ dependencies:
   - ca-certificates
   - certifi
   - openssl
+  - altair
