@@ -3,9 +3,10 @@ DB = config["DB"]
 
 FOCAL_GENE_DICT = {"mcr-1.1":"mcr1"} 
 # you have two input files:
-# input/focal_genes/mcr-1.1.fa
-# input/contigs/mcr1_contigs.fa 
-# The reason for this specification is to emphasise that your contigs may not contain your exact focal gene  
+# focal gene: input/focal_genes/mcr-1.1.fa
+# contigs: input/contigs/mcr1_contigs.fa 
+# The reason for this specification is to emphasise that 
+# the contigs may not contain the exact focal gene  
 
 rule prepare_DB:
 	input:
@@ -56,7 +57,7 @@ rule extract_genes_DB:
 rule extract_genes_from_contigs:
 	input:
 		gene_fasta="input/focal_genes/{gene}.fa",
-		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_combined_contigs.fa"
+		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_contigs.fa"
 	params:
 		snp_threshold=int(config["snp_threshold"])
 	output:
@@ -84,7 +85,7 @@ rule assign_variants:
 
 rule extract_region_around_focal_gene:
 	input:
-		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_combined_contigs.fa"
+		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_contigs.fa"
 	params:
 		gene="input/focal_genes/{gene}.fa",
 		prefix="output/pangraph/{gene}/{gene}_extracted",
