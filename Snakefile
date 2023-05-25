@@ -1,39 +1,38 @@
 # See configfile in e.g. configs/laptop_config.yaml for parameters
 
-FOCAL_GENE_DICT = {"mcr-1.1":"mcr-1"} 
+FOCAL_GENES = {"mcr-1.1"} 
 # you have two input files:
 # focal gene: input/focal_genes/mcr-1.1.fa
-# contigs: input/contigs/mcr1_contigs.fa 
-# The reason for this specification is to emphasise that 
-# the contigs may not contain the exact focal gene  
-# (probably should remove this requirement and just have same name...)
+# contigs: input/contigs/mcr1.1_contigs.fa 
+# Not all the contigs might contain the exact focal gene  
+# N.B. if trying to get named variants from CARD DB this may break 
 
 DB = config["DB"]
 
 rule prepare_DB:
 	input:
-		expand("DB/gene_fasta/{gene}.fa", gene=FOCAL_GENE_DICT.values()),
-		expand("output/analysis/sequence_assignments/{gene}.csv", gene=FOCAL_GENE_DICT.keys())
+		#expand("DB/gene_fasta/{gene}.fa", gene=FOCAL_GENE_DICT.values()), # Removed for now
+		expand("output/analysis/sequence_assignments/{gene}.csv", gene=FOCAL_GENES)
 
 rule run_pangraph:
 	input:
-		expand("output/pangraph/{gene}/{gene}_pangraph.json", gene=FOCAL_GENE_DICT.keys())
+		expand("output/pangraph/{gene}/{gene}_pangraph.json", gene=FOCAL_GENES)
 
 rule calculate_distances:
 	input:
-		expand("output/pangraph/{gene}/{gene}.output_dists.csv", gene=FOCAL_GENE_DICT.keys())
+		expand("output/pangraph/{gene}/{gene}.output_dists.csv", gene=FOCAL_GENES)
 
 rule make_plots:
 	input:
-		expand("output/pangraph/{gene}/plots/linear_blocks.pdf", gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{gene}/plots/linear_blocks.pdf", gene=FOCAL_GENES),
 		expand("output/pangraph/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
-			gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/{gene}_linear_blocks.html", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys())
+			gene=FOCAL_GENES),
+		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENES),
+		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENES),
+		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENES),
+		expand("output/pangraph/{gene}/plots/{gene}_linear_blocks.html", gene=FOCAL_GENES),
+		expand("output/pangraph/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENES),
+		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENES)
 
 # # Unsure whether to include this
 rule extract_genes_DB:
@@ -46,21 +45,10 @@ rule extract_genes_DB:
 	shell:
 		"python scripts/extract_gene_DB.py {input.fasta} {params.gene_name} CARD {output}"
 
-#############################
-# GETTING CONTIG DATA READY #
-#############################
-# rule combine_fastas_containing_gene:
-# 	input:
-# 		"output/analysis/{gene}_accessions.txt"
-# 	output:
-# 		"output/contigs/{gene}_combined_contigs.fa"
-# 	run:
-# 		shell("while read f; do cat "+f"{config['fastadir']}"+"/$f.fa >> {output}; done < {input}")
-
 rule extract_genes_from_contigs:
 	input:
 		gene_fasta="input/focal_genes/{gene}.fa",
-		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_contigs.fa"
+		input_fasta="input/contigs/{gene}_contigs.fa"
 	params:
 		snp_threshold=int(config["snp_threshold"])
 	output:
@@ -73,14 +61,15 @@ rule extract_genes_from_contigs:
 												--downstream 0 \
 												--threshold {params.snp_threshold}"
 
-rule assign_variants:
-	input:
-		fasta="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa",
-		variants= lambda wildcards: f"DB/gene_fasta/{FOCAL_GENE_DICT[wildcards.gene]}"+".fa"
-	output:
-		"output/analysis/sequence_assignments/{gene}.csv"
-	shell:
-		"python scripts/name_variants.py --variant_fasta {input.variants} --output_file {output} --input_fasta {input.fasta}"
+# Removed for now
+# rule assign_variants:
+# 	input:
+# 		fasta="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa",
+# 		variants= lambda wildcards: f"DB/gene_fasta/{FOCAL_GENE_DICT[wildcards.gene]}"+".fa"
+# 	output:
+# 		"output/analysis/sequence_assignments/{gene}.csv"
+# 	shell:
+# 		"python scripts/name_variants.py --variant_fasta {input.variants} --output_file {output} --input_fasta {input.fasta}"
 
 #############################
 # RUNNING PANGRAPH PIPELINE #
@@ -88,7 +77,7 @@ rule assign_variants:
 
 rule extract_region_around_focal_gene:
 	input:
-		input_fasta=lambda wildcards: f"input/contigs/{FOCAL_GENE_DICT[wildcards.gene]}"+"_contigs.fa"
+		input_fasta="input/contigs/{gene}_contigs.fa"
 	params:
 		gene="input/focal_genes/{gene}.fa",
 		prefix="output/pangraph/{gene}/{gene}_extracted",
