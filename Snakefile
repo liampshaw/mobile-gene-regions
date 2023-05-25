@@ -1,5 +1,4 @@
 # See configfile in e.g. configs/laptop_config.yaml for parameters
-DB = config["DB"]
 
 FOCAL_GENE_DICT = {"mcr-1.1":"mcr-1"} 
 # you have two input files:
@@ -8,6 +7,9 @@ FOCAL_GENE_DICT = {"mcr-1.1":"mcr-1"}
 # The reason for this specification is to emphasise that 
 # the contigs may not contain the exact focal gene  
 # (probably should remove this requirement and just have same name...)
+
+DB = config["DB"]
+
 
 rule prepare_DB:
 	input:
@@ -31,9 +33,10 @@ rule make_plots:
 		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/{gene}_linear_blocks.html", gene=FOCAL_GENE_DICT.keys()),
-		expand("output/pangraph/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENE_DICT.keys())
+		expand("output/pangraph/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENE_DICT.keys()),
+		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENE_DICT.keys())
 
-# Unsure whether to include this
+# # Unsure whether to include this
 rule extract_genes_DB:
 	input:
 		fasta="data/CARD_db.fa"
