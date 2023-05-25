@@ -185,7 +185,9 @@ def main():
 
 
     # Convert the annotations
-    protein_name = args.gene_name.upper() # needed for matching to protein
+    protein_name = re.sub("-.*", "", args.gene_name.upper()) # needed for matching to protein 
+    # CTX-M-65 becomes CTX as search string - this could go wrong if including different genes. 
+    # In testing phase!
     annotation_hits = convert_annotations(gff_df_cds, protein_name)
 
     # Convert plot positions to start 2000bp downstream (should be able to change this...)
