@@ -10,7 +10,6 @@ FOCAL_GENE_DICT = {"mcr-1.1":"mcr-1"}
 
 DB = config["DB"]
 
-
 rule prepare_DB:
 	input:
 		expand("DB/gene_fasta/{gene}.fa", gene=FOCAL_GENE_DICT.values()),
