@@ -30,8 +30,8 @@ Options for download are:
 
 * download the table of hits and download the contigs using the `Contig` accessions (e.g. with [ncbi-acc-download](https://github.com/kblin/ncbi-acc-download). 
 * download the gene hits with up to 2,000 bases flanking them in either direction (shorter contigs will return the whole contig)
-* use the Google Cloud Platform
 
+The nice thing about MicroBIGGE is that you get access to the species information and some other metadata such as BioSample, which you can use to fetch other metadata. 
 
 #### MicroBIGGE on Google Cloud Platform
 
@@ -42,7 +42,7 @@ First, we use an SQL query to obtain a list of Google Cloud storage locations of
 ```
 SELECT contig_url
 FROM `ncbi-pathogen-detect.pdbrowser.microbigge`
-WHERE element_symbol LIKE 'mcr-1.%' OR element_symbol=='mcr-1'
+WHERE element_symbol LIKE 'mcr-1.%' OR element_symbol='mcr-1'
 ```
 
 (returns 8987 hits as of 25 May 2023 i.e. matches MicroBIGGE)
@@ -63,7 +63,9 @@ do
 done < locations.csv
 ``` 
 
-These contigs should then be combined into a single multi-fasta contig file for the pipeline (`gene_contigs.fa`)
+These contigs should then be combined into a single multi-fasta contig file for the pipeline (`gene_contigs.fa`).
+
+Alternatively, you can just use `SELECT contig_acc` to get the accessions and use `ncbi-acc-download`.
 
 
 
