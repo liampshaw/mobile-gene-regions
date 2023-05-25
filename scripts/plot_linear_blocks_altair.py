@@ -20,7 +20,7 @@ def get_options():
     parser.add_argument("--gene_name", help='Name of focal gene (matched with re from GFF)', type=str)
     parser.add_argument('--output', help='Output html (default: output.html)', type=str, default='output.html')
     parser.add_argument('--unique', help='Whether to plot unique block configurations (for a simpler/smaller plot)', default=False, action='store_true')
-    parser.add_argument('--flanking_width', help='Size of flanking regions', type=int, default=2000)
+    parser.add_argument('--flanking_width', help='Size of flanking regions', type=int, default=5000)
     return parser.parse_args()
 
 def calculate_jaccard_index(set1, set2):
@@ -88,10 +88,10 @@ alt.themes.register('my_theme', my_theme)
 alt.themes.enable('my_theme')
 
 # Create the text explanation
-explanation = ["Click on a block to highlight that block (hold shift and click to select multiple blocks).",
+explanation = ["Blocks are coloured by inferred sequence homology (grey=unique block, only seen in one sequence).", "Click on a block to highlight that block (hold shift and click to select multiple blocks).",
                 "Double-click to unselect blocks.",
              "Y-axis order of sequences is determined by pairwise Jaccard index in terms of blocks."]
-explanation_gff = ["Annotations of CDSs can be toggled on/off using checkbox at bottom.",
+explanation_gff = ["Blocks are coloured by inferred sequence homology (grey=unique block, only seen in one sequence).", "Annotations of CDSs can be toggled on/off using checkbox at bottom.",
                 "Mouseover of block or CDS annotation gives more information."]
                
 
@@ -182,8 +182,10 @@ def main():
     gff_df_cds = gff_df_cds.assign(product=[re.sub(';.*', '', re.sub('.*product=', '', x)) for x in gff_df_cds['attributes']],
                                   name=[re.sub('ID=', '', re.sub(';.*', '', re.sub('.*Name=', '', x))) for x in gff_df_cds['attributes']])
 
+
     # Convert the annotations
-    annotation_hits = convert_annotations(gff_df_cds, args.gene_name)
+    protein_name = args.gene_name.upper() # needed for matching to protein
+    annotation_hits = convert_annotations(gff_df_cds, protein_name)
 
     # Convert plot positions to start 2000bp downstream (should be able to change this...)
     annotation_hits['new_start'] = annotation_hits['new_start']+args.flanking_width
@@ -196,6 +198,8 @@ def main():
     # add a 'genome' variable for consistency with block_df plot 
     if args.unique==False:
       annotation_hits_filtered = annotation_hits_filtered.assign(genome=annotation_hits_filtered['seqid'])
+      # Get rid of any not in block plot
+      annotation_hits_filtered = annotation_hits_filtered.loc[[x for x in annotation_hits_filtered.index if annotation_hits_filtered['genome'][x] in list(set(block_df['genome']))]]
     elif args.unique==True:
       # hacky fix to make the names of annotation seqids match up with the 'GENOME (n=1)' renaming
       #print(list(annotation_hits_filtered.index))
@@ -204,13 +208,13 @@ def main():
       annotation_hits_filtered = annotation_hits_filtered.assign(genome=[new_genome_name_dict[g] for g in annotation_hits_filtered['seqid']])
 
     # Add a measure of transposase/integrase
-    annotation_hits_filtered['annotation_type'] = np.where(annotation_hits_filtered['product'].str.contains(args.gene_name), args.gene_name, # hack to make it lexicographically first
+    annotation_hits_filtered['annotation_type'] = np.where(annotation_hits_filtered['product'].str.contains(protein_name), protein_name, # hack to make it lexicographically first
                                   np.where(annotation_hits_filtered['product'].str.contains('transposase|integrase|recombinase'), 'Mobile (transposase/integrase)',
                                            np.where(annotation_hits_filtered['product'].str.contains('hypothetical'), 'Hypothetical protein',
                                             'Other protein')))
     #sorted(annotation_hits_filtered['annotation_type'])
 
-    annotation_colours = {k:v for k, v in zip([args.gene_name, 
+    annotation_colours = {k:v for k, v in zip([protein_name, 
                                           'Mobile (transposase/integrase/recombinase)', 
                                           'Other protein', 
                                           'Hypothetical Protein'], 
