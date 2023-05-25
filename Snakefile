@@ -61,7 +61,7 @@ rule extract_genes_from_contigs:
 												--downstream 0 \
 												--threshold {params.snp_threshold}"
 
-# Removed for now
+# Removed for now because depended on FOCAL_GENE_DICT
 # rule assign_variants:
 # 	input:
 # 		fasta="output/analysis/sequence/{gene}_seqs_extracted_from_contigs.fa",
