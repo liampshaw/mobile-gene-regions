@@ -1,25 +1,11 @@
 # See configfile in e.g. configs/laptop_config.yaml for parameters
 DB = config["DB"]
-# #FOCAL_GENE_DICT = config["focal_gene_dict"]
-# FOCAL_GENE_DICT = {"MCR-1.1": "MCR", 
-# 					"aaeA": "aaeA", 
-# 					"catP":"catP",
-# 					"GES-24": "GES",
-# 					"rapA": "rapA",
-# 					"mefA":"mefA",
-# 					"CMY-2": "CMY", 
-# 					"CTX-M-15": "CTX-M",
-# 					"CTX-M-65":"CTX-M",
-# 					"GES-24":"GES",
-# 					"IMP-4":"IMP",
-# 					"KPC-2": "KPC",
-# 					"NDM-1":"NDM",
-# 					"PER-1":"PER",  
-# 					"VIM-1":"VIM",
-# 					"TEM-1": "TEM",
-# 					"OXA-10": "OXA",
-# 					"OXA-48":"OXA"}
-FOCAL_GENE_DICT = {"MCR-1.1":"MCR"}
+
+FOCAL_GENE_DICT = {"mcr-1.1":"mcr1"} 
+# you have two input files:
+# input/focal_genes/mcr-1.1.fa
+# input/contigs/mcr1_contigs.fa 
+# The reason for this specification is to emphasise that your contigs may not contain your exact focal gene  
 
 rule prepare_DB:
 	input:
@@ -44,9 +30,8 @@ rule make_plots:
 		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/{gene}_linear_blocks.html", gene=FOCAL_GENE_DICT.keys()),
 		expand("output/pangraph/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENE_DICT.keys())
-			#expand("output/pangraph/{gene}/plots/breakpoint_and_NJ.logfile", gene=FOCAL_GENE_DICT.keys()),
 
-
+# Unsure whether to include this
 rule extract_genes_DB:
 	input:
 		fasta="data/CARD_db.fa"
