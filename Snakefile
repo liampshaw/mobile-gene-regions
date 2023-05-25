@@ -1,12 +1,13 @@
 # See configfile in e.g. configs/laptop_config.yaml for parameters
 DB = config["DB"]
 
-FOCAL_GENE_DICT = {"mcr-1.1":"mcr1"} 
+FOCAL_GENE_DICT = {"mcr-1.1":"mcr-1"} 
 # you have two input files:
 # focal gene: input/focal_genes/mcr-1.1.fa
 # contigs: input/contigs/mcr1_contigs.fa 
 # The reason for this specification is to emphasise that 
 # the contigs may not contain the exact focal gene  
+# (probably should remove this requirement and just have same name...)
 
 rule prepare_DB:
 	input:
@@ -314,14 +315,30 @@ rule plot_linear_blocks_altair:
 	input:
 		"output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
 	params:
-		gene_name="{gene}"
+		gene_name="{gene}", 
+		gff="input/gffs/{gene}_annotations.gff",
+		flanking_width=max(config["region_upstream"], config["region_downstream"])
 	output:
-		full="output/pangraph/{gene}/plots/{gene}_linear_blocks.html",
-		unique="output/pangraph/{gene}/plots/{gene}_linear_blocks_deduplicated.html"
-	run: # not yet with gff file
-		shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --output {output.full}")
+		"output/pangraph/{gene}/plots/{gene}_linear_blocks.html",
+	shell: 
+		"python scripts/plot_linear_blocks_altair.py --flanking_width {params.flanking_width} --block_csv {input} --gene_name {params.gene_name} --output {output}" if config["include_gff"]==False else
+		"python scripts/plot_linear_blocks_altair.py --flanking_width {params.flanking_width} --block_csv {input} --gene_name {params.gene_name} --output {output} --gff_file {params.gff}"
+		
+rule plot_linear_blocks_altair_deduplicated:
+	input:
+		"output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv"
+	params:
+		gene_name="{gene}", 
+		gff="input/gffs/{gene}_annotations.gff",
+		flanking_width=max(config["region_upstream"], config["region_downstream"])
+	output:
+		"output/pangraph/{gene}/plots/{gene}_linear_blocks_deduplicated.html"
+	shell: 
+		"python scripts/plot_linear_blocks_altair.py --flanking_width {params.flanking_width} --unique --block_csv {input} --gene_name {params.gene_name} --output {output}" if config["include_gff"]==False else
+		"python scripts/plot_linear_blocks_altair.py --flanking_width {params.flanking_width} --unique --block_csv {input} --gene_name {params.gene_name} --output {output} --gff_file {params.gff}"
+		
 		#shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --unique --output {output.unique} --gff_file ")
-		shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --unique --output {output.unique}")
+		#shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --unique --output {output.unique}")
 
 
 # rule combine_breakpoint_and_NJ:
