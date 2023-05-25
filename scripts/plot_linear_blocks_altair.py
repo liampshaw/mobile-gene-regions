@@ -12,6 +12,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 import scipy.cluster.hierarchy as sch
+alt.renderers.enable('html')
 
 def get_options():
     parser = argparse.ArgumentParser(description='Produce html plot of linear blocks')
@@ -301,7 +302,7 @@ def main():
     combined_chart = block_plot
 
   # Save the plot
-  combined_chart.save(args.output)
+  combined_chart.save(args.output, format='html')
   
 
 if __name__=="__main__":
