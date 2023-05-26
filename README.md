@@ -4,6 +4,12 @@ __Liam P. Shaw__
 
 Repository of scripts and data for analysis of the genomic contexts of a given focal gene - presents a pipeline to analyse the surrounding regions of genes using [pangraph](https://github.com/neherlab/pangraph) and generate output plots. The original intention was to analyse beta-lactamase genes, but the pipeline is now generalised for any input gene. 
 
+![](tutorial/images/ecdf_screenshot.png)
+
+![](tutorial/images/linear_blocks_screenshot.png)
+
+
+
 ### Repository structure
 
 The pipeline uses [snakemake](https://snakemake.readthedocs.io/en/stable/index.html). 
