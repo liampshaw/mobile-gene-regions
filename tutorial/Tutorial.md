@@ -141,9 +141,7 @@ All output files are put into the `output` folder.
 
 Outputs to do with extracting the variation in the focal gene are put in `output/gene_variants` - for each sequence with a hit to the focal gene, one gets the name of the variant (based on amino acid sequence) if a named variant exists in CARD. Otherwise 'unnamed' (if valid variant, but not named) or 'truncated' (if premature stop codon). This is used for the NJ tree of the variation in the central gene. 
 
-All other outputs for the pangraph part of the pipeline are in `output/pangraph/{gene}`.
-
-Gene variant outputs are in `output/gene_variants/sequence_assignments/{gene}.csv` - 
+All other outputs for the pangraph part of the pipeline are in `output/pangraph/{gene}`. A list of them is given below. 
 
 Pangraph outputs in `output/pangraph/{gene}`:
 * `{gene}_pangraph.json` - pangraph of the flanking regions in all sequences
@@ -159,6 +157,13 @@ Plots are outputted in `output/pangraph/{gene}/plots`:
 * `{gene}_breakpoint_distances-...pdf` - empirical cumulative distribution function of pairwise breakpoint distances, either between `all`, `compare-to-focal-gene` (only comparisons involving focal gene), `compare-to-most-common` (only comparisons involving most common gene variant).
 * `{gene}_linear_blocks.html` - interactive html of linear representation of pangraph (also `{gene}_linear_blocks_deduplicated.html` showing only unique patterns of blocks, with number of sequences having that pattern)
 * `{gene}_ecdf.html` - interative html of all pairwise breakpoint distances
+
+![](images/ecdf_screenshot.png)
+
+
+![](images/linear_blocks_screenshot.png)
+
+
 
 
 
