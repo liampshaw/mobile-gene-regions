@@ -137,11 +137,13 @@ WARNING: a large GFF (particularly where you have whole chromosomes) will take a
 
 ## Outputs
 
-All outputs are put into the `output` folder. Outputs to do with extracting the variation in the focal gene are put in `output/gene_variants`. All other outputs for the pangraph part of the pipeline are in `output/pangraph/{gene}`.
+All output files are put into the `output` folder. 
 
-Gene variant outputs:
+Outputs to do with extracting the variation in the focal gene are put in `output/gene_variants` - for each sequence with a hit to the focal gene, one gets the name of the variant (based on amino acid sequence) if a named variant exists in CARD. Otherwise 'unnamed' (if valid variant, but not named) or 'truncated' (if premature stop codon). This is used for the NJ tree of the variation in the central gene. 
 
-`output/gene_variants/sequence_assignments/{gene}.csv` - for each sequence with a hit to the focal gene, the name of the variant (based on amino acid sequence) if a named variant exists in CARD. Otherwise 'unnamed' (if valid variant, but not named) or 'truncated' (if premature stop codon).
+All other outputs for the pangraph part of the pipeline are in `output/pangraph/{gene}`.
+
+Gene variant outputs are in `output/gene_variants/sequence_assignments/{gene}.csv` - 
 
 Pangraph outputs in `output/pangraph/{gene}`:
 * `{gene}_pangraph.json` - pangraph of the flanking regions in all sequences
