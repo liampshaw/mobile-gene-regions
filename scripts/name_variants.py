@@ -31,6 +31,8 @@ def main():
 
 	seqs_nt = {str(v.seq):re.sub('.*\\|', '', k) for k, v in variant_seqs.items()}
 
+	print(variant_seqs["MCR-1.1"])
+
 	seq_names_dict = {}
 	seq_counts_dict = {}
 	for seqid, seq_obj in seqs_to_assign.items():
@@ -46,6 +48,7 @@ def main():
 				#print(seq_aa)
 				seq_names_dict[seqid] = seqs_aa[seq_aa]
 			else:
+				print(seq_aa)
 				seq_names_dict[seqid] = 'unnamed'
 				#print(seqid, 'unnamed')
 		if seq_nt in seq_counts_dict.keys():
@@ -53,6 +56,7 @@ def main():
 		else:
 			seq_counts_dict[seq_nt] = 1
 
+	print(seq_names_dict)
 	#print(seq_names_dict)
 	#print(seq_counts_dict)
 

@@ -14,7 +14,7 @@ DB = config["DB"]
 
 rule prepare_DB:
 	input:
-		#expand("DB/gene_fasta/{gene}.fa", gene=FOCAL_GENE_DICT.values()), # Removed for now
+		expand("output/gene_variants/{gene}.fa", gene=FOCAL_GENES), # Removed for now
 		expand("output/gene_variants/sequence_assignments/{gene}.csv", gene=FOCAL_GENES)
 
 rule run_pangraph:
@@ -40,13 +40,13 @@ rule make_plots:
 # # Unsure whether to include this
 rule extract_genes_DB:
 	input:
-		fasta="data/CARD_db.fa"
+		"input/focal_genes/{gene}.fa"
 	params:
-		gene_name="{gene}"
+		DB="data/CARD_db.fa"
 	output:
-		"DB/gene_fasta/{gene}.fa"
+		"output/gene_variants/{gene}.fa"
 	shell:
-		"python scripts/extract_gene_DB.py {input.fasta} {params.gene_name} CARD {output}"
+		"python scripts/extract_gene_DB.py {params.DB} {input} CARD {output}"
 
 rule extract_genes_from_contigs:
 	input:
@@ -55,7 +55,7 @@ rule extract_genes_from_contigs:
 	params:
 		snp_threshold=int(config["snp_threshold"])
 	output:
-		"output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa"
+		"output/gene_variants/sequence/{gene}_seqs.fa"
 	shell:
 		"python scripts/extract_region_around_gene.py --gene {input.gene_fasta} \
 												--input_fasta {input.input_fasta} \
@@ -66,8 +66,8 @@ rule extract_genes_from_contigs:
 
 rule assign_variants:
 	input:
-		fasta="output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa",
-		variants="DB/gene_fasta/{gene}.fa"
+		fasta="output/gene_variants/sequence/{gene}_seqs.fa",
+		variants="output/gene_variants/{gene}.fa"
 	output:
 		"output/gene_variants/sequence_assignments/{gene}.csv"
 	shell:
@@ -95,11 +95,11 @@ rule extract_region_around_focal_gene:
 
 rule calculate_snp_dists_extracted_seqs:
 	input:
-		"output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa"
+		"output/gene_variants/sequence/{gene}_seqs.fa"
 	output:
-		"output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.snps.tsv",
-		"output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln",
-		"output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.txt"
+		"output/gene_variants/sequence/{gene}_seqs.snps.tsv",
+		"output/gene_variants/sequence/{gene}_seqs.fa.dedup.aln",
+		"output/gene_variants/sequence/{gene}_seqs.fa.dedup.txt"
 	run:
 		shell("mafft --auto {input} > {input}.aln"),
 		shell("snp-dists -q -m {input}.aln > {output}")
@@ -107,9 +107,9 @@ rule calculate_snp_dists_extracted_seqs:
 
 rule tree_for_focal_gene:
 	input:
-		"output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln"
+		"output/gene_variants/sequence/{gene}_seqs.fa.dedup.aln"
 	output:
-		"output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre"
+		"output/gene_variants/sequence/{gene}_seqs.fa.dedup.aln.refined.tre"
 	run:
 		shell("FastTree -quiet -nt -gtr {input} > {input}.tre")
 		shell("sed -e 's/:.*//g' {input} > {input}.renamed")
@@ -186,7 +186,7 @@ rule compute_distances:
 		gene_fasta="input/focal_genes/{gene}.fa",
 		block_csv="output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv",
 		gene_block="output/pangraph/{gene}/{gene}.gene_block.txt",
-		snps="output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.snps.tsv",
+		snps="output/gene_variants/sequence/{gene}_seqs.snps.tsv",
 		#locations="output/pangraph/{gene}/{gene}_gene_locations.txt",
 		pangraph_fasta="output/pangraph/{gene}/{gene}_pangraph.fa"
 	output:
@@ -225,7 +225,7 @@ rule positional_entropies:
 rule plot_breakpoint_distances:
 	input:
 		dists="output/pangraph/{gene}/{gene}.output_dists.csv",
-		deduplicated_gene="output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.txt",
+		deduplicated_gene="output/gene_variants/sequence/{gene}_seqs.fa.dedup.txt",
 		variant_assignments="output/gene_variants/sequence_assignments/{gene}.csv"
 	params:
 		gene="{gene}",
@@ -282,10 +282,10 @@ rule plot_positional_entropies_consensus_relative:
 
 rule plot_NJ_tree_central_gene:
 	input:
-		tree="output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln.refined.tre",
-		aln="output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.aln",
+		tree="output/gene_variants/sequence/{gene}_seqs.fa.dedup.aln.refined.tre",
+		aln="output/gene_variants/sequence/{gene}_seqs.fa.dedup.aln",
 		variant_assignments="output/gene_variants/sequence_assignments/{gene}.csv",
-		dup_names="output/gene_variants/sequence/{gene}_seqs_extracted_from_contigs.fa.dedup.txt"
+		dup_names="output/gene_variants/sequence/{gene}_seqs.fa.dedup.txt"
 	output:
 		"output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf"
 	shell:
