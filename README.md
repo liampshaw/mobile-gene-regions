@@ -1,4 +1,4 @@
-# Understanding the evolution of the regions surrounding beta-lactamase genes 
+# Analysing the evolution of gene flanking regions
 
 __Liam P. Shaw__
 
@@ -7,7 +7,6 @@ Repository of scripts and data for analysis of the genomic contexts of a given f
 ![](tutorial/images/ecdf_screenshot.png)
 
 ![](tutorial/images/linear_blocks_screenshot.png)
-
 
 
 ### Repository structure
