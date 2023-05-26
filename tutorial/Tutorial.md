@@ -29,7 +29,7 @@ Currently (25 May 2023) there is only an option to download whole contigs for up
 
 Options for download are: 
 
-* download the table of hits and download the contigs using the `Contig` accessions (e.g. with [ncbi-acc-download](https://github.com/kblin/ncbi-acc-download). 
+* download the table of hits and download the contigs using the `Contig` accessions (e.g. with [ncbi-acc-download](https://github.com/kblin/ncbi-acc-download): `ncbi-acc-download -F fasta {accession}`. 
 * download the gene hits with up to 2,000 bases flanking them in either direction (shorter contigs will return the whole contig)
 
 The nice thing about MicroBIGGE is that you get access to the species information and some other metadata such as BioSample, which you can use to fetch other metadata. 
@@ -38,17 +38,25 @@ The nice thing about MicroBIGGE is that you get access to the species informatio
 
 An alternative way to search NCBI and download whole contigs is via the Google Cloud Platform. NCBI have a [guide](https://www.ncbi.nlm.nih.gov/pathogens/docs/microbigge_gcp/) on how to do this. 
 
-First, we use an SQL query to obtain a list of Google Cloud storage locations of gzipped contigs:
+We can use an SQL query to obtain a list of Google Cloud storage locations of gzipped contigs:
 
 ```
-SELECT contig_url
+SELECT contig_acc
 FROM `ncbi-pathogen-detect.pdbrowser.microbigge`
 WHERE element_symbol LIKE 'mcr-1.%' OR element_symbol='mcr-1'
 ```
 
 (returns 8987 hits as of 25 May 2023 i.e. matches MicroBIGGE)
 
-<img src="images/gcp_mcr1_query.png"  width="800">
+This will return a list of the accessions of contigs, which we can download with `ncbi-acc-download -F fasta {accession}`. These contigs should then be combined into a single multi-fasta contig file for the pipeline (`gene_contigs.fa`).
+
+Alternatively, you can select `contig_url` to get a list of Google Cloud storage locations for the contigs:
+
+```
+SELECT contig_url
+FROM `ncbi-pathogen-detect.pdbrowser.microbigge`
+WHERE element_symbol LIKE 'mcr-1.%' OR element_symbol='mcr-1'
+```
 
 We can download that list of locations as a csv (save as `locations.csv`):
 
@@ -62,12 +70,6 @@ do
 	gsutil cp $f .
 done < locations.csv
 ``` 
-
-These contigs should then be combined into a single multi-fasta contig file for the pipeline (`gene_contigs.fa`).
-
-Alternatively, you can just use `SELECT contig_acc` to get the accessions and use `ncbi-acc-download`.
-
-
 
 ## Preparing the pipeline
 
