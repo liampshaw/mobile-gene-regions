@@ -1,6 +1,6 @@
 # See configfile in e.g. configs/laptop_config.yaml for parameters
 
-FOCAL_GENES = {"mcr-1.1"} 
+FOCAL_GENES = ["mcr-1.1"]
 # you have two input files:
 # focal gene: input/focal_genes/mcr-1.1.fa
 # contigs: input/contigs/mcr1.1_contigs.fa 
