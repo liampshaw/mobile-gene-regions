@@ -25,15 +25,17 @@ For a given 'focal' gene, there are two input files:
 * `input/focal_genes/{gene}.fa` - the focal gene of interest 
 * `input/focal_genes/{gene}_contigs.fa` - multi-fasta with the contigs which have been identified as containing the focal gene 
 
-A small dataset is provided for the *mcr-1.1* gene with 5kb flanking regions. Parameters for the analysis can be specified in the config file: 
-
-Within the `Snakefile` genes are specified in a list of `FOCAL_GENES`:
+Within the `Snakefile` these genes should be specified in a list of `FOCAL_GENES`:
 
 ```
-FOCAL_GENE_DICT = {"mcr-1.1"}
+FOCAL_GENES = {"mcr-1.1"}
 ```
 
-The full snakemake pipeline can be run with the following command:
+A small dataset (n=34 sequences) is provided for the *mcr-1.1* gene with 5kb flanking regions in the `input` directory. Parameters for the analysis can be specified in the config file (`configs/default_config.yaml`): 
+
+
+
+The full snakemake pipeline can be run on the example data with the following command:
 
 ```
 snakemake --cores 1 \
