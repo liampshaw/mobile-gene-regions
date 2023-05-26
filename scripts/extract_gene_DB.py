@@ -2,9 +2,11 @@ from Bio import SeqIO
 import sys
 import re
 seqs = SeqIO.to_dict(SeqIO.parse(sys.argv[1], "fasta"))
-gene = sys.argv[2]
+
+# We handle the gene name as just everything before "-" and make uppercase for CARD
+# This may not work depending on the gene
+gene = re.sub("-.*", "", str(sys.argv[2]).upper())
 db = sys.argv[3]
-print(gene)
 
 genes_seen = []
 with open(sys.argv[4], 'w') as f:
