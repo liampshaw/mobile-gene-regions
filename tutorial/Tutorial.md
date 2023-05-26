@@ -1,6 +1,6 @@
 # Tutorial on pipeline
 
-This document aims to give a basic tutorial in how to use the pipeline to explore the neighbourhood of a particular gene. 
+This document aims to give a detailed explanation of how to use the pipeline to explore the neighbourhood of a particular gene. 
 
 ## Obtaining your input files
 
@@ -69,7 +69,7 @@ Alternatively, you can just use `SELECT contig_acc` to get the accessions and us
 
 
 
-### Preparing the pipeline
+## Preparing the pipeline
 
 Your two files should be put in the following places (from the main directory):
 
@@ -96,7 +96,7 @@ means the pipeline will assume that the following files exist:
 The snakemake pipeline is split up into different rules. You can run the full pipeline with:
 
 ```
-snakemake --cores 1 --configfile configs/laptop_config.yaml -r prepare_DB run_pangraph calculate_distances make_plots
+snakemake --cores 1 --configfile configs/default_config.yaml -r run_pangraph calculate_distances make_plots
 ```
 
 Various other options can be specific in the config file e.g. `configs/laptop_config.yaml`
@@ -117,10 +117,6 @@ DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
 include_gff: False
 ```
 
-This will produce the main outputs:
-
-*To add: details of main output - html plots*
-
 ### Optional: providing GFF files
 
 The pipeline runs without annotation files by default, because pangraph uses only sequence similarity and no annotation information. However, it can be useful and interesting to see how the pangraph blocks correspond to the annotation information. Only `CDS` features will be used. 
@@ -130,6 +126,20 @@ If you have your own annotation files then they should be provided as a single g
 If you want to use NCBI annotation files, then you can get them with e.g. `ncbi-acc-download -F gff3 {accession}`. These can then be combined into a single gff (`cat *.gff > all.gff`; no need to strip out the headers etc., the pipeline can take care of it).
 
 If you want gff annotations on top of the linear blocks, change `include_gff` to `True` in the config file and put a gff in `input/gffs/{gene}_annotations.gff`.
+
+## Outputs
+
+All outputs are put into 
+
+
+## Beta-lactamase gene data
+
+*To include:*  is a focus on beta-lactamase genes as an example: for the beta-lactamases, using CARD prevalence data, we obtain sequences containing twelve beta-lactamases from clinically important beta-lactamase families. 
+*To include:* list of available accessions for download for each gene and their other metadata. 
+
+
+
+
 
 
 
