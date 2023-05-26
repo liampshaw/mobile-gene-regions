@@ -4,8 +4,9 @@ import re
 seqs = SeqIO.to_dict(SeqIO.parse(sys.argv[1], "fasta"))
 
 # We handle the gene name as just everything before "-" and make uppercase for CARD
-# This may not work depending on the gene
-gene = re.sub("-.*", "", str(sys.argv[2]).upper())
+# eg. for /some/path/to/input/focal_gene/mcr-1.1.fa it will search for MCR in CARD
+# This may not work depending on the gene...
+gene = re.sub(".*\\/", "", re.sub("-.*", "", str(sys.argv[2]).upper()))
 db = sys.argv[3]
 
 genes_seen = []
