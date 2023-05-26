@@ -71,6 +71,7 @@ makePlots <- function(df){
     p.upstream <-  ggplot(df, aes( -dist.up, group=snps.categorical, colour=snps.categorical))+
       stat_ecdf()+
       theme_bw()+
+    annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')+
       theme(legend.position = "none")+
       labs(colour="SNPs")+
       ylab("cdf")+
@@ -84,7 +85,8 @@ makePlots <- function(df){
         panel.border = element_blank(),
         panel.background = element_blank(),
         title = element_text())+
-      xlim(c(-dist.max, 0))+
+      scale_y_continuous(limits=c(0,1), expand = c(0, 0))+
+      scale_x_continuous(limits=c(-dist.max, 0), expand=c(0,0))+
       theme(plot.title=element_text(hjust=0.5))+
       annotation_custom(tableGrob(snp.comparison.table, theme=table.theme, rows=NULL), 
                         xmax=-dist.max*3.5/5, ymax=1.5)
@@ -93,12 +95,14 @@ makePlots <- function(df){
     p.downstream <- ggplot(df, aes( dist.down,group=snps.categorical, colour=snps.categorical))+
       stat_ecdf()+
       theme_bw()+
+    annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')+
       labs(colour="SNPs")+
       ylab("cdf")+
       xlab("distance from gene (bp)")+
       theme(panel.grid = element_blank())+
       scale_color_manual(values=snps.categorical.colour.palette)+
-      #xlim(c(0,dist.max))+
+      scale_y_continuous(limits=c(0,1), expand = c(0, 0))+
+      scale_x_continuous(limits=c(0, dist.max), expand=c(0,0))+      
       theme(axis.line.y=element_blank(),
             axis.text.y=element_blank(),
             axis.title.y=element_blank())+
@@ -133,5 +137,6 @@ dev.off()
 pdf(paste0(args$output_pdf_prefix, '-compare-to-focal-gene.pdf'), width=8, height=4)
 makePlots(d.subset.compare.to.focal)
 dev.off()
+
 
 
