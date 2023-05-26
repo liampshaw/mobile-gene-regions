@@ -106,32 +106,58 @@ Various other options can be specific in the config file e.g. `configs/laptop_co
 
 ```
 version: "default"
-panx_export : False
-bandage : True
-snp_threshold : "25"
-region_upstream : "5000"
-region_downstream : "5000"
-pangraph_polish : False
-pangraph_aligner : "minimap2"
-pangraph_minblocklength : "100"
-pangraph_edgeminlength : "0"
-DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
-include_gff: False
+bandage : True # whether to plot Bandage plot
+snp_threshold : "25" # threshold of SNP differences wrt input/{gene}.fa in instance of focal gene in contig in order to include
+region_upstream : "5000" # upstream bases flanking gene (shorter discarded)
+region_downstream : "5000" # downstream bases flanking gene (shorter discarded)
+panx_export : False # whether to export panX visualisation (block alignments)
+pangraph_polish : False # whether to polish the pangraph alignments (recommended with panx_export)
+pangraph_aligner : "minimap2" # aligner for pangraph. alternative: mmseqs (much slower but more accurate)
+pangraph_minblocklength : "100" # minimum blocklength of pangraph
+pangraph_edgeminlength : "0" # minimum edge length to include in bandage plot
+DB: ["CARD"] # could be NCBI (AMRFinderPlus, but currently not include
+include_gff: False # whether a gff is included for linear blocks plot
 ```
 
 ### Optional: providing GFF files
 
-The pipeline runs without annotation files by default, because pangraph uses only sequence similarity and no annotation information. However, it can be useful and interesting to see how the pangraph blocks correspond to the annotation information. Only `CDS` features will be used. 
+The pipeline runs without annotation files by default, because pangraph uses only sequence similarity and no annotation information. However, it can be useful and interesting to see how the pangraph blocks correspond to the annotation information for the final plot of linear blocks. Only `CDS` features are used. 
 
 If you have your own annotation files then they should be provided as a single gff. 
 
-If you want to use NCBI annotation files, then you can get them with e.g. `ncbi-acc-download -F gff3 {accession}`. These can then be combined into a single gff (`cat *.gff > all.gff`; no need to strip out the headers etc., the pipeline can take care of it).
+If you want to use NCBI annotation files, then you can get them with e.g. `ncbi-acc-download -F gff3 {accession}`. These can then be combined into a single gff (`cat *.gff > all.gff`; no need to strip out the headers etc., the pipeline just ignores all of that). 
 
-If you want gff annotations on top of the linear blocks, change `include_gff` to `True` in the config file and put a gff in `input/gffs/{gene}_annotations.gff`.
+If you want gff annotations on top of the linear blocks, set `include_gff: True` and put your combined gff in `input/gffs/{gene}_annotations.gff`.
+
+WARNING: a large GFF (particularly where you have whole chromosomes) will take a long time to process for this final plot.
+
+### Parameters
+
+
 
 ## Outputs
 
-All outputs are put into 
+All outputs are put into the `output` folder. Outputs to do with extracting the variation in the focal gene are put in `output/gene_variants`. All other outputs for the pangraph part of the pipeline are in `output/pangraph/{gene}`.
+
+Gene variant outputs:
+
+`output/gene_variants/sequence_assignments/{gene}.csv` - for each sequence with a hit to the focal gene, the name of the variant (based on amino acid sequence) if a named variant exists in CARD. Otherwise 'unnamed' (if valid variant, but not named) or 'truncated' (if premature stop codon).
+
+Pangraph outputs in `output/pangraph/{gene}`:
+* `{gene}_pangraph.json` - pangraph of the flanking regions in all sequences
+* `mcr-1.1_pangraph.gfa` - gfa of pangraph. Can be inspected in Bandage
+* `mcr-1.1_pangraph.json.blocks.csv` - csv of block start/end positions in each sequence with colours assigned to show homology
+* `mcr-1.1.output_dists.csv` - breakpoint distances upstream/downstream between every pair of sequences
+* `positional_entropies.txt` - block positional entropy at each position
+
+Plots are outputted in `output/pangraph/{gene}/plots`:
+* `NJ_tree_central_gene.pdf` - NJ tree of the focal gene
+* `{gene}_pangraph.bandage_plot.png` - Bandage plot of pangraph
+* `linear_blocks.pdf` - linear representation of pangraph 
+* `{gene}_breakpoint_distances-...pdf` - empirical cumulative distribution function of pairwise breakpoint distances, either between `all`, `compare-to-focal-gene` (only comparisons involving focal gene), `compare-to-most-common` (only comparisons involving most common gene variant).
+* `{gene}_linear_blocks.html` - interactive html of linear representation of pangraph (also `{gene}_linear_blocks_deduplicated.html` showing only unique patterns of blocks, with number of sequences having that pattern)
+* `{gene}_ecdf.html` - interative html of all pairwise breakpoint distances
+
 
 
 ## Beta-lactamase gene data
