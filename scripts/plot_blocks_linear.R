@@ -112,9 +112,15 @@ genome.blocks.unique$genome.n <- sapply(genome.blocks.unique$n.reps, function(x)
 # Now use a dendrogram to order the genomes
 m <- acast(genome ~ block, data=genome.blocks.unique, fill=0, fun.aggregate=length, value.var="genome.n")
 m.dist <- vegdist(m, method="jaccard") # jaccard distances based on block presence/absence
-dendro <- as.dendrogram(hclust(m.dist))
-dendro_order <- order.dendrogram(dendro)
-genome_labels <- dendro_data(dendro)$labels$label
+if (length(m.dist)>0){ # if there is more than one block pattern!
+  dendro <- as.dendrogram(hclust(m.dist))
+  dendro_order <- order.dendrogram(dendro)
+  genome_labels <- dendro_data(dendro)$labels$label
+}
+if (length(m.dist)==0){
+  genome_labels=genome.blocks.unique$genome[1]
+}
+
 genome.blocks.unique$genome.ordered <- ordered(genome.blocks.unique$genome,
                                                levels=genome_labels)
 

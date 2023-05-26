@@ -1,0 +1,27 @@
+name: bl-region-env 
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - r
+dependencies:
+  - scipy
+  - pandas
+  - snp-dists
+  - numpy
+  - seaborn
+  - biopython
+  - ncbi-acc-download
+  - ncbi-genome-download
+  - fasttree
+  - seqkit
+  - untangle
+  - entrez-direct
+  - mmseqs2
+  - treetime==0.9.4
+  - pairsnp
+  - snakemake
+  - ca-certificates
+  - certifi
+  - openssl
+  - altair

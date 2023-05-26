@@ -95,6 +95,22 @@ def blast_search(query_fasta, db_fasta):
     else:
         blast_output = blast_output[:-1]
         blast_results = np.reshape(blast_output, (-1, 11))
+
+
+        # RESHAPING
+        # remove the seqids for masking and set to int
+        blast_results_numeric = np.array(blast_results[:,[1,2,3,4,5, 7, 8, 9, 10]] , dtype=np.int32)
+
+
+        # Only select those with ~full-length hits (allow 95%)
+        print(len(blast_results))
+        #print(blast_results[:, 3])
+        #print(0.95*blast_results[:,7])
+        mask = blast_results_numeric[:, 3] > 0.95 * blast_results_numeric[:, 7]
+        blast_results = blast_results[mask]
+        # RESHAPING
+
+
         contigs_with_hits = list(blast_results[:,0])
         contigs_one_hit = [x for x in set(contigs_with_hits) if contigs_with_hits.count(x)==1]
         contigs_multiple_hits = [x for x in set(contigs_with_hits) if contigs_with_hits.count(x)>1]
@@ -114,7 +130,7 @@ def extract_regions(sequences, blast_hits, gene_length, length_threshold=0.99, i
 
     for seq_id, hit in blast_hits.items():
         if hit=="multiple_hits":
-            print('WARNING: Contig '+seq_id+' has multiple blast hits. Not including in output.')
+            print('WARNING: Contig '+seq_id+' has multiple full-length blast hits (>95% coverage). Not including in output.')
         else:
             contig_seq = str(sequences[seq_id].seq)
             #print(region_seq)

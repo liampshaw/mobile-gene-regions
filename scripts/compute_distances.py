@@ -7,6 +7,7 @@ def get_options():
     parser = argparse.ArgumentParser(description='computes a variety of distances between sequences')
     parser.add_argument("--block_csv", help="Input file (pangraph json)", type=str)
     parser.add_argument("--gene_block_file", help='File containing block with gene of interest (anchor)', type=str)
+    parser.add_argument("--gene_offset", help='File containing actual locations of anchor gene in consensus central block', type=str)
     parser.add_argument("--snps", help="file of SNP distances between isolates", type=str)
     parser.add_argument("--output", help="output file", type=str)
     return parser.parse_args()
@@ -49,6 +50,11 @@ def jaccard(a, b):
 def main():
     args = get_options()
 
+    with open(args.gene_offset, 'r') as f:
+        gene_offset = f.read().strip('\n').split('\t')
+        # formatted as balst output of focal gene against the consensus gene block: sstart send slen 
+    gene_offset_upstream = int(gene_offset[0])
+    gene_offset_downstream = int(gene_offset[2])-int(gene_offset[1])
     block_lengths = {}
     path_dict = {}
     with open(args.block_csv, 'r') as f:
@@ -77,7 +83,7 @@ def main():
                     upstream_dist = sum([block_lengths[x][a] for x in upstream_blocks])
                     downstream_blocks = distFirstBreakpoint(path_dict[a], path_dict[b], starting_block, upstream=False)
                     downstream_dist = sum([block_lengths[x][a] for x in downstream_blocks])
-                    output_file.write('%s,%s,%d,%d,%d\n' % (a, b, upstream_dist, downstream_dist, snps))
+                    output_file.write('%s,%s,%d,%d,%d\n' % (a, b, upstream_dist+gene_offset_upstream, downstream_dist+gene_offset_downstream, snps))
 
 if __name__ == "__main__":
     main()
