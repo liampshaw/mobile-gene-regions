@@ -38,7 +38,7 @@ The full snakemake pipeline can be run with the following command:
 ```
 snakemake --cores 1 \
           --configfile configs/default_config.yaml \
-          -r run_pangraph calculate_distances make_plots
+          -r prepare_DB run_pangraph calculate_distances make_plots
 ```
 
 Outputs are written to `output` and include output data files as well as pdf plots (generated with R) and html plots (generated with [altair](https://altair-viz.github.io/) in Python).
