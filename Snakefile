@@ -34,6 +34,7 @@ rule make_plots:
 		expand("output/pangraph/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENES),
 		expand("output/pangraph/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENES),
 		expand("output/pangraph/{gene}/plots/{gene}_linear_blocks.html", gene=FOCAL_GENES),
+		expand("output/pangraph/{gene}/plots/{gene}_linear_blocks_deduplicated.html", gene=FOCAL_GENES),
 		expand("output/pangraph/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENES),
 		expand("output/pangraph/{gene}/plots/bandage.log_file", gene=FOCAL_GENES)
 
@@ -329,10 +330,6 @@ rule plot_linear_blocks_altair_deduplicated:
 	shell: 
 		"python scripts/plot_linear_blocks_altair.py --flanking_width {params.flanking_width} --unique --block_csv {input} --gene_name {params.gene_name} --output {output}" if config["include_gff"]==False else
 		"python scripts/plot_linear_blocks_altair.py --flanking_width {params.flanking_width} --unique --block_csv {input} --gene_name {params.gene_name} --output {output} --gff_file {params.gff}"
-		
-		#shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --unique --output {output.unique} --gff_file ")
-		#shell("python scripts/plot_linear_blocks_altair.py --block_csv {input} --gene_name {params.gene_name} --unique --output {output.unique}")
-
 
 # rule combine_breakpoint_and_NJ:
 # 	input:
