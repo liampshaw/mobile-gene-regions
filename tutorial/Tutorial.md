@@ -158,11 +158,12 @@ Plots are outputted in `output/pangraph/{gene}/plots`:
 * `{gene}_linear_blocks.html` - interactive html of linear representation of pangraph (also `{gene}_linear_blocks_deduplicated.html` showing only unique patterns of blocks, with number of sequences having that pattern)
 * `{gene}_ecdf.html` - interative html of all pairwise breakpoint distances
 
-![](images/ecdf_screenshot.png)
 
+![](images/ecdf_screenshot.png)
 
 ![](images/linear_blocks_screenshot.png)
 
+*To add*: more information about how to interact with linear blocks plot, with an interesting example. 
 
 
 
