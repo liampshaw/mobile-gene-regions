@@ -41,8 +41,6 @@ snakemake --cores 1 \
           -r run_pangraph calculate_distances make_plots
 ```
 
-Outputs are written to `output` and include output data files as well as pdf plots (generated with R) and html plots (generated with altair in Python):
-
-![](tutorial/images/example_screenshot.png)
+Outputs are written to `output` and include output data files as well as pdf plots (generated with R) and html plots (generated with [altair](https://altair-viz.github.io/) in Python).
 
 A more detailed tutorial on how to prepare data and use the pipeline is available in `tutorial/Tutorial.md`.
