@@ -1,4 +1,5 @@
 version: "default"
+complete: True
 panx_export : False
 bandage : True
 snp_threshold : "25"
