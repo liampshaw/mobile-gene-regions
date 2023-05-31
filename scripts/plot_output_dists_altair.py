@@ -62,9 +62,10 @@ def main():
     args = get_options()
 
     if args.gene_of_interest!='':
+        gene = args.gene_of_interest.upper()
         df = pd.read_csv(args.dist_csv)
-        df = df.loc[(df["variant1"]==args.gene_of_interest) | (df["variant2"]==args.gene_of_interest)]
-        tmp_csv = args.dist_csv+'.'+args.gene_of_interest+'.csv'
+        df = df.loc[(df["variant1"]==gene) | (df["variant2"]==gene)]
+        tmp_csv = args.dist_csv+'.'+gene+'.csv'
         df.to_csv(tmp_csv)
         # Convert csv to json
         tmp_json = tmp_csv+'_tmp.json'
@@ -77,6 +78,7 @@ def main():
         convert_csv_to_json(csv_input=args.dist_csv, json_output=tmp_json)
         df = pd.read_json(tmp_json)
 
+    print(df)
     # Convert the data types of the columns to float 
     df['distup'] = df['dist.up'].astype(float)
     df['distdown'] = df['dist.down'].astype(float)
