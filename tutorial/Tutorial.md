@@ -131,6 +131,17 @@ If you want gff annotations on top of the linear blocks, set `include_gff: True`
 
 WARNING: a large GFF (particularly where you have whole chromosomes) will take a long time to process for this final plot.
 
+You can run the pipeline iteratively to get a better handle on this: first, run with `include_gff: False`. Then, look in `output/pangraph/{gene}/plots/{gene}_linear_blocks_deduplicated.html.unique_genomes.txt` to see the (reduced) list of accessions you would need gffs for to cover the variation in your dataset. Having downloaded these, you can then plot the reduced dataset with gff annotations with:
+
+```
+python scripts/plot_linear_blocks_altair.py --flanking_width {flanking_width} \
+                                            --block_csv output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv \
+                                            --strain_list {deduplicated_genomes}
+                                            --gene_name {gene} \ 
+                                            --gff_file {your_combined_gff} \
+                                            --output gff_plot.html
+```
+
 ### Parameters
 
 
