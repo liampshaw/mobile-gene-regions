@@ -65,7 +65,7 @@ def main():
         df = pd.read_csv(args.dist_csv)
         df = df.loc[(df["variant1"]==args.gene_of_interest) | (df["variant2"]==args.gene_of_interest)]
         tmp_csv = args.dist_csv+'.'+args.gene_of_interest+'.csv'
-        df.write_csv(tmp_csv)
+        df.to_csv(tmp_csv)
         # Convert csv to json
         tmp_json = tmp_csv+'_tmp.json'
         convert_csv_to_json(csv_input=tmp_csv, json_output=tmp_json)
