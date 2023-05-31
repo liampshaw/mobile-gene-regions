@@ -76,7 +76,7 @@ def main():
     starting_block = open(args.gene_block_file, "r").readline().strip("\n")
 
     with open(args.output, "w") as output_file:
-        output_file.write('seq1,seq2,dist.up,dist.down,snps\n')
+        output_file.write('seq1,seq2,dist.up,dist.down,snps,variant1,variant2\n')
         with open(args.snps, 'r') as f: # generated with snp-dists -p from gene seqs
             for line in f.readlines():
                 line = line.strip().split()
