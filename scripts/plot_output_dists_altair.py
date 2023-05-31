@@ -23,6 +23,7 @@ def get_options():
     parser = argparse.ArgumentParser(description='Produce html plot of pairwise breakpoint distances')
     parser.add_argument('--dist_csv', help='CSV of output distances, produced from pangraph pipeline.', type=str)
     parser.add_argument('--output_html', help='Output html (default: output.html)', type=str, default='output.html')
+    parser.add_argument('--gene_of_interest', help='Gene of interest to subset to comparisons involving only this named variant', type=str, default='', required=False)   
     return parser.parse_args()
 
 def convert_csv_to_json(csv_input, json_output):
@@ -60,10 +61,21 @@ def main():
     # Open the CSV file for reading
     args = get_options()
 
-    # Convert csv to json
-    tmp_json = args.dist_csv+'_tmp.json'
-    convert_csv_to_json(csv_input=args.dist_csv, json_output=tmp_json)
-    df = pd.read_json(tmp_json)
+    if args.gene_of_interest!='':
+        df = pd.read_csv(args.dist_csv)
+        df = df.loc[(df["variant1"]==args.gene_of_interest) | (df["variant2"]==args.gene_of_interest)]
+        tmp_csv = args.dist_csv+'.'+args.gene_of_interest+'.csv'
+        df.write_csv(tmp_csv)
+        # Convert csv to json
+        tmp_json = tmp_csv+'_tmp.json'
+        convert_csv_to_json(csv_input=tmp_csv, json_output=tmp_json)
+        df = pd.read_json(tmp_json)
+
+    else:
+        # Convert csv to json
+        tmp_json = args.dist_csv+'_tmp.json'
+        convert_csv_to_json(csv_input=args.dist_csv, json_output=tmp_json)
+        df = pd.read_json(tmp_json)
 
     # Convert the data types of the columns to float 
     df['distup'] = df['dist.up'].astype(float)

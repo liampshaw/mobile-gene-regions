@@ -301,11 +301,14 @@ rule plot_NJ_tree_central_gene:
 rule plot_output_dists_altair:
 	input:
 		"output/pangraph/{gene}/{gene}.output_dists.csv"
+	params:
+		gene="{gene}"
 	output:
-		"output/pangraph/{gene}/plots/{gene}_ecdf.html"
-	shell: 
-		"python scripts/plot_output_dists_altair.py --dist_csv {input} --output_html {output}"
-
+		full="output/pangraph/{gene}/plots/{gene}_ecdf.html",
+		focal="output/pangraph/{gene}/plots/{gene}_ecdf_focal_gene.html"
+	run: 
+		shell("python scripts/plot_output_dists_altair.py --dist_csv {input} --output_html {output.full}")
+		shell("python scripts/plot_output_dists_altair.py --dist_csv {input} --gene_of_interest {params.gene} --output_html {output.focal}")
 
 rule plot_linear_blocks_altair:
 	input:
