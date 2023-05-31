@@ -189,7 +189,8 @@ rule compute_distances:
 		gene_block="output/pangraph/{gene}/{gene}.gene_block.txt",
 		snps="output/gene_variants/sequence/{gene}_seqs.snps.tsv",
 		#locations="output/pangraph/{gene}/{gene}_gene_locations.txt",
-		pangraph_fasta="output/pangraph/{gene}/{gene}_pangraph.fa"
+		pangraph_fasta="output/pangraph/{gene}/{gene}_pangraph.fa",
+		gene_assignments="output/gene_variants/sequence_assignments/{gene}.csv" # assignments of genes
 	output:
 		gene_block_fasta="output/pangraph/{gene}/{gene}.gene_block.fa",
 		gene_rel_locations="output/pangraph/{gene}/{gene}_relative_locations_block.txt",
@@ -201,8 +202,9 @@ rule compute_distances:
 		shell("python scripts/compute_distances.py --block_csv {input.block_csv} \
 											--gene_block_file {input.gene_block} \
 											--snps {input.snps}\
-											--output {output.dists}\
-											--gene_offset {output.gene_rel_locations}")
+											--gene_assignments {input.gene_assignments}\
+											--gene_offset {output.gene_rel_locations}\
+											--output {output.dists}")
 
 rule positional_entropies:
 	input:
