@@ -24,6 +24,7 @@ def get_options():
     parser.add_argument('--dist_csv', help='CSV of output distances, produced from pangraph pipeline.', type=str)
     parser.add_argument('--output_html', help='Output html (default: output.html)', type=str, default='output.html')
     parser.add_argument('--gene_of_interest', help='Gene of interest to subset to comparisons involving only this named variant', type=str, default='', required=False)   
+    parser.add_argument('--strain_list', help='Only include comparisons between sequences named in this file', type=str, default='', required=False)   
     return parser.parse_args()
 
 def convert_csv_to_json(csv_input, json_output):
@@ -78,7 +79,11 @@ def main():
         convert_csv_to_json(csv_input=args.dist_csv, json_output=tmp_json)
         df = pd.read_json(tmp_json)
 
-    print(df)
+    # Check for strain list
+    if args.strain_list!='':
+        seqs_to_include = list(pd.read_csv(args.strain_list, header=None)[0])
+        df = df.loc[(df['seq1'].isin(seqs_to_include)) & (df['seq2'].isin(seqs_to_include))]
+
     # Convert the data types of the columns to float 
     df['distup'] = df['dist.up'].astype(float)
     df['distdown'] = df['dist.down'].astype(float)
