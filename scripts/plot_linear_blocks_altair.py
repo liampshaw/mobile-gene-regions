@@ -22,6 +22,7 @@ def get_options():
     parser.add_argument('--output', help='Output html (default: output.html)', type=str, default='output.html')
     parser.add_argument('--unique', help='Whether to plot unique block configurations (for a simpler/smaller plot)', default=False, action='store_true')
     parser.add_argument('--flanking_width', help='Size of flanking regions', type=int, default=5000)
+    parser.add_argument('--strain_list', help='Only include comparisons between sequences named in this file', type=str, default='', required=False)   
     return parser.parse_args()
 
 def calculate_jaccard_index(set1, set2):
@@ -112,6 +113,12 @@ def main():
   # remove the information on genome location (might want to keep, just useful for gff annotation consistency)
   block_df['genome'] = [re.sub(':.*', '', x) for x in list(block_df['genome'])]
   # To do: if we keep these, can use them to give actual positions with mouseover
+
+  # Check for strain list
+  if args.strain_list!='':
+    seqs_to_include = list(pd.read_csv(args.strain_list, header=None)[0])
+    block_df = block_df.loc[(block_df['genome'].isin(seqs_to_include))]
+
 
   # Sort out the block colours for the plot
   block_colours = {k:v for k, v in zip(block_df['block'], block_df['colour'])}
