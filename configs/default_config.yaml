@@ -1,5 +1,5 @@
 version: "default"
-complete: True
+complete: True # incomplete is work-in-progress - don't use
 panx_export : False
 bandage : True
 snp_threshold : "25"
