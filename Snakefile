@@ -92,6 +92,9 @@ rule extract_region_around_focal_gene:
 	shell: 
 		"python scripts/extract_region_around_gene.py --gene {params.gene} --input {input.input_fasta} \
 		--upstream {params.upstream} --downstream {params.upstream} --complete --output_fasta {params.prefix}.fa\
+		--threshold {params.threshold}" if config["complete"]==True else
+		"python scripts/extract_region_around_gene.py --gene {params.gene} --input {input.input_fasta} \
+		--upstream {params.upstream} --downstream {params.upstream} --output_fasta {params.prefix}.fa\
 		--threshold {params.threshold}"
 
 rule calculate_snp_dists_extracted_seqs:
