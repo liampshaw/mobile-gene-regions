@@ -8,7 +8,7 @@ def get_options():
     parser.add_argument("--block_csv", help="Input file (pangraph json)", type=str)
     parser.add_argument("--gene_block_file", help='File containing block with gene of interest (anchor)', type=str)
     parser.add_argument("--gene_offset", help='File containing actual locations of anchor gene in consensus central block', type=str)
-    parser.add_argument("--snps", help="file of SNV distances between isolates", type=str)
+    parser.add_argument("--snvs", help="file of SNV distances between isolates", type=str)
     parser.add_argument("--gene_assignments", help="file of variant assignment of genes", type=str)
     parser.add_argument("--output", help="output file", type=str)
     return parser.parse_args()
@@ -72,21 +72,21 @@ def main():
                     block_lengths[line[1]][line[0]] = abs(int(line[4])-int(line[3]))
                 else:
                     block_lengths[line[1]] = {line[0]: abs(int(line[4])-int(line[3]))}
-    # Generate snp-dists?
+    # Generate snv-dists?
     starting_block = open(args.gene_block_file, "r").readline().strip("\n")
 
     with open(args.output, "w") as output_file:
-        output_file.write('seq1,seq2,dist.up,dist.down,snps,variant1,variant2\n')
-        with open(args.snps, 'r') as f: # generated with snp-dists -p from gene seqs
+        output_file.write('seq1,seq2,dist.up,dist.down,snvs,variant1,variant2\n')
+        with open(args.snvs, 'r') as f: # generated with snv-dists -p from gene seqs
             for line in f.readlines():
                 line = line.strip().split()
-                a, b, snps = line[0], line[1], int(line[2])
+                a, b, snvs = line[0], line[1], int(line[2])
                 if a in path_dict.keys() and b in path_dict.keys(): # check if in pangraph (may not be if e.g. seq was too short)
                     upstream_blocks = distFirstBreakpoint(path_dict[a], path_dict[b], starting_block)
                     upstream_dist = sum([block_lengths[x][a] for x in upstream_blocks])
                     downstream_blocks = distFirstBreakpoint(path_dict[a], path_dict[b], starting_block, upstream=False)
                     downstream_dist = sum([block_lengths[x][a] for x in downstream_blocks])
-                    output_file.write('%s,%s,%d,%d,%d,%s,%s\n' % (a, b, upstream_dist+gene_offset_upstream, downstream_dist+gene_offset_downstream, snps, gene_assignments[a], gene_assignments[b]))
+                    output_file.write('%s,%s,%d,%d,%d,%s,%s\n' % (a, b, upstream_dist+gene_offset_upstream, downstream_dist+gene_offset_downstream, snvs, gene_assignments[a], gene_assignments[b]))
 
 if __name__ == "__main__":
     main()

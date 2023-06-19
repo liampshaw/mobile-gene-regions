@@ -40,7 +40,7 @@ def convert_csv_to_json(csv_input, json_output):
             f.write(json_str)
     return
   
-def map_to_categorical_snp(values):
+def map_to_categorical_snv(values):
     '''Maps SNVs to categories - have >7 as (arbitrary) highest category'''
     return_values = [""] * len(values)
     for i,v in enumerate(values):
@@ -88,13 +88,13 @@ def main():
     df['distup'] = df['dist.up'].astype(float)
     df['distdown'] = df['dist.down'].astype(float)
     # And add categorical SNVs
-    df['snpscategorical'] = map_to_categorical_snp(list(df['snps']))
+    df['snvscategorical'] = map_to_categorical_snv(list(df['snvs']))
     # Maximum distance
     # to clip the edges where ecdf artifically goes to 1 (so plot drops to 0) because we don't look beyond
     max_dist = max(df['distup'])-10 # 
 
     # For dropdown selection for SNV category of comparison
-    options = sorted(set(df['snpscategorical']))
+    options = sorted(set(df['snvscategorical']))
     labels = [option + ' ' for option in options]
     # Sort labels in the same order
     labels_sorted = [label for _, label in sorted(zip(options, labels))]
@@ -106,24 +106,24 @@ def main():
     )
 
     selection = alt.selection_point(
-        fields=['snpscategorical'],
+        fields=['snvscategorical'],
         bind=input_dropdown,
         #empty='all'
     )
 
     color = alt.condition(
-        selection ,# & (alt.datum.snpscategorical != 'None'),
-        alt.Color('snpscategorical:N').legend(None),
+        selection ,# & (alt.datum.snvscategorical != 'None'),
+        alt.Color('snvscategorical:N').legend(None),
         alt.value('lightgray')
     )
 
 
 
     # Create ecdf dataframes
-    plot_df_up = df.groupby('snpscategorical').apply(lambda x: ecdf(x['distup'])).reset_index(level=1, drop=True)
-    plot_df_up = plot_df_up.assign(snpscategorical=plot_df_up.index)
-    plot_df_down = df.groupby('snpscategorical').apply(lambda x: ecdf(x['distdown'])).reset_index(level=1, drop=True)
-    plot_df_down = plot_df_down.assign(snpscategorical=plot_df_down.index)
+    plot_df_up = df.groupby('snvscategorical').apply(lambda x: ecdf(x['distup'])).reset_index(level=1, drop=True)
+    plot_df_up = plot_df_up.assign(snvscategorical=plot_df_up.index)
+    plot_df_down = df.groupby('snvscategorical').apply(lambda x: ecdf(x['distdown'])).reset_index(level=1, drop=True)
+    plot_df_down = plot_df_down.assign(snvscategorical=plot_df_down.index)
 
 
     # The strategy for selection is that 
@@ -132,7 +132,7 @@ def main():
 
     # Produce legend
     legend = alt.Chart(plot_df_up).mark_point().encode(
-        alt.Y('snpscategorical:N').axis(orient='right'),
+        alt.Y('snvscategorical:N').axis(orient='right'),
         color=color
     ).add_params(
         selection
@@ -150,7 +150,7 @@ def main():
         x=alt.X("dist:Q",
                 scale=alt.Scale(reverse=True, domain=[0, max_dist])),
         y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0,1])),
-        color=alt.Color('snpscategorical:N').legend(None),
+        color=alt.Color('snvscategorical:N').legend(None),
     )
     ecdf_plot_up_unselected = alt.Chart(plot_df_up).mark_line(
         interpolate=interpolate_option,
@@ -161,8 +161,8 @@ def main():
         x=alt.X("dist:Q",
                 scale=alt.Scale(reverse=True, domain=[0, max_dist])),
         y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0,1])),
-        color=alt.Color('snpscategorical:N', scale=None, 
-        sort=alt.EncodingSortField('snpscategorical')),
+        color=alt.Color('snvscategorical:N', scale=None, 
+        sort=alt.EncodingSortField('snvscategorical')),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
 
@@ -179,7 +179,7 @@ def main():
         x=alt.X("dist:Q",
                 scale=alt.Scale(domain=[0, max_dist])),
         y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0, 1])),
-        color=alt.Color('snpscategorical:N').legend(None),
+        color=alt.Color('snvscategorical:N').legend(None),
     )
     ecdf_plot_down_unselected = alt.Chart(plot_df_down).mark_line(
         interpolate=interpolate_option,
@@ -190,8 +190,8 @@ def main():
         x=alt.X("dist:Q",
                 scale=alt.Scale(domain=[0, max_dist])),
         y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0,1])),
-        color=alt.Color('snpscategorical:N', scale=None, 
-        sort=alt.EncodingSortField('snpscategorical')),
+        color=alt.Color('snvscategorical:N', scale=None, 
+        sort=alt.EncodingSortField('snvscategorical')),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
 

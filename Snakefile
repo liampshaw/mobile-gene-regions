@@ -54,7 +54,7 @@ rule extract_genes_from_contigs:
 		gene_fasta="input/focal_genes/{gene}.fa",
 		input_fasta="input/contigs/{gene}_contigs.fa"
 	params:
-		snp_threshold=int(config["snp_threshold"])
+		snv_threshold=int(config["snv_threshold"])
 	output:
 		"output/gene_variants/sequence/{gene}_seqs.fa"
 	shell:
@@ -63,7 +63,7 @@ rule extract_genes_from_contigs:
 												--output_fasta {output} \
 												--upstream 0 \
 												--downstream 0 \
-												--threshold {params.snp_threshold}"
+												--threshold {params.snv_threshold}"
 
 rule assign_variants:
 	input:
@@ -86,7 +86,7 @@ rule extract_region_around_focal_gene:
 		prefix="output/pangraph/{gene}/{gene}_extracted",
 		upstream=config["region_upstream"],
 		downstream=config["region_downstream"],
-		threshold=int(config["snp_threshold"])
+		threshold=int(config["snv_threshold"])
 	output:
 		"output/pangraph/{gene}/{gene}_extracted.fa"
 	shell: 
@@ -97,16 +97,16 @@ rule extract_region_around_focal_gene:
 		--upstream {params.upstream} --downstream {params.upstream} --output_fasta {params.prefix}.fa\
 		--threshold {params.threshold}"
 
-rule calculate_snp_dists_extracted_seqs:
+rule calculate_snv_dists_extracted_seqs:
 	input:
 		"output/gene_variants/sequence/{gene}_seqs.fa"
 	output:
-		"output/gene_variants/sequence/{gene}_seqs.snps.tsv",
+		"output/gene_variants/sequence/{gene}_seqs.snvs.tsv",
 		"output/gene_variants/sequence/{gene}_seqs.fa.dedup.aln",
 		"output/gene_variants/sequence/{gene}_seqs.fa.dedup.txt"
 	run:
 		shell("mafft --auto {input} > {input}.aln"),
-		shell("snp-dists -q -m {input}.aln > {output}")
+		shell("snv-dists -q -m {input}.aln > {output}")
 		shell("seqkit rmdup -s < {input}.aln > {input}.dedup.aln -D {input}.dedup.txt")
 
 rule tree_for_focal_gene:
@@ -190,7 +190,7 @@ rule compute_distances:
 		gene_fasta="input/focal_genes/{gene}.fa",
 		block_csv="output/pangraph/{gene}/{gene}_pangraph.json.blocks.csv",
 		gene_block="output/pangraph/{gene}/{gene}.gene_block.txt",
-		snps="output/gene_variants/sequence/{gene}_seqs.snps.tsv",
+		snvs="output/gene_variants/sequence/{gene}_seqs.snvs.tsv",
 		#locations="output/pangraph/{gene}/{gene}_gene_locations.txt",
 		pangraph_fasta="output/pangraph/{gene}/{gene}_pangraph.fa",
 		gene_assignments="output/gene_variants/sequence_assignments/{gene}.csv" # assignments of genes
@@ -204,7 +204,7 @@ rule compute_distances:
 		shell("blastn -max_hsps 10000 -query {input.gene_fasta} -db {output.gene_block_fasta} -outfmt '6 sstart send slen' > {output.gene_rel_locations}")
 		shell("python scripts/compute_distances.py --block_csv {input.block_csv} \
 											--gene_block_file {input.gene_block} \
-											--snps {input.snps}\
+											--snvs {input.snvs}\
 											--gene_assignments {input.gene_assignments}\
 											--gene_offset {output.gene_rel_locations}\
 											--output {output.dists}")

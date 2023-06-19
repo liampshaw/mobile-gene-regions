@@ -46,7 +46,7 @@ if (!is.null(root)){
 
 dna <- read.dna(variant_alignment_file, format='fasta')
 isolates = gsub(" .*", "",labels(dna))
-snps = as.numeric(sapply(labels(dna), function(x) strsplit(x, " ", fixed=TRUE)[[1]][4]))
+snvs = as.numeric(sapply(labels(dna), function(x) strsplit(x, " ", fixed=TRUE)[[1]][4]))
 
 
 
@@ -56,7 +56,7 @@ n.values[is.na(n.values)] = 1 # if they only have one rep, not in dedup.txt file
   metadata = data.frame(isolate=isolates, 
                       variant=variant.names,
                       n=n.values,
-                      snps=snps)
+                      snvs=snvs)
 
 rownames(metadata) <- metadata$isolate
 
@@ -73,19 +73,19 @@ metadata$tip.label = paste0(metadata$variant, " (n=", metadata$n, ")")
 p <- ggtree(tree, layout = 'rectangular')
 
 # Add colors
-snps.categorical.colour.palette <- RColorBrewer::brewer.pal(name="RdYlBu", n=9)
-metadata$snps.categorical = sapply(metadata$snps, function(x) ifelse(x<8, x, ">7"))
-metadata$snps.categorical = ordered(metadata$snps.categorical, levels=c(seq(0,7), ">7"))
+snvs.categorical.colour.palette <- RColorBrewer::brewer.pal(name="RdYlBu", n=9)
+metadata$snvs.categorical = sapply(metadata$snvs, function(x) ifelse(x<8, x, ">7"))
+metadata$snvs.categorical = ordered(metadata$snvs.categorical, levels=c(seq(0,7), ">7"))
 
 p <- p %<+% metadata+
-  geom_tippoint(aes(size=n, fill=snps.categorical), shape=21, colour="black")+
+  geom_tippoint(aes(size=n, fill=snvs.categorical), shape=21, colour="black")+
   geom_tiplab(aes(label=tip.label), size=3, offset = 0.2)+
   theme(legend.title= element_text(size=8), 
         legend.text = element_text(size=6))+
   scale_size_continuous(range=c(2, 10), breaks=c(1, 10, 50, 100), name="No. sequences")+
   geom_treescale(width = 1, offset = 0.1, linesize = 1)+
   guides(fill="none")+
-  scale_fill_manual(values=snps.categorical.colour.palette)
+  scale_fill_manual(values=snvs.categorical.colour.palette)
 expanded.range = as.numeric(layer_scales(p)$x$range$range[2]*1.1)
 p = p +xlim(c(0, expanded.range)) # expand plot so as to not obscure labels
 
