@@ -2,7 +2,7 @@ version: "default"
 complete: True # incomplete is work-in-progress - don't use
 panx_export : False
 bandage : True
-snp_threshold : "25"
+snv_threshold : "25"
 region_upstream : "5000"
 region_downstream : "5000"
 pangraph_polish : False

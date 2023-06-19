@@ -30,11 +30,11 @@ d <- read.csv(args$dists,
               header=T,
               stringsAsFactors = F)
 
-d$snps.categorical <- sapply(d$snps, function(x)
+d$snvs.categorical <- sapply(d$snvs, function(x)
   ifelse(x<8, x, ">7"))
-d$snps.categorical <- ordered(d$snps.categorical,
+d$snvs.categorical <- ordered(d$snvs.categorical,
                       levels=c(seq(0,7), ">7"))
-snps.categorical.colour.palette <- RColorBrewer::brewer.pal(name="RdYlBu", n=9)
+snvs.categorical.colour.palette <- RColorBrewer::brewer.pal(name="RdYlBu", n=9)
 
 
 
@@ -61,14 +61,14 @@ dist.max <- max(c(d$dist.up, d$dist.down))
 
 makePlots <- function(df){
     # Add number of comparisons for each SNV distance
-    snp.comparison.table = data.frame(SNVs=names(table(df$snps.categorical)),
-                                    N.pairs=as.numeric(table(df$snps.categorical)))
+    snv.comparison.table = data.frame(SNVs=names(table(df$snvs.categorical)),
+                                    N.pairs=as.numeric(table(df$snvs.categorical)))
     table.theme <- gridExtra::ttheme_default(
     core = list(fg_params=list(cex = 0.5)),
     colhead = list(fg_params=list(cex = 0.5)),
     rowhead = list(fg_params=list(cex = 0.5)))
 
-    p.upstream <-  ggplot(df, aes( -dist.up, group=snps.categorical, colour=snps.categorical))+
+    p.upstream <-  ggplot(df, aes( -dist.up, group=snvs.categorical, colour=snvs.categorical))+
       stat_ecdf()+
       theme_bw()+
     annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')+
@@ -77,7 +77,7 @@ makePlots <- function(df){
       ylab("cdf")+
       xlab("distance from gene (bp)")+
       theme(panel.grid = element_blank())+
-      scale_color_manual(values=snps.categorical.colour.palette)+
+      scale_color_manual(values=snvs.categorical.colour.palette)+
       theme(axis.line.x = element_line(colour = "black"),
         axis.line.y=element_line(colour = "black"),
         panel.grid.major = element_blank(),
@@ -88,11 +88,11 @@ makePlots <- function(df){
       scale_y_continuous(limits=c(0,1), expand = c(0, 0))+
       scale_x_continuous(limits=c(-dist.max, 0), expand=c(0,0))+
       theme(plot.title=element_text(hjust=0.5))+
-      annotation_custom(tableGrob(snp.comparison.table, theme=table.theme, rows=NULL), 
+      annotation_custom(tableGrob(snv.comparison.table, theme=table.theme, rows=NULL), 
                         xmax=-dist.max*3.5/5, ymax=1.5)
 
 
-    p.downstream <- ggplot(df, aes( dist.down,group=snps.categorical, colour=snps.categorical))+
+    p.downstream <- ggplot(df, aes( dist.down,group=snvs.categorical, colour=snvs.categorical))+
       stat_ecdf()+
       theme_bw()+
     annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')+
@@ -100,7 +100,7 @@ makePlots <- function(df){
       ylab("cdf")+
       xlab("distance from gene (bp)")+
       theme(panel.grid = element_blank())+
-      scale_color_manual(values=snps.categorical.colour.palette)+
+      scale_color_manual(values=snvs.categorical.colour.palette)+
       scale_y_continuous(limits=c(0,1), expand = c(0, 0))+
       scale_x_continuous(limits=c(0, dist.max), expand=c(0,0))+      
       theme(axis.line.y=element_blank(),
