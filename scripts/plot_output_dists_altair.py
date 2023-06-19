@@ -41,7 +41,7 @@ def convert_csv_to_json(csv_input, json_output):
     return
   
 def map_to_categorical_snp(values):
-    '''Maps SNPs to categories - have >7 as (arbitrary) highest category'''
+    '''Maps SNVs to categories - have >7 as (arbitrary) highest category'''
     return_values = [""] * len(values)
     for i,v in enumerate(values):
         if v<=7:
@@ -87,13 +87,13 @@ def main():
     # Convert the data types of the columns to float 
     df['distup'] = df['dist.up'].astype(float)
     df['distdown'] = df['dist.down'].astype(float)
-    # And add categorical SNPs
+    # And add categorical SNVs
     df['snpscategorical'] = map_to_categorical_snp(list(df['snps']))
     # Maximum distance
     # to clip the edges where ecdf artifically goes to 1 (so plot drops to 0) because we don't look beyond
     max_dist = max(df['distup'])-10 # 
 
-    # For dropdown selection for SNP category of comparison
+    # For dropdown selection for SNV category of comparison
     options = sorted(set(df['snpscategorical']))
     labels = [option + ' ' for option in options]
     # Sort labels in the same order
@@ -102,7 +102,7 @@ def main():
     input_dropdown = alt.binding_radio(
         options=options + [None],
         labels=labels_sorted + ['All'],
-        name='SNPs: '
+        name='SNVs: '
     )
 
     selection = alt.selection_point(

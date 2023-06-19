@@ -8,7 +8,7 @@ def get_options():
     parser.add_argument("--block_csv", help="Input file (pangraph json)", type=str)
     parser.add_argument("--gene_block_file", help='File containing block with gene of interest (anchor)', type=str)
     parser.add_argument("--gene_offset", help='File containing actual locations of anchor gene in consensus central block', type=str)
-    parser.add_argument("--snps", help="file of SNP distances between isolates", type=str)
+    parser.add_argument("--snps", help="file of SNV distances between isolates", type=str)
     parser.add_argument("--gene_assignments", help="file of variant assignment of genes", type=str)
     parser.add_argument("--output", help="output file", type=str)
     return parser.parse_args()

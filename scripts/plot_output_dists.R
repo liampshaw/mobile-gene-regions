@@ -60,8 +60,8 @@ dist.max <- max(c(d$dist.up, d$dist.down))
 
 
 makePlots <- function(df){
-    # Add number of comparisons for each SNP distance
-    snp.comparison.table = data.frame(SNPs=names(table(df$snps.categorical)),
+    # Add number of comparisons for each SNV distance
+    snp.comparison.table = data.frame(SNVs=names(table(df$snps.categorical)),
                                     N.pairs=as.numeric(table(df$snps.categorical)))
     table.theme <- gridExtra::ttheme_default(
     core = list(fg_params=list(cex = 0.5)),
@@ -73,7 +73,7 @@ makePlots <- function(df){
       theme_bw()+
     annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')+
       theme(legend.position = "none")+
-      labs(colour="SNPs")+
+      labs(colour="SNVs")+
       ylab("cdf")+
       xlab("distance from gene (bp)")+
       theme(panel.grid = element_blank())+
@@ -96,7 +96,7 @@ makePlots <- function(df){
       stat_ecdf()+
       theme_bw()+
     annotate(geom="segment", x=0, y=0,xend=0, yend=1,  linetype='dashed')+
-      labs(colour="SNPs")+
+      labs(colour="SNVs")+
       ylab("cdf")+
       xlab("distance from gene (bp)")+
       theme(panel.grid = element_blank())+

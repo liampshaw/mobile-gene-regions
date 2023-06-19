@@ -7,7 +7,7 @@ def get_options():
     parser = argparse.ArgumentParser(description='Make a multi fasta file for a given gene.',
                                      prog='make_multi_fasta')
     parser.add_argument('--gene', help='Name of gene (e.g. CTX-M-15, VIM-1, NDM-1).', required=True)
-    parser.add_argument('--threshold', help='SNP threshold for distance from gene variant.', required=False, default=25)
+    parser.add_argument('--threshold', help='SNV threshold for distance from gene variant.', required=False, default=25)
     parser.add_argument('--fastadir', help='Directory with fasta files.', required=True)
     parser.add_argument('--outputdir', help='Output directory', required=False, default='./')
     parser.add_argument('--multiplehits', help='Whether to allow multiple hits', required=False, default=False, action='store_true')
