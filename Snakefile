@@ -106,7 +106,7 @@ rule calculate_snv_dists_extracted_seqs:
 		"output/gene_variants/sequence/{gene}_seqs.fa.dedup.txt"
 	run:
 		shell("mafft --auto {input} > {input}.aln"),
-		shell("snv-dists -q -m {input}.aln > {output}")
+		shell("snp-dists -q -m {input}.aln > {output}")
 		shell("seqkit rmdup -s < {input}.aln > {input}.dedup.aln -D {input}.dedup.txt")
 
 rule tree_for_focal_gene:
