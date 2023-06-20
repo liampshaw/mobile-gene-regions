@@ -16,3 +16,4 @@ DB-old/
 output-old/
 input/
 *docx
+.DS_Store
