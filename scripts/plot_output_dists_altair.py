@@ -5,12 +5,27 @@ import pandas as pd
 import argparse
 
 def my_theme():
-  return {
-    'config': {
-      'view': {'continuousHeight': 300, 'continuousWidth': 400},  # from the default theme
-      'range': {'category': {'scheme': 'yelloworangered'}}
+    font = "Helvetica Neue"
+    return {
+        "config" : {
+              'view': {'continuousHeight': 300, 'continuousWidth': 400},  # from the default theme
+      'range': {'category': {'scheme': 'yelloworangered'}},
+             "title": {'font': font},
+             "axis": {
+                  "labelFont": font,
+                  "titleFont": font
+             },
+             "header": {
+                  "labelFont": font,
+                  "titleFont": font
+             },
+             "legend": {
+                  "labelFont": font,
+                  "titleFont": font
+             }
+        }
     }
-  }
+
 alt.themes.register('my_theme', my_theme)
 alt.themes.enable('my_theme')
 
