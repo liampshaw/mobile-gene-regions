@@ -5,7 +5,7 @@ import pandas as pd
 import argparse
 
 def my_theme():
-    font = "Helvetica Neue"
+    font = "Helvetica"
     return {
         "config" : {
               'view': {'continuousHeight': 300, 'continuousWidth': 400},  # from the default theme
