@@ -126,7 +126,7 @@ def convert_annotations(input_df, focal_gene_search_name):
 def my_theme():
   return {
     'config': {
-      'view': {'continuousHeight': 300, 'continuousWidth': 800},  # from the default theme
+      'view': {'continuousHeight': 300, 'continuousWidth': 500},  # from the default theme
     }
   }
 
@@ -148,6 +148,8 @@ explanation_gff = ["Blocks are coloured by inferred sequence homology (grey=uniq
 # gene name
 def main():
   args = get_options()
+
+  strain_list = args.strain_list
 
   if args.gene_name!='':
     gene = args.gene_name.upper()
@@ -203,9 +205,9 @@ def main():
   if args.gff_file!='':
     # Read in gff 
     gff_df = pd.read_csv(args.gff_file, comment='#', sep='\t', header=None)
-    if args.strain_list!='':
-      gff_df = gff_df[gff_df['seqid'].isin(strain_list)]
     gff_df.columns = ['seqid', 'source', 'type', 'start', 'end', 'score', 'strand', 'phase', 'attributes']
+    if args.strain_list!='':
+      gff_df = gff_df[gff_df['seqid'].isin(seqs_to_include)]
     gff_df_cds = gff_df[gff_df['type']=='CDS']
 
     gff_df_cds = gff_df_cds.assign(product=[re.sub(';.*', '', re.sub('.*product=', '', x)) for x in gff_df_cds['attributes']],
@@ -318,8 +320,6 @@ def main():
     entropy_df_down['dist'] = entropy_df_down['dist']-min(entropy_df_down['dist'])
     entropy_df_up = entropy_df[entropy_df['dist']<median_gene_start]
     entropy_df_up['dist'] = max(entropy_df_up['dist'])-entropy_df_up['dist']
-    print(entropy_df_down)
-    print(entropy_df_up)
 
     # Upstream
     ecdf_plot_up = alt.Chart(plot_df_up_0).mark_line(
@@ -339,7 +339,7 @@ def main():
         strokeWidth=2,
         opacity=1,
     ).encode(
-        x=alt.X("dist:Q"),
+        x=alt.X("dist:Q", scale=alt.Scale(domain=[0, max_dist])),
         y=alt.Y('norm_density:Q'),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
@@ -349,7 +349,7 @@ def main():
         strokeWidth=2,
         opacity=1,
     ).encode(
-        x=alt.X("dist:Q"),
+        x=alt.X("dist:Q", scale=alt.Scale(domain=[0, max_dist])),
         y=alt.Y('entropy:Q'),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
@@ -373,7 +373,7 @@ def main():
         strokeWidth=2,
         opacity=1,
     ).encode(
-        x=alt.X("dist:Q"),
+        x=alt.X("dist:Q", scale=alt.Scale(domain=[0, max_dist])),
         y=alt.Y('norm_density:Q'),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
@@ -383,11 +383,12 @@ def main():
         strokeWidth=2,
         opacity=1,
     ).encode(
-        x=alt.X("dist:Q"),
+        x=alt.X("dist:Q", scale=alt.Scale(domain=[0, max_dist])),
         y=alt.Y('entropy:Q'),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
     combined_down = ecdf_plot_down+density_plot_down+entropy_plot_down
+    combined_down
 
     # Plot together
     combined = combined_up | combined_down
