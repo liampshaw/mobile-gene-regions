@@ -40,6 +40,7 @@ def get_options():
     parser.add_argument('--output_html', help='Output html (default: output.html)', type=str, default='output.html')
     parser.add_argument('--gene_of_interest', help='Gene of interest to subset to comparisons involving only this named variant', type=str, default='', required=False)   
     parser.add_argument('--strain_list', help='Only include comparisons between sequences named in this file', type=str, default='', required=False)   
+    parser.add_argument('--save_ecdf', help='Whether to store ecdf data as csv', action='store_true', default=False, required=False)
     return parser.parse_args()
 
 def convert_csv_to_json(csv_input, json_output):
@@ -217,6 +218,11 @@ def main():
 
     # Save them
     ecdf_plot_combined.save(args.output_html)
+
+    if args.save_ecdf==True:
+        plot_df_up.to_csv(args.output_html+'.upstream_ecdf.csv')
+        plot_df_down.to_csv(args.output_html+'.downstream_ecdf.csv')
+
 
 if __name__=="__main__":
     main()
