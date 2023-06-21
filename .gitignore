@@ -17,3 +17,4 @@ output-old/
 input/
 *docx
 .DS_Store
+test*
