@@ -12,6 +12,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 import scipy.cluster.hierarchy as sch
+import scipy.stats as ss
 alt.renderers.enable('html')
 
 def get_options():
@@ -23,6 +24,7 @@ def get_options():
     parser.add_argument('--unique', help='Whether to plot unique block configurations (for a simpler/smaller plot)', default=False, action='store_true')
     parser.add_argument('--flanking_width', help='Size of flanking regions', type=int, default=5000)
     parser.add_argument('--strain_list', help='Only include comparisons between sequences named in this file', type=str, default='', required=False)   
+    parser.add_argument('--entropies', help='entropies file', required=True)
     return parser.parse_args()
 
 def convert_csv_to_json(csv_input, json_output):
@@ -194,6 +196,8 @@ def main():
   plot_df_up = plot_df_up.assign(snvscategorical=plot_df_up.index)
   plot_df_down = df.groupby('snvscategorical').apply(lambda x: ecdf(x['distdown'])).reset_index(level=1, drop=True)
   plot_df_down = plot_df_down.assign(snvscategorical=plot_df_down.index)
+  plot_df_up['ecdf'] = 1-plot_df_up['ecdf']
+  plot_df_down['ecdf'] = 1-plot_df_down['ecdf']
 
   # If GFF, use it
   if args.gff_file!='':
@@ -286,8 +290,8 @@ def main():
     # maximum density proportion
     max_density = max([density_df_up['density'].max(), density_df_down['density'].max()])
     # do 1 minus so that we can use the reversed axis of breakpoint distnace plot
-    density_df_up['norm_density'] = [1-x/max_density for x in density_df_up['density']] 
-    density_df_down['norm_density'] = [1-x/max_density for x in density_df_down['density']]
+    density_df_up['norm_density'] = [x/max_density for x in density_df_up['density']] 
+    density_df_down['norm_density'] = [x/max_density for x in density_df_down['density']]
 
 
     # Set 'dist' as the index for just the 0 SNV comparisons
@@ -307,20 +311,30 @@ def main():
     # Reindex and fill in values
     plot_df_down_0 = plot_df_down_0.reindex(new_index, method='ffill').reset_index()
 
+    # Add in the entropies
+    entropy_df = pd.read_csv(args.entropies, sep=' ', header=None)
+    entropy_df.columns = ['dist', 'entropy']
+    entropy_df_down = entropy_df[entropy_df['dist']>median_gene_end]
+    entropy_df_down['dist'] = entropy_df_down['dist']-min(entropy_df_down['dist'])
+    entropy_df_up = entropy_df[entropy_df['dist']<median_gene_start]
+    entropy_df_up['dist'] = max(entropy_df_up['dist'])-entropy_df_up['dist']
+    print(entropy_df_down)
+    print(entropy_df_up)
+
     # Upstream
-    ecdf_plot_up_unselected = alt.Chart(plot_df_up_0).mark_line(
+    ecdf_plot_up = alt.Chart(plot_df_up_0).mark_line(
+        color="#000000", # black
         clip=True,
         strokeWidth=2,
         opacity=1,
     ).encode(
         x=alt.X("dist:Q",
-                scale=alt.Scale(reverse=True, domain=[0, max_dist])),
-        y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0,1])),
-        color=alt.Color('snvscategorical:N', scale=None, 
-        sort=alt.EncodingSortField('snvscategorical')),
+        scale=alt.Scale(reverse=True, domain=[0, max_dist])),
+        y=alt.Y('ecdf:Q', scale=alt.Scale(domain=[0,1])),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
     density_plot_up = alt.Chart(density_df_up).mark_line(
+        color="#1f78b4", # dark blue
         clip=True,
         strokeWidth=2,
         opacity=1,
@@ -329,22 +343,32 @@ def main():
         y=alt.Y('norm_density:Q'),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
-    combined_up = ecdf_plot_up_unselected+density_plot_up
+    entropy_plot_up = alt.Chart(entropy_df_up).mark_line(
+        color="#b2df8a", # green
+        clip=True,
+        strokeWidth=2,
+        opacity=1,
+    ).encode(
+        x=alt.X("dist:Q"),
+        y=alt.Y('entropy:Q'),
+        tooltip=[alt.Tooltip("dist:Q", title="")]
+    )
+    combined_up = ecdf_plot_up+density_plot_up+entropy_plot_up
 
     # Downstream
-    ecdf_plot_down_unselected = alt.Chart(plot_df_down_0).mark_line(
+    ecdf_plot_down = alt.Chart(plot_df_down_0).mark_line(
+        color="#000000",
         clip=True,
         strokeWidth=2,
         opacity=1,
     ).encode(
         x=alt.X("dist:Q",
                 scale=alt.Scale(domain=[0, max_dist])),
-        y=alt.Y('ecdf:Q', scale=alt.Scale(reverse=True, domain=[0,1])),
-        color=alt.Color('snvscategorical:N', scale=None, 
-        sort=alt.EncodingSortField('snvscategorical')),
+        y=alt.Y('ecdf:Q', scale=alt.Scale(domain=[0,1])),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
     density_plot_down = alt.Chart(density_df_down).mark_line(
+        color="#1f78b4",
         clip=True,
         strokeWidth=2,
         opacity=1,
@@ -353,12 +377,47 @@ def main():
         y=alt.Y('norm_density:Q'),
         tooltip=[alt.Tooltip("dist:Q", title="")]
     )
-    combined_down = ecdf_plot_down_unselected+density_plot_down
+    entropy_plot_down = alt.Chart(entropy_df_down).mark_line(
+        color="#b2df8a",
+        clip=True,
+        strokeWidth=2,
+        opacity=1,
+    ).encode(
+        x=alt.X("dist:Q"),
+        y=alt.Y('entropy:Q'),
+        tooltip=[alt.Tooltip("dist:Q", title="")]
+    )
+    combined_down = ecdf_plot_down+density_plot_down+entropy_plot_down
 
     # Plot together
     combined = combined_up | combined_down
     combined.save(args.output_html)
-    
+
+    # Combine datasets together
+    # Merge the DataFrames on 'dist' column
+    merged_df_up = pd.merge(plot_df_up_0, density_df_up, on='dist', how='outer')
+    merged_df_up = pd.merge(merged_df_up, entropy_df_up, on='dist', how='outer')
+    merged_df_up = merged_df_up.dropna()
+    print("Upstream")
+    print('breakpoint, transposase density', ss.pearsonr(merged_df_up['ecdf'], merged_df_up['density']))
+    print('breakpoint, block entropy', ss.pearsonr(merged_df_up['ecdf'], merged_df_up['entropy']))
+    print('transposase density, block entropy', ss.pearsonr(merged_df_up['density'], merged_df_up['entropy']))
+
+    merged_df_down = pd.merge(plot_df_down_0, density_df_down, on='dist', how='outer')
+    merged_df_down = pd.merge(merged_df_down, entropy_df_down, on='dist', how='outer')
+    merged_df_down = merged_df_down.dropna()
+    print("Downstream:")
+    print('breakpoint, transposase density', ss.pearsonr(merged_df_down['ecdf'], merged_df_down['density']))
+    print('breakpoint, block entropy', ss.pearsonr(merged_df_down['ecdf'], merged_df_down['entropy']))
+    print('transposase density, block entropy', ss.pearsonr(merged_df_down['density'], merged_df_down['entropy']))
+
+    concatenated_df = pd.concat([merged_df_up[["location", "dist", "ecdf", "density", "entropy"]], 
+        merged_df_down[["location", "dist", "ecdf", "density", "entropy"]]], axis=0)
+    # Reset the index of the concatenated DataFrame
+    concatenated_df = concatenated_df.reset_index(drop=True)
+    concatenated_df.to_csv(args.output_html+".raw_data.csv")
+
+
   
 
 if __name__=="__main__":
