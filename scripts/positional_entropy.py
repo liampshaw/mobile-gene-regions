@@ -174,7 +174,7 @@ def main():
 
                 genomes_as_int[genome_i] = genome_as_int
                 genome_i += 1
-        for i in range(0, int(args.region_size)*2, int(args.step)):
+        for i in range(0, int(args.region_size)*2+1000, int(args.step)): # hacky - we should actually specify the region we want
             if i<min([len(g) for g in genomes_as_int]):
                 block_vector = [g[i] for g in genomes_as_int]# this is the vector we want
                 if args.name=='':
