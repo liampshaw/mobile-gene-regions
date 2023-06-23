@@ -11,8 +11,8 @@ theme_basic <- function () {
 }
 
 
-auc_files = Sys.glob("AUCs/*deduplicated.txt")
-summary_table = matrix(nrow=length(accession_files), ncol=6)
+auc_files = Sys.glob("AUCs/*AUCs_all_deduplicated.txt")
+summary_table = matrix(nrow=length(auc_files), ncol=6)
 i = 1
 all_results = matrix(nrow=0, ncol=4)
 for (file in auc_files){
@@ -30,9 +30,49 @@ all_results$down = as.numeric(all_results$down)
 all_results$snvs = ordered(all_results$snvs, levels=c(0, 1, 2, 3, 4, 5, 6, 7, ">7"))
 all_results$snvs.ordinal = as.numeric(all_results$snvs)
 
+all_results$auc.total = all_results$up + all_results$down 
+
 # unsure whether to include this - just to make the figure nicer
 # in terms of colours
 omit_genes = c("GES-24", "IMP-4", "OXA-10", "PER-1", "VIM-1")
+all_results_top = all_results[which(!all_results$gene %in% omit_genes),]
+
+p.auc.overall = ggplot(all_results_top, aes(snvs, auc.total, colour=gene, fill=gene))+
+  ylim(c(0,0.75))+
+  ylab("AUC for breakpoint distance distribution")+
+  theme_basic()+
+  scale_color_brewer(palette="Paired")+
+  scale_fill_brewer(palette="Paired")+
+  xlab("SNVs relative to focal gene")+
+  labs(fill="Beta-lactamase")+
+  guides(colour=FALSE)+
+  theme(legend.position = "none")+
+  stat_smooth(aes(x=snvs.ordinal-1, auc.total), method="lm", se=FALSE)+
+  scale_x_continuous(breaks=seq(0,8), labels=c("0", "1", "2", "3", "4", "5", "6", "7", ">7"))
+p.auc.facet = ggplot(all_results_top, aes(snvs, auc.total, colour=gene, fill=gene))+
+  geom_point(shape=21, aes(fill=gene), colour="black")+
+  geom_line(aes(group=gene))+
+  ylim(c(0,0.75))+
+  ylab("AUC for breakpoint distance distribution")+
+  theme_basic()+
+  scale_color_brewer(palette="Paired")+
+  scale_fill_brewer(palette="Paired")+
+  xlab("SNVs relative to focal gene")+
+  labs(fill="Beta-lactamase")+
+  guides(colour=FALSE)+
+  facet_wrap(~gene)+
+  theme(legend.position = "none")+
+  theme(axis.text=element_text(size=8))+
+  ylab("")+xlab("")
+p.auc.combined = cowplot::plot_grid(p.auc.overall+ggtitle("(a)"), 
+                                    p.auc.facet+ggtitle("(b)"), align='h', 
+                                    rel_widths = c(1,1.2))
+
+ggsave(p.auc.combined, 
+       file='../manuscript/figs/figure-AUC-top-bl.pdf',
+       width=6, height=4)
+
+cor.test(all_results$auc.total, as.numeric(all_results$snvs), method="spearman")
 
 all_results_top = all_results[which(!all_results$gene %in% omit_genes),]
 p.up = ggplot(all_results_top, aes(snvs, up, fill=gene))+
