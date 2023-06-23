@@ -18,3 +18,7 @@ input/
 *docx
 .DS_Store
 test*
+beta-lactamases/curves/*
+beta-lactamases/gfastats/*
+beta-lactamases/breakpoint_plots/*
+
