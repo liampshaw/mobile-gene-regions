@@ -7,5 +7,6 @@ do
         python ../scripts/plot_output_dists_altair.py --dist_csv /Users/Liam/Downloads/test-bl/output/pangraph/"$gene"/"$gene".output_dists.csv --gene_of_interest $gene --strain_list breakpoint_plots/"$gene"_accs.txt --output_html breakpoint_plots/"$gene"_all.html
 	python ../scripts/calculate_AUC.py --dist_csv /Users/Liam/Downloads/test-bl/output/pangraph/"$gene"/"$gene".output_dists.csv --gene_of_interest $gene > AUCs/"$gene"_AUCs_focal_gene.txt
         python ../scripts/calculate_AUC.py --dist_csv /Users/Liam/Downloads/test-bl/output/pangraph/"$gene"/"$gene".output_dists.csv --gene_of_interest $gene --strain_list breakpoint_plots/"$gene"_accs_deduplicated.txt > AUCs/"$gene"_AUCs_focal_gene_deduplicated.txt
+        python ../scripts/calculate_AUC.py --dist_csv /Users/Liam/Downloads/test-bl/output/pangraph/"$gene"/"$gene".output_dists.csv --strain_list breakpoint_plots/"$gene"_accs_deduplicated.txt > AUCs/"$gene"_AUCs_all_deduplicated.txt
 done < genes.txt
 
