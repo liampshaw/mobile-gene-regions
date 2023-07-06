@@ -9,7 +9,7 @@ from random import randint
 def get_options():
     parser = argparse.ArgumentParser(description='Convert pangraph json to path list of blocks with start/end positions')
     parser.add_argument('--json', help='Input json', type=str)
-    parser.add_argument('--gfa', help='Input json', type=str) # TODO: remove gfa and generate with pangraph directly
+    parser.add_argument('--gfa', help='Input gfa', type=str) # TODO: remove gfa and generate with pangraph directly
     parser.add_argument('--all', '-a', help='colour all blocks (even unique ones)',
                     action='store_true')
     return parser.parse_args()
