@@ -15,4 +15,4 @@ pangraph_minblocklength : "100" # minimum length of blocks
 pangraph_edgeminlength : "0"
 DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
 include_gff: False
-output_prefix : "output"
+output_prefix : "output_example"
