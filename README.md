@@ -20,6 +20,23 @@ mamba env create -f bl-region-env.yaml
 conda activate bl-region-env
 ```
 
+The full snakemake pipeline can be run on the example data with the following command:
+
+```
+snakemake --cores 1 \
+          --configfile configs/default_config.yaml \
+          -r prepare_DB run_pangraph calculate_distances make_plots
+```
+
+Equivalently you can call the full pipeline with:
+
+```
+python run_full_pipepine.py --config-file configs/default_config.yaml
+```
+
+Outputs for a given gene are saved in `{output_prefix}/{focal_gene}` and include output data files as well as pdf plots (generated with R) and html plots (generated with [altair](https://altair-viz.github.io/) in Python).
+
+
 ## Configuration file 
 
 All parameters are passed in with a configuration file - for an example, see `configs/default_config.yaml`.
@@ -74,22 +91,6 @@ include_gff: False
 output_prefix : "output"
     # output folder
 ```
-
-The full snakemake pipeline can be run on the example data with the following command:
-
-```
-snakemake --cores 1 \
-          --configfile configs/default_config.yaml \
-          -r prepare_DB run_pangraph calculate_distances make_plots
-```
-
-Equivalently you can call the full pipeline with:
-
-```
-python run_full_pipepine.py --config-file configs/default_config.yaml
-```
-
-Outputs are written to `{output_prefix}/{focal_gene}` and include output data files as well as pdf plots (generated with R) and html plots (generated with [altair](https://altair-viz.github.io/) in Python).
 
 
 
