@@ -125,12 +125,15 @@ rule build_pangraph:
 		"output/pangraph/{gene}/{gene}_extracted.fa"
 	params:
 		aligner=config["pangraph_aligner"],
-		minlength=config["pangraph_minblocklength"]
+		minlength=config["pangraph_minblocklength"],
+		seed=config["pangraph_seed"],
+		alpha=config["pangraph_alpha"],
+		beta=config["pangraph_beta"]
 	output:
 		"output/pangraph/{gene}/{gene}_pangraph.json"
 	shell:
-		"pangraph build -k {params.aligner} --len {params.minlength} {input} > {output}" if config["pangraph_polish"]==False 
-		else "pangraph build -k {params.aligner} --len {params.minlength} {input} | pangraph polish > {output}"
+		"pangraph build --random-seed {params.seed} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} > {output}" if config["pangraph_polish"]==False 
+		else "pangraph build --random-seed {params.seed} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} | pangraph polish > {output}"
 
 
 rule export_pangraph:
