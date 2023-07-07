@@ -1,6 +1,6 @@
 version: "default"
 focal_genes : ["CMY-2", "CTX-M-15", "CTX-M-65","GES-1", "IMP-4","KPC-2","NDM-1","OXA-10","OXA-48","PER-1","TEM-1","VIM-1"]
-complete: True # incomplete is work-in-progress - don't use
+complete: True 
 panx_export : False
 bandage : True
 snv_threshold : "25"
@@ -8,11 +8,11 @@ region_upstream : "5000"
 region_downstream : "5000"
 pangraph_polish : False
 pangraph_aligner : "minimap2"
-pangraph_seed : 0 # random seed for pangraph
-pangraph_alpha : 100 # alpha parameter, controls cost of splitting blocks
-pangraph_beta : 10 # beta parameter, controls cost of block diversity
-pangraph_minblocklength : "100" # minimum length of blocks 
+pangraph_seed : 0 
+pangraph_alpha : 100 
+pangraph_beta : 10
+pangraph_minblocklength : "100" 
 pangraph_edgeminlength : "0"
-DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
+DB: ["CARD"] 
 include_gff: False
 output_prefix : "output"
