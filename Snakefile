@@ -227,7 +227,7 @@ rule compute_distances:
 
 rule breakpoint_distances_minimap2:
 	input:
-		fasta=output_folder+"/{gene}/pangraph/{gene}_pangraph.fa"
+		fasta=output_folder+"/{gene}/pangraph/{gene}_extracted.fa"
 	output:
 		output_folder+"/{gene}/pangraph/{gene}.breakpoint_dists_minimap2.tsv"
 	run:
