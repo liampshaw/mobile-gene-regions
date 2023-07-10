@@ -90,6 +90,8 @@ include_gff: False
     # whether to include gff annotations - assumed in gffs/mcr-1.1_annotations.gff
 output_prefix : "output"
     # output folder
+breakpoint_minimap2 : False
+    # whether to calculate breakpoint distances with minimap2 directly rather than using homology blocks
 ```
 
 
