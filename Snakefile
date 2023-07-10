@@ -26,9 +26,16 @@ rule run_pangraph:
 	input:
 		expand(output_folder+"/{gene}/pangraph/{gene}_pangraph.json", gene=FOCAL_GENES)
 
-rule calculate_distances:
-	input:
-		expand(output_folder+"/{gene}/pangraph/{gene}.output_dists.csv", gene=FOCAL_GENES)
+if config["breakpoint_minimap2"]==False:
+	rule calculate_distances:
+		input:
+			expand(output_folder+"/{gene}/pangraph/{gene}.output_dists.csv", gene=FOCAL_GENES)
+elif config["breakpoint_minimap2"]==True:
+	rule calculate_distances:
+		input:
+			expand(output_folder+"/{gene}/pangraph/{gene}.output_dists.csv", gene=FOCAL_GENES),
+			expand(output_folder+"/{gene}/pangraph/{gene}.breakpoint_dists_minimap2.tsv", gene=FOCAL_GENES)
+
 
 rule make_plots:
 	input:
@@ -216,6 +223,16 @@ rule compute_distances:
 											--gene_assignments {input.gene_assignments}\
 											--gene_offset {output.gene_rel_locations}\
 											--output {output.dists}")
+
+
+rule breakpoint_distances_minimap2:
+	input:
+		fasta=output_folder+"/{gene}/pangraph/{gene}_pangraph.fa"
+	output:
+		output_folder+"/{gene}/pangraph/{gene}.breakpoint_dists_minimap2.tsv"
+	run:
+		# r 10 allows maximum 10 gaps in alignment. X is all-against-all comparison
+		shell("minimap2 -r 10 --no-long-join -X {input.fasta} {input.fasta} > {output}")
 
 rule positional_entropies:
 	input:
