@@ -228,11 +228,13 @@ rule compute_distances:
 rule breakpoint_distances_minimap2:
 	input:
 		fasta=output_folder+"/{gene}/pangraph/{gene}_extracted.fa"
+	params:
+		upstream=config["region_upstream"]
 	output:
 		output_folder+"/{gene}/pangraph/{gene}.breakpoint_dists_minimap2.tsv"
 	run:
 		# r 10 allows maximum 10 gaps in alignment. X is all-against-all comparison
-		shell("minimap2 -r 10 --no-long-join -X {input.fasta} {input.fasta} > {output}")
+		shell("minimap2 -r 10 --no-long-join -X {input.fasta} {input.fasta} | awk '$3<{params.upstream} && $4>{params.upstream}' > {output}")
 
 rule positional_entropies:
 	input:
