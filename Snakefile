@@ -234,7 +234,7 @@ rule breakpoint_distances_minimap2:
 		output_folder+"/{gene}/pangraph/{gene}.breakpoint_dists_minimap2.tsv"
 	run:
 		# r 10 allows maximum 10 gaps in alignment. X is all-against-all comparison
-		shell("minimap2 -r 10 --no-long-join -X {input.fasta} {input.fasta} | awk '$3<{params.upstream} && $4>{params.upstream}' > {output}")
+		shell("minimap2 -r 10 --no-long-join -X {input.fasta} {input.fasta} | awk '$3<{params.upstream} && $4>{params.upstream} && $8<{params.upstream} && $9>{params.upstream}'  > {output}")
 
 rule positional_entropies:
 	input:
