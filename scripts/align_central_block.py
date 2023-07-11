@@ -18,10 +18,10 @@ def main():
 
 	blocks_df = pd.read_csv(args.block_csv)
 	block_df = blocks_df[blocks_df['block']==block_name]
-	print(block_df)
+	#print(block_df)
 
 	block_locations = {block_df['genome'].iloc[x] : [int(block_df['start'].iloc[x]), int(block_df['end'].iloc[x])] for x in range(0, len(block_df))}
-	print(block_locations)
+	#print(block_locations)
 	fasta = sf.read_fasta(args.fasta)
 	with open(args.output_fasta, 'w') as f:
 		for genome, block_location in block_locations.items():
