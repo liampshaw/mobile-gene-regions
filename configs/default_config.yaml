@@ -13,6 +13,7 @@ pangraph_alpha : 100 # alpha parameter, controls cost of splitting blocks
 pangraph_beta : 10 # beta parameter, controls cost of block diversity
 pangraph_minblocklength : "100" # minimum length of blocks 
 pangraph_edgeminlength : "0"
+pangraph_dist_backend : "mash"
 DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
 include_gff: False
 output_prefix : "output_example"
