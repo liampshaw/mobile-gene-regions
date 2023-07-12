@@ -140,12 +140,13 @@ rule build_pangraph:
 		minlength=config["pangraph_minblocklength"],
 		seed=config["pangraph_seed"],
 		alpha=config["pangraph_alpha"],
-		beta=config["pangraph_beta"]
+		beta=config["pangraph_beta"],
+		dist_backend=config["pangraph_dist_backend"]
 	output:
 		output_folder+"/{gene}/pangraph/{gene}_pangraph.json"
 	shell:
-		"pangraph build --random-seed {params.seed} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} > {output}" if config["pangraph_polish"]==False 
-		else "pangraph build --random-seed {params.seed} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} | pangraph polish > {output}"
+		"pangraph build --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} > {output}" if config["pangraph_polish"]==False 
+		else "pangraph build --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} | pangraph polish > {output}"
 
 
 rule export_pangraph:

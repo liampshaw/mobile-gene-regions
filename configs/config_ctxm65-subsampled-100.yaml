@@ -1,0 +1,20 @@
+version: "default"
+focal_genes : ["ctxm65-subsampled-100"]
+complete: True
+panx_export : False
+bandage : True
+snv_threshold : "25"
+region_upstream : "5000"
+region_downstream : "5000"
+pangraph_polish : False
+pangraph_aligner : "minimap2"
+pangraph_seed : 0
+pangraph_alpha : 100
+pangraph_beta : 10
+pangraph_dist_backend: "mash"
+pangraph_minblocklength : "100"
+pangraph_edgeminlength : "0"
+DB: ["CARD"]
+include_gff: False
+output_prefix : "output_ctxm65-subsampled-100"
+breakpoint_minimap2: True

@@ -13,7 +13,8 @@ pangraph_alpha : 100
 pangraph_beta : 10
 pangraph_minblocklength : "100" 
 pangraph_edgeminlength : "0"
+pangraph_dist_backend : "mash"
 DB: ["CARD"] 
-include_gff: False
+include_gff: True
 output_prefix : "output"
 breakpoint_minimap2: True
