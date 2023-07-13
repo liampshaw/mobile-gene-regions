@@ -145,8 +145,8 @@ rule build_pangraph:
 	output:
 		output_folder+"/{gene}/pangraph/{gene}_pangraph.json"
 	shell:
-		"pangraph build --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} > {output}" if config["pangraph_polish"]==False 
-		else "pangraph build --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} | pangraph polish > {output}"
+		"pangraph build -n --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} > {output}" if config["pangraph_polish"]==False 
+		else "pangraph build -n --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} | pangraph polish > {output}"
 
 
 rule export_pangraph:
