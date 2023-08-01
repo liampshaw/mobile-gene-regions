@@ -2,7 +2,9 @@
 
 __Liam P. Shaw__
 
-This repository contains a pipeline to analyse the flanking regions of genes using [pangraph](https://github.com/neherlab/pangraph) and generate output plots. The original intention was to analyse beta-lactamase genes, but the pipeline is now general and can be used for any input gene. 
+This repository contains a pipeline to analyse the flanking regions of genes using [pangraph](https://github.com/neherlab/pangraph). 
+
+It was developed for the analysis of mobile AMR genes, but can be used for any input gene. 
 
 Basic usage:
 
@@ -13,49 +15,19 @@ python analyze-flanking-regions.py \
         --prefix gene_name 
 ```
 
+For more details, see the linked paper:
 
-### Repository structure
+Visualizing and quantifying structural diversity around mobile AMR genes  
+Liam P. Shaw and Richard A. Neher  
+doi: []()
 
-The pipeline uses [snakemake](https://snakemake.readthedocs.io/en/stable/index.html). 
+### Dependencies
 
-Dependencies can be installed with conda or mamba (recommended: mamba):
+### Usage
 
-```
-mamba env create -f bl-region-env.yaml
-conda activate bl-region-env
-```
+The pipeline has flexible parameters including the size of the flanking region and the number of single nucleotide variants (SNVs) allowed in the focal gene for a contig to be included. 
 
-`analyze-flanking-regions.py` is a helper script that creates a config file and calls the snakemake pipeline. 
-
-
-For an example, the snakemake pipeline can be run on some example data (mcr-1) with the following command:
-
-```
-snakemake --cores 1 \
-          --configfile configs/default_config.yaml \
-          -r prepare_DB run_pangraph calculate_distances make_plots
-```
-
-Equivalently you can call the full pipeline on a config file with:
-
-```
-python run_full_pipeline.py --config-file configs/default_config.yaml
-```
-
-Outputs for a given gene are saved in `{output_prefix}/{focal_gene}` and include output data files as well as pdf plots (generated with R) and html plots (generated with [altair](https://altair-viz.github.io/) in Python).
-
-
-## Configuration file 
-
-All parameters are passed in with a configuration file - for an example, see `configs/default_config.yaml`.
-
-
-For each focal gene, there are two expected input files:
-
-* `input/focal_genes/{gene}.fa` - the focal gene of interest 
-* `input/focal_genes/{gene}_contigs.fa` - multi-fasta with the contigs which have been identified as containing the focal gene 
-
-A small dataset (n=34 sequences) is provided for the *mcr-1.1* gene with 5kb flanking regions in the `input` directory. Parameters for the analysis can be specified in the config file. For example, `configs/default_config.yaml`:
+The defaults are as follows:
 
 ```
 version: "default"
@@ -103,5 +75,51 @@ breakpoint_minimap2 : False
 ```
 
 
+These are passed in with a configuration file - for an example, see `configs/default_config.yaml`.
+
+For each focal gene, there are two expected input files:
+
+* `input/focal_genes/{gene}.fa` - the focal gene of interest 
+* `input/focal_genes/{gene}_contigs.fa` - multi-fasta with the contigs which have been identified as containing the focal gene 
+
+A small dataset (n=34 sequences) is provided for the *mcr-1.1* gene with 5kb flanking regions in the `input` directory. Parameters for the analysis can be specified in the config file. For example, `configs/default_config.yaml`:
+
+
+
 
 A more detailed tutorial on how to prepare data and use the pipeline is available in `tutorial/Tutorial.md`.
+
+
+
+### Repository structure
+
+The pipeline uses [snakemake](https://snakemake.readthedocs.io/en/stable/index.html). 
+
+Dependencies can be installed with conda or mamba (recommended: mamba):
+
+```
+mamba env create -f bl-region-env.yaml
+conda activate bl-region-env
+```
+
+`analyze-flanking-regions.py` is a helper script that creates a config file and calls the snakemake pipeline. 
+
+
+For an example, the snakemake pipeline can be run on some example data (mcr-1) with the following command:
+
+```
+snakemake --cores 1 \
+          --configfile configs/default_config.yaml \
+          -r prepare_DB run_pangraph calculate_distances make_plots
+```
+
+Equivalently you can call the full pipeline on a config file with:
+
+```
+python run_full_pipeline.py --config-file configs/default_config.yaml
+```
+
+Outputs for a given gene are saved in `{output_prefix}/{focal_gene}` and include output data files as well as pdf plots (generated with R) and html plots (generated with [altair](https://altair-viz.github.io/) in Python).
+
+
+
