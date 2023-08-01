@@ -1,4 +1,4 @@
-# Analysing the evolution of gene flanking regions
+# Visualizing and quantifying structural diversity around mobile AMR genes
 
 __Liam P. Shaw__
 
