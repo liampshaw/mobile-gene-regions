@@ -291,6 +291,8 @@ def main():
 
     # maximum density proportion
     max_density = max([density_df_up['density'].max(), density_df_down['density'].max()])
+    print("Maximum transposase density:", max_density)
+    print("Number of sequences:", len(set(gff_df_cds['seqid'])))
     # do 1 minus so that we can use the reversed axis of breakpoint distnace plot
     density_df_up['norm_density'] = [x/max_density for x in density_df_up['density']] 
     density_df_down['norm_density'] = [x/max_density for x in density_df_down['density']]

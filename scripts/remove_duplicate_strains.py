@@ -21,6 +21,7 @@ def main():
 	args = get_options()
 	metadata_df = pd.read_csv(args.metadata, index_col=0)
 	strain_list = [line.strip() for line in open(args.strain_list, "r").readlines()]
+	strain_list = [s for s in strain_list if s in metadata_df.index]
 	metadata_df_strains = metadata_df.loc[strain_list]
 
 	metadata_fields = args.metadata_fields.split(",")

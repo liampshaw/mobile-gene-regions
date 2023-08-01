@@ -21,4 +21,7 @@ test*
 beta-lactamases/curves/*
 beta-lactamases/gfastats/*
 beta-lactamases/breakpoint_plots/*
-
+beta-lactamases/breakpoint_plots/*html
+beta-lactamases/*fa
+output*/
+beta-lactamases/*html
