@@ -3,6 +3,7 @@ import csv
 import json
 import pandas as pd
 import argparse
+import sys
 
 def my_theme():
     font = "Helvetica"
@@ -99,7 +100,14 @@ def main():
     if args.strain_list!='':
         seqs_to_include = list(pd.read_csv(args.strain_list, header=None)[0])
         df = df.loc[(df['seq1'].isin(seqs_to_include)) & (df['seq2'].isin(seqs_to_include))]
+        
+    if len(df)==0:
+        with open(args.output_html, "w") as f:
+            f.write("")
+        print("WARNING: nothing to plot (after subsetting, block df is empty)")
+        sys.exit(0)
 
+            
     # Convert the data types of the columns to float 
     df['distup'] = df['dist.up'].astype(float)
     df['distdown'] = df['dist.down'].astype(float)

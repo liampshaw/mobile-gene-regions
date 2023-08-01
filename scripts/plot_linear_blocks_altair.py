@@ -94,11 +94,11 @@ alt.themes.register('my_theme', my_theme)
 alt.themes.enable('my_theme')
 
 # Create the text explanation
-explanation = ["Blocks are coloured by inferred sequence homology (grey=unique block, only seen in one sequence).", "Click on a block to highlight that block (hold shift and click to select multiple blocks).",
-                "Double-click to unselect blocks.",
-             "Y-axis order of sequences is determined by pairwise Jaccard index in terms of blocks."]
-explanation_gff = ["Blocks are coloured by inferred sequence homology (grey=unique block, only seen in one sequence).", "Annotations of CDSs can be toggled on/off using checkbox at bottom.",
-                "Mouseover of block or CDS annotation gives more information."]
+#explanation = ["Blocks are coloured by inferred sequence homology (grey=unique block, only seen in one sequence).", "Click on a block to highlight that block (hold shift and click to select multiple blocks).",
+#                "Double-click to unselect blocks.",
+#             "Y-axis order of sequences is determined by pairwise Jaccard index in terms of blocks."]
+#explanation_gff = ["Blocks are coloured by inferred sequence homology (grey=unique block, only seen in one sequence).", "Annotations of CDSs can be toggled on/off using checkbox at bottom.",
+#                "Mouseover of block or CDS annotation gives more information."]
                
 
 # Arguments
@@ -168,13 +168,8 @@ def main():
   block_df['order'] = pd.Categorical(block_df['genome'], categories=ordered_genomes, ordered=True)
 
   # Selection of block - aim is to click one and highlight all others on chart
-  block_selection = alt.selection_point(fields=['block'], empty=True)
-  explanation_title = explanation 
-  if args.gff_file!='':
-    explanation_title += explanation_gff
-  block_plot = alt.Chart(block_df,
-  title=alt.Title("How to use this plot",
-  subtitle=explanation_title, align="left", orient="top")).mark_bar().encode(
+  block_selection = alt.selection_point(fields=['block'], empty=True) 
+  block_plot = alt.Chart(block_df).mark_bar().encode(
     x=alt.X('start:Q', title='Position (bp)', scale=alt.Scale(domain=[0, max(block_df['end'])])),
     x2=alt.X2('end:Q'),
     y=alt.Y('genome:O', title='Genome', sort=ordered_genomes),

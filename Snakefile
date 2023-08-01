@@ -19,8 +19,10 @@ DB = config["DB"]
 
 rule prepare_DB:
 	input:
-		expand(output_folder+"/{gene}/gene_diversity/{gene}_DB.fa", gene=FOCAL_GENES), # Removed for now
-		expand(output_folder+"/{gene}/gene_diversity/{gene}.csv", gene=FOCAL_GENES)
+		#expand(output_folder+"/{gene}/gene_diversity/{gene}_DB.fa", gene=FOCAL_GENES), # Removed for now
+		expand(output_folder+"/{gene}/gene_diversity/{gene}.csv", gene=FOCAL_GENES),
+		expand(output_folder+"/{gene}/data/{gene}_contigs.fa", gene=FOCAL_GENES),
+		expand(output_folder+"/{gene}/data/{gene}.fa", gene=FOCAL_GENES)
 
 rule run_pangraph:
 	input:
@@ -40,26 +42,39 @@ elif config["breakpoint_minimap2"]==True:
 rule make_plots:
 	input:
 		expand(output_folder+"/{gene}/plots/linear_blocks.pdf", gene=FOCAL_GENES),
-		expand(output_folder+"/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
-			gene=FOCAL_GENES),
+		#expand(output_folder+"/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
+	#		gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/bandage.log_file", gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENES),
-		expand(output_folder+"/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENES),
+		#expand(output_folder+"/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/{gene}_linear_blocks.html", gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/{gene}_linear_blocks_deduplicated.html", gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/{gene}_ecdf.html", gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/bandage.log_file", gene=FOCAL_GENES)
 
 # # Unsure whether to include this
-rule extract_genes_DB:
+# rule extract_genes_DB:
+# 	input:
+# 		"input/focal_genes/{gene}.fa"
+# 	params:
+# 		DB="data/CARD_db.fa"
+# 	output:
+# 		output_folder+"/{gene}/gene_diversity/{gene}_DB.fa"
+# 	shell:
+# 		"python scripts/extract_gene_DB.py {params.DB} {input} CARD {output}"
+
+rule copy_data:
 	input:
-		"input/focal_genes/{gene}.fa"
-	params:
-		DB="data/CARD_db.fa"
+		gene_fasta="input/focal_genes/{gene}.fa",
+		contig_fasta="input/contigs/{gene}_contigs.fa"
 	output:
-		output_folder+"/{gene}/gene_diversity/{gene}_DB.fa"
-	shell:
-		"python scripts/extract_gene_DB.py {params.DB} {input} CARD {output}"
+		output_gene_fasta=output_folder+"/{gene}/data/{gene}.fa",
+		output_contig_fasta=output_folder+"/{gene}/data/{gene}_contigs.fa"
+	run:
+		shell("cp {input.gene_fasta} {output.output_gene_fasta}"),
+		shell("cp {input.contig_fasta} {output.output_contig_fasta}"),
+
+
 
 rule extract_genes_from_contigs:
 	input:
@@ -80,7 +95,7 @@ rule extract_genes_from_contigs:
 rule assign_variants:
 	input:
 		fasta=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa",
-		variants=output_folder+"/{gene}/gene_diversity/{gene}_DB.fa"
+		variants="input/focal_genes/{gene}.fa"
 	output:
 		output_folder+"/{gene}/gene_diversity/{gene}.csv"
 	shell:
@@ -256,20 +271,20 @@ rule positional_entropies:
 		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus --genelocations {params.gene_locations} > {output.consensus_relative}")
 		shell("python scripts/positional_entropy.py --json {input.pangraph} --normalise --consensus > {output.consensus}")
 
-rule plot_breakpoint_distances:
-	input:
-		dists=output_folder+"/{gene}/pangraph/{gene}.output_dists.csv",
-		deduplicated_gene=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.txt",
-		variant_assignments=output_folder+"/{gene}/gene_diversity/{gene}.csv"
-	params:
-		gene="{gene}",
-		output_pdf_prefix=output_folder+"/{gene}/plots/{gene}_breakpoint_distances"
-	output:
-		output_folder+"/{gene}/plots/{gene}_breakpoint_distances-all.pdf",
-	shell:
-		"Rscript scripts/plot_output_dists.R {input.dists} {input.deduplicated_gene} {input.variant_assignments}\
-						--output_pdf_prefix {params.output_pdf_prefix} \
-						--focal_gene {params.gene}"
+# rule plot_breakpoint_distances:
+# 	input:
+# 		dists=output_folder+"/{gene}/pangraph/{gene}.output_dists.csv",
+# 		deduplicated_gene=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.txt",
+# 		#variant_assignments=output_folder+"/{gene}/gene_diversity/{gene}.csv"
+# 	params:
+# 		gene="{gene}",
+# 		output_pdf_prefix=output_folder+"/{gene}/plots/{gene}_breakpoint_distances"
+# 	output:
+# 		output_folder+"/{gene}/plots/{gene}_breakpoint_distances-all.pdf",
+# 	shell:
+# 		"Rscript scripts/plot_output_dists.R {input.dists} {input.deduplicated_gene} {input.variant_assignments}\
+# 						--output_pdf_prefix {params.output_pdf_prefix} \
+# 						--focal_gene {params.gene}"
 
 rule plot_linear_blocks:
 	input:
@@ -292,19 +307,6 @@ rule plot_bandage:
 		"Bandage image {input} {params.output_png} --height 4000 --width 7000 --colour custom > {output}" if config["bandage"]==True else
 		"echo 'Bandage not run' > {output}"
 
-# rule combine_linear_and_bandage:
-# 	input:
-# 		linear=output_folder+"/{gene}/plots/linear_blocks.pdf",
-# 		bandage_logfile=output_folder+"/{gene}/plots/bandage.log_file"
-# 	params:
-# 		output_pdf = output_folder+"/{gene}/plots/{gene}_bandage_and_linear.pdf",
-# 		bandage=output_folder+"/{gene}/plots/{gene}_pangraph.bandage_plot.png"
-# 	output:
-# 		output_folder+"/{gene}/plots/{gene}_bandage_and_linear.logfile"
-# 	shell:
-# 		"Rscript scripts/combine_two_plots.R {input.linear} {params.bandage} --output_pdf {params.output_pdf} > {output}" if config["bandage"]==True else
-# 		"echo 'Bandage not run' > {output}"
-
 
 rule plot_positional_entropies_consensus_relative:
 	input:
@@ -314,20 +316,20 @@ rule plot_positional_entropies_consensus_relative:
 	run:
 		shell("Rscript scripts/plot_entropies.R {input} --relative T --output_pdf {output}")
 
-rule plot_NJ_tree_central_gene:
-	input:
-		tree=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.aln.refined.tre",
-		aln=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.aln",
-		variant_assignments=output_folder+"/{gene}/gene_diversity/{gene}.csv",
-		dup_names=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.txt"
-	output:
-		output_folder+"/{gene}/plots/NJ_tree_central_gene.pdf"
-	shell:
-		"Rscript scripts/plot_tree_variants.R --aln {input.aln} \
-											--tree {input.tree} \
-											--variants {input.variant_assignments}\
-											--dup_names {input.dup_names} \
-											--output_pdf {output}"
+# rule plot_NJ_tree_central_gene:
+# 	input:
+# 		tree=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.aln.refined.tre",
+# 		aln=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.aln",
+# 		variant_assignments=output_folder+"/{gene}/gene_diversity/{gene}.csv",
+# 		dup_names=output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa.dedup.txt"
+# 	output:
+# 		output_folder+"/{gene}/plots/NJ_tree_central_gene.pdf"
+# 	shell:
+# 		"Rscript scripts/plot_tree_variants.R --aln {input.aln} \
+# 											--tree {input.tree} \
+# 											--variants {input.variant_assignments}\
+# 											--dup_names {input.dup_names} \
+# 											--output_pdf {output}"
 
 rule plot_output_dists_altair:
 	input:

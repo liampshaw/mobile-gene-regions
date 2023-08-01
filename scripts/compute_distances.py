@@ -55,7 +55,7 @@ def main():
 
     with open(args.gene_offset, 'r') as f:
         gene_offset = f.read().strip('\n').split('\t')
-        # formatted as balst output of focal gene against the consensus gene block: sstart send slen 
+        # formatted as blast output of focal gene against the consensus gene block: sstart send slen 
     gene_offset_upstream = int(gene_offset[0])
     gene_offset_downstream = int(gene_offset[2])-int(gene_offset[1])
     block_lengths = {}

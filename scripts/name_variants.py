@@ -47,7 +47,7 @@ def main():
 				#print(seq_aa)
 				seq_names_dict[seqid] = seqs_aa[seq_aa]
 			else:
-				seq_names_dict[seqid] = 'unnamed'
+				seq_names_dict[seqid] = 'other'
 				#print(seqid, 'unnamed')
 		if seq_nt in seq_counts_dict.keys():
 			seq_counts_dict[seq_nt] +=1
