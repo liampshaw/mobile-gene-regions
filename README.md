@@ -2,11 +2,16 @@
 
 __Liam P. Shaw__
 
-Repository of scripts and data for analysis of the genomic contexts of a given focal gene - presents a pipeline to analyse the surrounding regions of genes using [pangraph](https://github.com/neherlab/pangraph) and generate output plots. The original intention was to analyse beta-lactamase genes, but the pipeline is now generalised for any input gene. 
+This repository contains a pipeline to analyse the flanking regions of genes using [pangraph](https://github.com/neherlab/pangraph) and generate output plots. The original intention was to analyse beta-lactamase genes, but the pipeline is now general and can be used for any input gene. 
 
-![](tutorial/images/ecdf_screenshot.png)
+Basic usage:
 
-![](tutorial/images/linear_blocks_screenshot.png)
+```
+python analyze-flanking-regions.py \
+        --contigs contig_fasta.fa \
+        --gene focal_gene.fa 
+        --prefix gene_name 
+```
 
 
 ### Repository structure
@@ -20,7 +25,10 @@ mamba env create -f bl-region-env.yaml
 conda activate bl-region-env
 ```
 
-The full snakemake pipeline can be run on the example data with the following command:
+`analyze-flanking-regions.py` is a helper script that creates a config file and calls the snakemake pipeline. 
+
+
+For an example, the snakemake pipeline can be run on some example data (mcr-1) with the following command:
 
 ```
 snakemake --cores 1 \
@@ -28,10 +36,10 @@ snakemake --cores 1 \
           -r prepare_DB run_pangraph calculate_distances make_plots
 ```
 
-Equivalently you can call the full pipeline with:
+Equivalently you can call the full pipeline on a config file with:
 
 ```
-python run_full_pipepine.py --config-file configs/default_config.yaml
+python run_full_pipeline.py --config-file configs/default_config.yaml
 ```
 
 Outputs for a given gene are saved in `{output_prefix}/{focal_gene}` and include output data files as well as pdf plots (generated with R) and html plots (generated with [altair](https://altair-viz.github.io/) in Python).
