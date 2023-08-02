@@ -1,7 +1,9 @@
 import subprocess
-import os
 import argparse
 import re
+import sys
+import shutil
+import os
 
 def get_options():
     parser = argparse.ArgumentParser(description="Run pipeline to analyse flanking regions of a focal gene.")
@@ -146,39 +148,43 @@ if __name__ == "__main__":
         print("doesn't exist")
         os.makedirs(args.output_dir)
 
+    if os.path.exists(args.output_dir+"/"+args.focal_gene_name):
+        print("Warning: output directory "+args.output_dir+"/"+args.focal_gene_name+" exists.")
+        print("If you encounter snakemake errors, rerun the snakemake command below and add --unlock.")
+        if args.force:
+            print("You used --force! Removing previous results and rerunning pipeline.")
+            shutil.rmtree(args.output_dir+"/"+args.focal_gene_name)
+
+
     config_file = "configs/"+"config_"+args.focal_gene_name+".yaml"
+
+    # copy files into input directory if needed 
+    # (wasteful, but because of how I've written snakemake pipeline to function with multiple genes)
     contigs_file = "input/contigs/"+args.focal_gene_name+"_contigs.fa"
     gene_file = "input/focal_genes/"+args.focal_gene_name+".fa"
+
     if args.gff!="":
         user_options["include_gff"] = "True"
         gff_file = "input/gffs/"+args.focal_gene_name+"_annotations.gff"
-        if os.path.isfile(gff_file):
-            if not args.force:
-                print("Warning: gff file "+gff_file+" exists already. Using this rather than the file you requested. Use --force to overwrite")
-            else:
-                os.remove(gff_file)
-                os.symlink(args.gff, gff_file)
+        if args.gff==gff_file:
+            pass
         else:
-            os.symlink(args.gff, gff_file)
+            shutil.copy(args.gff, gff_file)
 
-    if os.path.isfile(contigs_file):
-        if not args.force:
-            print("Warning: contigs file "+contigs_file+" exists already. Using this rather than the file you requested. Use --force to overwrite")
-        else:
-            os.remove(contigs_file)
-            os.symlink(args.contigs, contigs_file)
+    if args.contigs==contigs_file:
+        pass
     else:
-        os.symlink(args.contigs, contigs_file)
+        shutil.copy(args.contigs, contigs_file)
 
-    if os.path.isfile(gene_file):
-        if not args.force:
-            print("Warning: gene file "+gene_file+" exists already. Using this rather than the file you requested. Use --force to overwrite")
-        else:
-            os.remove(gene_file)
-            rewrite_gene_fasta(args.gene_fasta, args.focal_gene_name, gene_file)
+    if args.gene_fasta==gene_file:
+        with open(args.gene_fasta, "r") as f:
+            header = f.readline().split(" ")[0]
+            if header!=args.focal_gene_name:
+                print("Warning: your focal gene fasta does not have the same name as the focal gene. Please amend.")
+                sys.exit(1)
     else:
         rewrite_gene_fasta(args.gene_fasta, args.focal_gene_name, gene_file)
-
+    
     # Write the config file
     write_config_file(user_options, config_file)
 

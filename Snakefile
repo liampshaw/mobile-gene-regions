@@ -21,8 +21,8 @@ rule prepare_DB:
 	input:
 		#expand(output_folder+"/{gene}/gene_diversity/{gene}_DB.fa", gene=FOCAL_GENES), # Removed for now
 		expand(output_folder+"/{gene}/gene_diversity/{gene}.csv", gene=FOCAL_GENES),
-		expand(output_folder+"/{gene}/data/{gene}_contigs.fa", gene=FOCAL_GENES),
-		expand(output_folder+"/{gene}/data/{gene}.fa", gene=FOCAL_GENES)
+		#expand(output_folder+"/{gene}/data/{gene}_contigs.fa", gene=FOCAL_GENES),
+		#expand(output_folder+"/{gene}/data/{gene}.fa", gene=FOCAL_GENES)
 
 rule run_pangraph:
 	input:
@@ -63,16 +63,16 @@ rule make_plots:
 # 	shell:
 # 		"python scripts/extract_gene_DB.py {params.DB} {input} CARD {output}"
 
-rule copy_data:
-	input:
-		gene_fasta="input/focal_genes/{gene}.fa",
-		contig_fasta="input/contigs/{gene}_contigs.fa"
-	output:
-		output_gene_fasta=output_folder+"/{gene}/data/{gene}.fa",
-		output_contig_fasta=output_folder+"/{gene}/data/{gene}_contigs.fa"
-	run:
-		shell("cp {input.gene_fasta} {output.output_gene_fasta}"),
-		shell("cp {input.contig_fasta} {output.output_contig_fasta}"),
+# rule copy_data:
+# 	input:
+# 		gene_fasta="input/focal_genes/{gene}.fa",
+# 		contig_fasta="input/contigs/{gene}_contigs.fa"
+# 	output:
+# 		output_gene_fasta=output_folder+"/{gene}/data/{gene}.fa",
+# 		output_contig_fasta=output_folder+"/{gene}/data/{gene}_contigs.fa"
+# 	run:
+# 		shell("cp {input.gene_fasta} {output.output_gene_fasta}"),
+# 		shell("cp {input.contig_fasta} {output.output_contig_fasta}"),
 
 
 
