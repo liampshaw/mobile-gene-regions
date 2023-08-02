@@ -26,3 +26,4 @@ beta-lactamases/*fa
 output*/
 beta-lactamases/*html
 configs/*yaml
+beta-lactamases/analysis/*fa
