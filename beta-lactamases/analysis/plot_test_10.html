@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.8.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousHeight": 300, "continuousWidth": 800}}, "data": {"name": "data-b5ac9f2525f379ca78734c0abd09950a"}, "mark": {"type": "bar"}, "encoding": {"color": {"field": "block", "legend": null, "scale": {"range": ["#3A9456", "#B13292", "#4C0F5A", "#ED5628", "#081C3C", "#11E1D7", "#B592CC", "#08EC54", "#3BD3D4", "#5DBE0E", "#2AF9F3", "#E1A7B4", "#2EBD32", "#2E68D6"]}, "type": "nominal"}, "opacity": {"condition": {"param": "param_1", "value": 1, "empty": true}, "value": 0.2}, "tooltip": [{"field": "block", "type": "nominal"}, {"field": "start", "type": "quantitative"}, {"field": "end", "type": "quantitative"}, {"field": "strand", "type": "nominal"}], "x": {"field": "start", "scale": {"domain": [0, 10876]}, "title": "Position (bp)", "type": "quantitative"}, "x2": {"field": "end"}, "y": {"field": "genome", "sort": ["NZ_CP066256.1", "NZ_CP047194.1"], "title": "Genome", "type": "ordinal"}}, "params": [{"name": "param_1", "select": {"type": "point", "fields": ["block"]}}, {"name": "param_2", "select": {"type": "interval", "encodings": ["x", "y"]}, "bind": "scales"}], "title": {"text": "How to use this plot", "align": "left", "orient": "top", "subtitle": ["Blocks are coloured by inferred sequence homology (grey=unique block, only seen in one sequence).", "Click on a block to highlight that block (hold shift and click to select multiple blocks).", "Double-click to unselect blocks.", "Y-axis order of sequences is determined by pairwise Jaccard index in terms of blocks."]}, "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-b5ac9f2525f379ca78734c0abd09950a": [{"genome": "NZ_CP066256.1", "block": "SXNZSORXVI", "strand": "+", "start": 1, "end": 3141, "colour": "#E1A7B4", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "HYWZRUXYAH", "strand": "+", "start": 3142, "end": 3733, "colour": "#11E1D7", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "QJVMIKYQOM", "strand": "+", "start": 3734, "end": 4058, "colour": "#5DBE0E", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "RJYOLYJPLM", "strand": "+", "start": 4059, "end": 4553, "colour": "#2AF9F3", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "WRTASRCKWM", "strand": "+", "start": 4554, "end": 4809, "colour": "#2E68D6", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "BBYIRWTZZD", "strand": "+", "start": 4810, "end": 4958, "colour": "#3A9456", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "GPBPYTRTDV", "strand": "+", "start": 4959, "end": 5878, "colour": "#ED5628", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "EOIUSLHDWD", "strand": "+", "start": 5879, "end": 6229, "colour": "#4C0F5A", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "KGOIBUMAEO", "strand": "+", "start": 6230, "end": 6935, "colour": "#B592CC", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "NIEELJDETX", "strand": "+", "start": 6936, "end": 8103, "colour": "#08EC54", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "NNGNZBFGJM", "strand": "+", "start": 8104, "end": 8217, "colour": "#3BD3D4", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "ULHKZEHNQF", "strand": "+", "start": 8218, "end": 8577, "colour": "#2EBD32", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "QJVMIKYQOM", "strand": "+", "start": 8578, "end": 8902, "colour": "#5DBE0E", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "RJYOLYJPLM", "strand": "+", "start": 8903, "end": 9397, "colour": "#2AF9F3", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "BSNUIDZNID", "strand": "+", "start": 9398, "end": 10159, "colour": "#B13292", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "HOXIIDINSU", "strand": "+", "start": 10160, "end": 10381, "colour": "#081C3C", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP066256.1", "block": "RJYOLYJPLM", "strand": "-", "start": 10382, "end": 10876, "colour": "#2AF9F3", "order": "NZ_CP066256.1"}, {"genome": "NZ_CP047194.1", "block": "SXNZSORXVI", "strand": "+", "start": 1, "end": 3141, "colour": "#E1A7B4", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "HYWZRUXYAH", "strand": "+", "start": 3142, "end": 3733, "colour": "#11E1D7", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "QJVMIKYQOM", "strand": "+", "start": 3734, "end": 4058, "colour": "#5DBE0E", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "RJYOLYJPLM", "strand": "+", "start": 4059, "end": 4553, "colour": "#2AF9F3", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "WRTASRCKWM", "strand": "+", "start": 4554, "end": 4809, "colour": "#2E68D6", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "BBYIRWTZZD", "strand": "+", "start": 4810, "end": 4958, "colour": "#3A9456", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "GPBPYTRTDV", "strand": "+", "start": 4959, "end": 5878, "colour": "#ED5628", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "EOIUSLHDWD", "strand": "+", "start": 5879, "end": 6229, "colour": "#4C0F5A", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "KGOIBUMAEO", "strand": "+", "start": 6230, "end": 6935, "colour": "#B592CC", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "NIEELJDETX", "strand": "+", "start": 6936, "end": 8103, "colour": "#08EC54", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "NNGNZBFGJM", "strand": "+", "start": 8104, "end": 8217, "colour": "#3BD3D4", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "ULHKZEHNQF", "strand": "+", "start": 8218, "end": 8577, "colour": "#2EBD32", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "QJVMIKYQOM", "strand": "+", "start": 8578, "end": 8902, "colour": "#5DBE0E", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "RJYOLYJPLM", "strand": "+", "start": 8903, "end": 9397, "colour": "#2AF9F3", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "BSNUIDZNID", "strand": "+", "start": 9398, "end": 10159, "colour": "#B13292", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "HOXIIDINSU", "strand": "+", "start": 10160, "end": 10381, "colour": "#081C3C", "order": "NZ_CP047194.1"}, {"genome": "NZ_CP047194.1", "block": "RJYOLYJPLM", "strand": "-", "start": 10382, "end": 10876, "colour": "#2AF9F3", "order": "NZ_CP047194.1"}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.8.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousHeight": 300, "continuousWidth": 400}, "range": {"category": {"scheme": "yelloworangered"}}, "title": {"font": "Helvetica"}, "axis": {"labelFont": "Helvetica", "titleFont": "Helvetica"}, "header": {"labelFont": "Helvetica", "titleFont": "Helvetica"}, "legend": {"labelFont": "Helvetica", "titleFont": "Helvetica"}}, "hconcat": [{"layer": [{"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 0.8, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "scale": null, "sort": {"field": "snvscategorical"}, "type": "nominal"}, "tooltip": [{"field": "dist", "title": "", "type": "quantitative"}], "x": {"field": "dist", "scale": {"domain": [0, 5002.0], "reverse": true}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "name": "view_1"}, {"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 1, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "legend": null, "type": "nominal"}, "x": {"field": "dist", "scale": {"domain": [0, 5002.0], "reverse": true}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "transform": [{"filter": {"param": "param_1"}}]}], "data": {"name": "data-adca1f34f44b5c5876dd7a4635994ec9"}}, {"layer": [{"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 0.8, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "scale": null, "sort": {"field": "snvscategorical"}, "type": "nominal"}, "tooltip": [{"field": "dist", "title": "", "type": "quantitative"}], "x": {"field": "dist", "scale": {"domain": [0, 5002.0]}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "name": "view_2"}, {"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 1, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "legend": null, "type": "nominal"}, "x": {"field": "dist", "scale": {"domain": [0, 5002.0]}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "transform": [{"filter": {"param": "param_1"}}]}], "data": {"name": "data-c6a90dd51b55be61f062ce9d60cc4aa6"}}, {"data": {"name": "data-adca1f34f44b5c5876dd7a4635994ec9"}, "mark": {"type": "point"}, "encoding": {"color": {"condition": {"param": "param_1", "field": "snvscategorical", "legend": null, "type": "nominal"}, "value": "lightgray"}, "y": {"axis": {"orient": "right"}, "field": "snvscategorical", "type": "nominal"}}, "name": "view_3"}], "params": [{"name": "param_1", "select": {"type": "point", "fields": ["snvscategorical"]}, "bind": {"input": "radio", "options": ["0", "2", "3", "4", null], "labels": ["0 ", "2 ", "3 ", "4 ", "All"], "name": "SNVs: "}, "views": ["view_1", "view_2", "view_3"]}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-adca1f34f44b5c5876dd7a4635994ec9": [{"dist": 0.0, "ecdf": 0.0, "snvscategorical": "0"}, {"dist": 45.0, "ecdf": 0.375, "snvscategorical": "0"}, {"dist": 1358.0, "ecdf": 0.5, "snvscategorical": "0"}, {"dist": 1394.0, "ecdf": 0.625, "snvscategorical": "0"}, {"dist": 1399.0, "ecdf": 0.75, "snvscategorical": "0"}, {"dist": 4992.0, "ecdf": 0.8125, "snvscategorical": "0"}, {"dist": 4997.0, "ecdf": 0.875, "snvscategorical": "0"}, {"dist": 4999.0, "ecdf": 0.9375, "snvscategorical": "0"}, {"dist": 5012.0, "ecdf": 1.0, "snvscategorical": "0"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "2"}, {"dist": 45.0, "ecdf": 0.4375, "snvscategorical": "2"}, {"dist": 1298.0, "ecdf": 0.53125, "snvscategorical": "2"}, {"dist": 1358.0, "ecdf": 0.625, "snvscategorical": "2"}, {"dist": 1393.0, "ecdf": 0.71875, "snvscategorical": "2"}, {"dist": 1394.0, "ecdf": 0.8125, "snvscategorical": "2"}, {"dist": 1399.0, "ecdf": 1.0, "snvscategorical": "2"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "3"}, {"dist": 45.0, "ecdf": 0.35, "snvscategorical": "3"}, {"dist": 1298.0, "ecdf": 0.5, "snvscategorical": "3"}, {"dist": 1358.0, "ecdf": 0.6, "snvscategorical": "3"}, {"dist": 1393.0, "ecdf": 0.675, "snvscategorical": "3"}, {"dist": 1394.0, "ecdf": 0.775, "snvscategorical": "3"}, {"dist": 1399.0, "ecdf": 0.95, "snvscategorical": "3"}, {"dist": 1982.0, "ecdf": 0.975, "snvscategorical": "3"}, {"dist": 1983.0, "ecdf": 1.0, "snvscategorical": "3"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "4"}, {"dist": 45.0, "ecdf": 1.0, "snvscategorical": "4"}], "data-c6a90dd51b55be61f062ce9d60cc4aa6": [{"dist": 0.0, "ecdf": 0.0, "snvscategorical": "0"}, {"dist": 112.0, "ecdf": 0.75, "snvscategorical": "0"}, {"dist": 4992.0, "ecdf": 0.8125, "snvscategorical": "0"}, {"dist": 4995.0, "ecdf": 0.875, "snvscategorical": "0"}, {"dist": 4997.0, "ecdf": 0.9375, "snvscategorical": "0"}, {"dist": 4998.0, "ecdf": 1.0, "snvscategorical": "0"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "2"}, {"dist": 112.0, "ecdf": 0.8125, "snvscategorical": "2"}, {"dist": 747.0, "ecdf": 0.84375, "snvscategorical": "2"}, {"dist": 754.0, "ecdf": 0.875, "snvscategorical": "2"}, {"dist": 2350.0, "ecdf": 0.9375, "snvscategorical": "2"}, {"dist": 2438.0, "ecdf": 1.0, "snvscategorical": "2"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "3"}, {"dist": 112.0, "ecdf": 0.9, "snvscategorical": "3"}, {"dist": 747.0, "ecdf": 0.95, "snvscategorical": "3"}, {"dist": 754.0, "ecdf": 1.0, "snvscategorical": "3"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "4"}, {"dist": 112.0, "ecdf": 0.75, "snvscategorical": "4"}, {"dist": 748.0, "ecdf": 0.8125, "snvscategorical": "4"}, {"dist": 754.0, "ecdf": 1.0, "snvscategorical": "4"}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

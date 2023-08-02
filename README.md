@@ -86,23 +86,10 @@ Outputs for a given gene are saved in `{output_dir}/{focal_gene_name}`. They inc
 
 A tutorial on how to prepare data and use the pipeline to explore flanking regions is available in `tutorial/Tutorial.md`.
 
-Example plots for the beta-lactamases analysed in the paper can be seen at [https://liampshaw.github.io/flanking-regions/](https://liampshaw.github.io/flanking-regions/).
+### Beta-lactamases example
 
-### Repository structure
+The analysis presented in the paper for twelve beta-lactamases uses the version of the pipeline in `beta-lactamases`. The plots generated can be seen at [https://liampshaw.github.io/flanking-regions/](https://liampshaw.github.io/flanking-regions/).
 
-For an example, the snakemake pipeline can be run on some example data (mcr-1) with the following command:
-
-```
-snakemake --cores 1 \
-          --configfile configs/default_config.yaml \
-          -r prepare_DB run_pangraph calculate_distances make_plots
-```
-
-Equivalently you can call the full pipeline on a config file with:
-
-```
-python run_full_pipeline.py --config-file configs/default_config.yaml
-```
 
 
 

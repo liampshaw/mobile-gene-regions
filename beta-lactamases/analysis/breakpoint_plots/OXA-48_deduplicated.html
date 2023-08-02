@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #vis.vega-embed {
+      width: 100%;
+      display: flex;
+    }
+
+    #vis.vega-embed details,
+    #vis.vega-embed details summary {
+      position: relative;
+    }
+  </style>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-lite@5.8.0"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+</head>
+<body>
+  <div id="vis"></div>
+  <script>
+    (function(vegaEmbed) {
+      var spec = {"config": {"view": {"continuousHeight": 300, "continuousWidth": 400}, "range": {"category": {"scheme": "yelloworangered"}}, "title": {"font": "Helvetica"}, "axis": {"labelFont": "Helvetica", "titleFont": "Helvetica"}, "header": {"labelFont": "Helvetica", "titleFont": "Helvetica"}, "legend": {"labelFont": "Helvetica", "titleFont": "Helvetica"}}, "hconcat": [{"layer": [{"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 0.8, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "scale": null, "sort": {"field": "snvscategorical"}, "type": "nominal"}, "tooltip": [{"field": "dist", "title": "", "type": "quantitative"}], "x": {"field": "dist", "scale": {"domain": [0, 5802.0], "reverse": true}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "name": "view_1"}, {"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 1, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "legend": null, "type": "nominal"}, "x": {"field": "dist", "scale": {"domain": [0, 5802.0], "reverse": true}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "transform": [{"filter": {"param": "param_1"}}]}], "data": {"name": "data-4e355e83358aede4cdf152a58e285001"}}, {"layer": [{"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 0.8, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "scale": null, "sort": {"field": "snvscategorical"}, "type": "nominal"}, "tooltip": [{"field": "dist", "title": "", "type": "quantitative"}], "x": {"field": "dist", "scale": {"domain": [0, 5802.0]}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "name": "view_2"}, {"mark": {"type": "line", "clip": true, "interpolate": "step", "opacity": 1, "strokeWidth": 2}, "encoding": {"color": {"field": "snvscategorical", "legend": null, "type": "nominal"}, "x": {"field": "dist", "scale": {"domain": [0, 5802.0]}, "type": "quantitative"}, "y": {"field": "ecdf", "scale": {"domain": [0, 1], "reverse": true}, "type": "quantitative"}}, "transform": [{"filter": {"param": "param_1"}}]}], "data": {"name": "data-ce22f0562a8b8f7bd83ec67c89a8c559"}}, {"data": {"name": "data-4e355e83358aede4cdf152a58e285001"}, "mark": {"type": "point"}, "encoding": {"color": {"condition": {"param": "param_1", "field": "snvscategorical", "legend": null, "type": "nominal"}, "value": "lightgray"}, "y": {"axis": {"orient": "right"}, "field": "snvscategorical", "type": "nominal"}}, "name": "view_3"}], "params": [{"name": "param_1", "select": {"type": "point", "fields": ["snvscategorical"]}, "bind": {"input": "radio", "options": ["0", "1", null], "labels": ["0 ", "1 ", "All"], "name": "SNVs: "}, "views": ["view_1", "view_2", "view_3"]}], "$schema": "https://vega.github.io/schema/vega-lite/v5.8.0.json", "datasets": {"data-4e355e83358aede4cdf152a58e285001": [{"dist": 0.0, "ecdf": 0.0, "snvscategorical": "0"}, {"dist": 973.0, "ecdf": 0.1527777777777778, "snvscategorical": "0"}, {"dist": 1099.0, "ecdf": 0.17833333333333334, "snvscategorical": "0"}, {"dist": 1109.0, "ecdf": 0.1827777777777778, "snvscategorical": "0"}, {"dist": 1724.0, "ecdf": 0.1975, "snvscategorical": "0"}, {"dist": 1738.0, "ecdf": 0.34055555555555556, "snvscategorical": "0"}, {"dist": 1739.0, "ecdf": 0.37, "snvscategorical": "0"}, {"dist": 1747.0, "ecdf": 0.4738888888888889, "snvscategorical": "0"}, {"dist": 2162.0, "ecdf": 0.475, "snvscategorical": "0"}, {"dist": 2163.0, "ecdf": 0.4761111111111111, "snvscategorical": "0"}, {"dist": 2928.0, "ecdf": 0.5294444444444445, "snvscategorical": "0"}, {"dist": 2936.0, "ecdf": 0.6297222222222222, "snvscategorical": "0"}, {"dist": 2946.0, "ecdf": 0.7294444444444445, "snvscategorical": "0"}, {"dist": 3903.0, "ecdf": 0.7544444444444445, "snvscategorical": "0"}, {"dist": 3904.0, "ecdf": 0.7558333333333334, "snvscategorical": "0"}, {"dist": 3913.0, "ecdf": 0.7822222222222223, "snvscategorical": "0"}, {"dist": 5794.0, "ecdf": 0.8244444444444444, "snvscategorical": "0"}, {"dist": 5802.0, "ecdf": 0.9247222222222222, "snvscategorical": "0"}, {"dist": 5804.0, "ecdf": 0.9291666666666667, "snvscategorical": "0"}, {"dist": 5805.0, "ecdf": 0.9294444444444444, "snvscategorical": "0"}, {"dist": 5806.0, "ecdf": 0.9344444444444444, "snvscategorical": "0"}, {"dist": 5808.0, "ecdf": 0.935, "snvscategorical": "0"}, {"dist": 5812.0, "ecdf": 1.0, "snvscategorical": "0"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "1"}, {"dist": 973.0, "ecdf": 0.08333333333333333, "snvscategorical": "1"}, {"dist": 1099.0, "ecdf": 0.1, "snvscategorical": "1"}, {"dist": 1724.0, "ecdf": 0.10833333333333334, "snvscategorical": "1"}, {"dist": 1738.0, "ecdf": 0.7, "snvscategorical": "1"}, {"dist": 1739.0, "ecdf": 0.7166666666666667, "snvscategorical": "1"}, {"dist": 1747.0, "ecdf": 1.0, "snvscategorical": "1"}], "data-ce22f0562a8b8f7bd83ec67c89a8c559": [{"dist": 0.0, "ecdf": 0.0, "snvscategorical": "0"}, {"dist": 1485.0, "ecdf": 0.03277777777777778, "snvscategorical": "0"}, {"dist": 1596.0, "ecdf": 0.04888888888888889, "snvscategorical": "0"}, {"dist": 1647.0, "ecdf": 0.065, "snvscategorical": "0"}, {"dist": 2316.0, "ecdf": 0.06916666666666667, "snvscategorical": "0"}, {"dist": 2317.0, "ecdf": 0.085, "snvscategorical": "0"}, {"dist": 2325.0, "ecdf": 0.09055555555555556, "snvscategorical": "0"}, {"dist": 2326.0, "ecdf": 0.09666666666666666, "snvscategorical": "0"}, {"dist": 2442.0, "ecdf": 0.12777777777777777, "snvscategorical": "0"}, {"dist": 3515.0, "ecdf": 0.5772222222222222, "snvscategorical": "0"}, {"dist": 4482.0, "ecdf": 0.6538888888888889, "snvscategorical": "0"}, {"dist": 5774.0, "ecdf": 0.6541666666666667, "snvscategorical": "0"}, {"dist": 5776.0, "ecdf": 0.9991666666666666, "snvscategorical": "0"}, {"dist": 5777.0, "ecdf": 0.9994444444444445, "snvscategorical": "0"}, {"dist": 5779.0, "ecdf": 0.9997222222222222, "snvscategorical": "0"}, {"dist": 5782.0, "ecdf": 1.0, "snvscategorical": "0"}, {"dist": 0.0, "ecdf": 0.0, "snvscategorical": "1"}, {"dist": 960.0, "ecdf": 0.16666666666666666, "snvscategorical": "1"}, {"dist": 1485.0, "ecdf": 0.18055555555555555, "snvscategorical": "1"}, {"dist": 1596.0, "ecdf": 0.8263888888888888, "snvscategorical": "1"}, {"dist": 1647.0, "ecdf": 0.8277777777777777, "snvscategorical": "1"}, {"dist": 2317.0, "ecdf": 0.8291666666666667, "snvscategorical": "1"}, {"dist": 2325.0, "ecdf": 0.8305555555555556, "snvscategorical": "1"}, {"dist": 2361.0, "ecdf": 0.8361111111111111, "snvscategorical": "1"}, {"dist": 2412.0, "ecdf": 0.8416666666666667, "snvscategorical": "1"}, {"dist": 2442.0, "ecdf": 0.8444444444444444, "snvscategorical": "1"}, {"dist": 3515.0, "ecdf": 0.9194444444444444, "snvscategorical": "1"}, {"dist": 4482.0, "ecdf": 0.9361111111111111, "snvscategorical": "1"}, {"dist": 5776.0, "ecdf": 1.0, "snvscategorical": "1"}]}};
+      var embedOpt = {"mode": "vega-lite"};
+
+      function showError(el, error){
+          el.innerHTML = ('<div style="color:red;">'
+                          + '<p>JavaScript Error: ' + error.message + '</p>'
+                          + "<p>This usually means there's a typo in your chart specification. "
+                          + "See the javascript console for the full traceback.</p>"
+                          + '</div>');
+          throw error;
+      }
+      const el = document.getElementById('vis');
+      vegaEmbed("#vis", spec, embedOpt)
+        .catch(error => showError(el, error));
+    })(vegaEmbed);
+
+  </script>
+</body>
+</html>

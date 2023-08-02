@@ -1,5 +1,5 @@
 version: "default"
-focal_genes : ["mcr-1.1"]
+focal_genes : ["IMP-4"]
 complete: True # incomplete is work-in-progress - don't use
 panx_export : False
 bandage : True

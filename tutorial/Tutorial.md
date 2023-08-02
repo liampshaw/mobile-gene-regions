@@ -2,16 +2,37 @@
 
 This document aims to give a detailed explanation of how to use the pipeline to explore the neighbourhood of a particular gene. 
 
+N.B. This was written before the helper `analyze-flanking-regions.py` script was developed. It applies to using the snakemake pipeline by writing the config file yourself. 
+
+### Repository structure
+
+For an example, the snakemake pipeline can be run on some example data (mcr-1) with the following command:
+
+```
+snakemake --cores 1 \
+          --configfile configs/default_config.yaml \
+          -r prepare_DB run_pangraph calculate_distances make_plots
+```
+
+Equivalently you can call the full pipeline on a config file with:
+
+```
+python run_full_pipeline.py --config-file configs/default_config.yaml
+```
+
+
 ## Obtaining your input files
 
 The first thing you need to do is obtain two input files: a fasta file containing a focal gene of interest (`{gene}.fa`), and a set of contigs that contain the gene (`{gene}_contigs.fa`). 
 
-You may already have these prepared for your own dataset. Alternatively, you may be interested in downloading some existing fasta files from NCBI. 
+You may already have these prepared for your own dataset. If so, you can run the pipeline with the helper script `analyze-flanking-regions.py`. 
+
+Alternatively, you may be interested in downloading some existing fasta files from NCBI. Here, we walk through the process of how to download contigs containing a particular antimicrobial resistance (AMR) gene.  
 
 
 ### Using NCBI to download AMR genes
 
-For those interested in antimicrobial resistance (AMR) genes, let us assume that you have a particular resistance gene you are interested in and want to look at the region around that gene in published assemblies. 
+Let us assume that you have a particular resistance gene you are interested in and want to look at the region around that gene in published assemblies. 
 
 #### MicroBIGGE
 
@@ -25,7 +46,7 @@ For example, we can search for all contigs that contain *mcr-1.1* (a variant of 
 **A note on searching for gene variants:** unfortunately the naming schemes for AMR genes can make this kind of Boolean search difficult. Taking *mcr-1* as an example, its variants are named as *mcr-1.1*, *mcr-1.2* etc. These are all almost identical with only a few SNPs separating them. You might want to include in a search using `element_symbol:mcr-1.*`. However, some hits will be to sequences that do not match a named variant, so will just be stored as *mcr-1*, which will not be matched by this search. But `element_symbol:mcr-1*` is not what you want either, because this would also return *mcr-10* - which is non-homologous to *mcr-1* (50.9% protein similarity). In conclusion, the right search to return all *mcr-1* variants but exclude other *mcr* genes is: `element_symbol:mcr-1.* OR element_symbol:mcr-1` (8987 hits as of 25 May 2023).
 
 
-Currently (25 May 2023) there is only an option to download whole contigs for up to 1,000 hits. For *mcr-1.1* there are 8403 hits, so we cannot download all contigs from this interface. 
+As of 25 May 2023 there was only an option to download whole contigs for up to 1,000 hits. For *mcr-1.1* there are 8403 hits, so we cannot download all contigs from this interface. 
 
 Options for download are: 
 
@@ -73,27 +94,19 @@ done < locations.csv
 
 ## Preparing the pipeline
 
-Your two files should be put in the following places (from the main directory):
+The snakemake pipeline enables analysis of multiple focal genes at the same time with the same parameters. 
+
+For each focal gene, your two input files should be put in the following places (from the main directory):
 
 * `input/focal_genes/{focal_gene}.fa`
-* `input/focal_genes/{focal_gene_search}_contigs.fa`
+* `input/contigs/{focal_gene_search}_contigs.fa`
 
-You will need to edit the `Snakefile` as follows:
-
-```
-FOCAL_GENE_DICT = {"{focal_gene}":"{focal_gene_search}"} 
-```
-
-for example:
-
-```
-FOCAL_GENE_DICT = {"mcr-1.1": "mcr-1"} 
-```
+In the config file, 
 
 means the pipeline will assume that the following files exist:
 
 * `input/focal_genes/mcr-1.1.fa`
-* `input/focal_genes/mcr1_contigs.fa`
+* `input/focal_genes/mcr1.1_contigs.fa`
 
 The snakemake pipeline is split up into different rules. You can run the full pipeline with:
 
