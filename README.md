@@ -14,7 +14,13 @@ doi: []()
 
 ### Dependencies
 
-The pipeline requires [pangraph](https://github.com/neherlab/pangraph) to be installed first. 
+The pipeline requires [pangraph](https://github.com/neherlab/pangraph) to be installed first. Currently it uses the `feat/unbalanced-tree` branch which can be installed with:
+
+```
+git clone -b feat/unbalanced-tree https://github.com/neherlab/pangraph.git && cd pangraph
+```
+
+And then follow the installation instructions from the pangraph github as normal.
 
 Other dependencies can be installed with conda or mamba (recommended: mamba):
 
