@@ -1,4 +1,4 @@
-name: bl-region-env 
+name: flanking-regions-2 
 channels:
   - bioconda
   - conda-forge
@@ -9,19 +9,15 @@ dependencies:
   - pandas
   - snp-dists
   - numpy
-  - seaborn
   - biopython
-  - ncbi-acc-download
-  - ncbi-genome-download
   - fasttree
   - seqkit
   - untangle
-  - entrez-direct
   - mmseqs2
   - treetime==0.9.4
-  - pairsnp
+#  - pairsnp
   - snakemake
-  - ca-certificates
-  - certifi
-  - openssl
+#  - ca-certificates
+#  - certifi
+#  - openssl
   - altair
