@@ -1,21 +1,66 @@
 import subprocess
 import os
 import argparse
-
+import re
 
 def get_options():
-    parser = argparse.ArgumentParser(description="Run Snakemake pipeline")
+    parser = argparse.ArgumentParser(description="Run pipeline to analyse flanking regions of a focal gene.")
     parser.add_argument("--contigs", required=True,
                         help="fasta with contigs containing central/focal gene")
-    parser.add_argument("--gene", required=True,
-                        help="central/focal gene fasta")
-    parser.add_argument("--prefix", required=True,
-                        help="prefix to use for gene in config file")
+    parser.add_argument("--gene_fasta", required=True,
+                        help="fasta with nucleotide sequence of focal gene")
+    parser.add_argument("--focal_gene_name", required=True,
+                        help="name of focal gene\n(NOTE: if using gffs, must match name of protein product e.g. IMP-4 not blaIMP-4)")
     parser.add_argument("--flanking_region", required=False,
-                        help="size of flanking region")
+                        help="size of flanking region (N.B. currently symmetrical upstream/downstream)",
+                        default="5000")
+    parser.add_argument("--output_dir", required=False,
+                        help="output directory",
+                        default="output")
     parser.add_argument("--force", required=False,
                         help="whether to overwrite existing input files",
                         action='store_true')
+    parser.add_argument("--gff", required=False,
+                        help="file with gff annotations for contigs",
+                        default="")
+    parser.add_argument("--panx_export", required=False,
+                        help="whether to export panX output from pangraph",
+                        action="store_true")
+    parser.add_argument("--bandage", required=False,
+                        help="whether to run Bandage on pangraph",
+                        action="store_true")
+    parser.add_argument("--snv_threshold", required=False,
+                        help="SNV threshold for focal gene",
+                        default="25")
+    parser.add_argument("--pangraph_polish", required=False,
+                        help="whether to polish the pangraph",
+                        action="store_true")
+    parser.add_argument("--pangraph_aligner", required=False,
+                        help="aligner to use for building pangraph",
+                        default="minimap2",
+                        choices=["minimap2", "mmseqs"])
+    parser.add_argument("--pangraph_seed", required=False,
+                        help="random seed for pangraph (for reproducibility)",
+                        default="0")
+    parser.add_argument("--pangraph_alpha", required=False,
+                        help="value of alpha parameter for pangraph",
+                        default="100")
+    parser.add_argument("--pangraph_beta", required=False,
+                        help="value of beta parameter for pangraph",
+                        default="10")
+    parser.add_argument("--pangraph_dist_backend", required=False,
+                        help="distance backend for calculation of pangraph",
+                        default="native",
+                        choices=["native", "mash"])
+    parser.add_argument("--pangraph_minblocklength", required=False,
+                        help="minimum block length for pangraph",
+                        default="100")
+    parser.add_argument("--pangraph_edgeminlength", required=False,
+                        help="minimum edge length for pangraph when exporting gfa",
+                        default="0")
+    parser.add_argument("--breakpoint_minimap2", required=False,
+                        help="whether to also calculate breakpoint distances using minimap2",
+                        action="store_true")
     return parser.parse_args()
 
 def run_snakemake_pipeline(config_file):
@@ -40,9 +85,8 @@ default_options =  {"version":"default",
                     "pangraph_dist_backend": "native",
                     "pangraph_minblocklength": "100",
                     "pangraph_edgeminlength": "0",
-                    "DB": "CARD",
                     "include_gff": "False",
-                    "output_prefix": "output",
+                    "output_dir": "output",
                     "breakpoint_minimap2":"False"}
 boolean_options = ["complete", "panx_export", "pangraph_polish",
                     "include_gff", "breakpoint_minimap2", "bandage"]
@@ -64,62 +108,79 @@ def write_config_file(user_options, config_file):
                 else:
                     f.write("%s: \"%s\"\n" % (key, default_options[key]))
 
-        # f.write("version: \"default\"\n")
-        # f.write("focal_genes : [\""+prefix+"\"]\n")
-        # f.write("complete: True\n")
-        # f.write("panx_export : False\n")
-        # f.write("bandage : True\n")
-        # f.write("snv_threshold : \"25\"\n")
-        # f.write("region_upstream : \"5000\"\n")
-        # f.write("region_downstream : \"5000\"\n")
-        # f.write("pangraph_polish : False\n")
-        # f.write("pangraph_aligner : \"minimap2\"\n")
-        # f.write("pangraph_seed : 0\n")
-        # f.write("pangraph_alpha : 100\n")
-        # f.write("pangraph_beta : 10\n")
-        # f.write("pangraph_dist_backend: \"native\"\n")
-        # f.write("pangraph_minblocklength : \"100\"\n") # minimum length of blocks 
-        # f.write("pangraph_edgeminlength : \"0\"\n")
-        # f.write("DB: [\"CARD\"]\n") 
-        # f.write("include_gff: False\n")
-        # f.write("output_prefix : \"output_"+prefix+"\"\n")
-        # f.write("breakpoint_minimap2: True") 
+
+def rewrite_gene_fasta(gene_fasta, new_prefix, new_fasta):
+    with open(gene_fasta, 'r') as f:
+        gene_fasta_string = f.read()
+    if gene_fasta_string.count(">")>1:
+        print("Warning: gene fasta "+gene_fasta+" seems to have more than one fasta header")
+        sys.exit(1)
+    elif gene_fasta_string.count(">")==1:
+        re.sub(">", ">"+new_prefix+" ", gene_fasta_string)
+        with open(new_fasta, "w") as f:
+            f.write(gene_fasta_string)
 
 if __name__ == "__main__":
 
     # Parse command line arguments
     args = get_options()
 
-    config_file = "configs/"+"config_"+args.prefix+".yaml"
-    contigs_file = "input/contigs/"+args.prefix+"_contigs.fa"
-    gene_file = "input/focal_genes/"+args.prefix+".fa"
+    user_options = {"output_dir": args.output_dir, 
+                    "focal_genes": args.focal_gene_name,
+                    "panx_export": args.panx_export,
+                    "bandage": args.bandage,
+                    "snv_threshold": args.snv_threshold,
+                    "region_upstream": args.flanking_region, 
+                    "region_downstream": args.flanking_region,
+                    "pangraph_polish": args.pangraph_polish,
+                    "pangraph_aligner": args.pangraph_aligner,
+                    "pangraph_seed":args.pangraph_seed,
+                    "pangraph_alpha":args.pangraph_alpha,
+                    "pangraph_beta": args.pangraph_beta,
+                    "pangraph_dist_backend": args.pangraph_dist_backend,
+                    "pangraph_minblocklength": args.pangraph_minblocklength,
+                    "pangraph_edgeminlength": args.pangraph_edgeminlength,
+                    "breakpoint_minimap2": args.breakpoint_minimap2}
+
+    if not os.path.exists(args.output_dir):
+        print("doesn't exist")
+        os.makedirs(args.output_dir)
+
+    config_file = "configs/"+"config_"+args.focal_gene_name+".yaml"
+    contigs_file = "input/contigs/"+args.focal_gene_name+"_contigs.fa"
+    gene_file = "input/focal_genes/"+args.focal_gene_name+".fa"
+    if args.gff!="":
+        user_options["include_gff"] = "True"
+        gff_file = "input/gffs/"+args.focal_gene_name+"_annotations.gff"
+        if os.path.isfile(gff_file):
+            if not args.force:
+                print("Warning: gff file "+gff_file+" exists already. Using this rather than the file you requested. Use --force to overwrite")
+            else:
+                os.remove(gff_file)
+                os.symlink(args.gff, gff_file)
+        else:
+            os.symlink(args.gff, gff_file)
+
     if os.path.isfile(contigs_file):
         if not args.force:
-            print("Warning: contigs file "+contigs_file+" exists already. Use --force to overwrite")
+            print("Warning: contigs file "+contigs_file+" exists already. Using this rather than the file you requested. Use --force to overwrite")
         else:
             os.remove(contigs_file)
             os.symlink(args.contigs, contigs_file)
     else:
         os.symlink(args.contigs, contigs_file)
+
     if os.path.isfile(gene_file):
         if not args.force:
-            print("Warning: gene file "+gene_file+" exists already. Use --force to overwrite")
+            print("Warning: gene file "+gene_file+" exists already. Using this rather than the file you requested. Use --force to overwrite")
         else:
             os.remove(gene_file)
-            os.symlink(args.gene, gene_file)
+            rewrite_gene_fasta(args.gene_fasta, args.focal_gene_name, gene_file)
     else:
-        os.symlink(args.gene, gene_file)
-    #else:
-    #    print("(File with prefix exists in input/contigs, not overwriting)")
-    #if not os.path.isfile(gene_file):
-    #os.symlink(args.gene, gene_file)
-    #else:
-    #print("(File with prefix exists in input/focal_gene, not overwriting)")
-    #shutil.copyfile(args.contigs, "input/contigs/"+args.prefix+"_contigs.fa")
-    #shutil.copyfile(args.gene, "input/focal_genes/"+args.prefix+".fa")
-    
-    write_config_file({"prefix": args.prefix, "focal_genes": args.prefix,
-        "region_upstream": args.flanking_region, "region_downstream": args.flanking_region}, config_file)
+        rewrite_gene_fasta(args.gene_fasta, args.focal_gene_name, gene_file)
+
+    # Write the config file
+    write_config_file(user_options, config_file)
 
     # Call the Snakemake pipeline
     run_snakemake_pipeline(config_file)
