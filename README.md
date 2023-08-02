@@ -6,16 +6,6 @@ This repository contains a pipeline to analyse the flanking regions of genes usi
 
 It was developed for the analysis of mobile AMR genes, but can be used for any input gene. 
 
-Basic usage (run from the current directory):
-
-```
-python analyze-flanking-regions.py \
-        --contigs contig_fasta.fa \
-        --gene_fasta focal_gene.fa \
-        --focal_gene_name gene_name \
-        --output_dir output
-```
-
 For more details, see the paper:
 
 Visualizing and quantifying structural diversity around mobile AMR genes  
@@ -35,7 +25,17 @@ conda activate flanking-regions
 
 ### Usage
 
-The pipeline has flexible parameters such as the size of the flanking region, the number of single nucleotide variants (SNVs) allowed in the focal gene, and pangraph parameters:
+Basic usage (run from the current directory):
+
+```
+python analyze-flanking-regions.py \
+        --contigs contig_fasta.fa \
+        --gene_fasta focal_gene.fa \
+        --focal_gene_name gene_name \
+        --output_dir output
+```
+
+The underlying pipeline has flexible parameters such as the size of the flanking region, the number of single nucleotide variants (SNVs) allowed in the focal gene, and pangraph parameters:
 
 
 ```
@@ -80,7 +80,7 @@ options:
 
 ```
 
-`analyze-flanking-regions.py` is just a helper script that creates a config file and calls the pipeline which is written in [snakemake](https://snakemake.readthedocs.io/en/stable/index.html), so as to potentially enable analysis of multiple genes in a single command. 
+`analyze-flanking-regions.py` is just a helper script that creates a config file and calls the pipeline for a single gene. However, the pipeline is written in [snakemake](https://snakemake.readthedocs.io/en/stable/index.html), so as to potentially enable analysis of multiple genes in a single command once the input files have been formatted correctly and put in the `input` directory.
 
 Outputs for a given gene are saved in `{output_dir}/{focal_gene_name}`. They include output data files as well as interactive html plots (generated with [altair](https://altair-viz.github.io/) in Python). 
 
