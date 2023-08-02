@@ -14,7 +14,6 @@ pangraph_beta : 10 # beta parameter, controls cost of block diversity
 pangraph_minblocklength : "100" # minimum length of blocks 
 pangraph_edgeminlength : "0"
 pangraph_dist_backend : "mash"
-DB: ["CARD"] # Can include "NCBI" if desired, but very similar results
 include_gff: False
-output_prefix : "output_example"
+output_dir : "output_example"
 breakpoint_minimap2: False # whether to calculate breakpoint distances using minimap2 from full sequence (more accurate)

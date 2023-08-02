@@ -4,28 +4,56 @@ This document aims to give a detailed explanation of how to use the pipeline to 
 
 N.B. This was written before the helper `analyze-flanking-regions.py` script was developed. It applies to using the snakemake pipeline by writing the config file yourself. 
 
-### Repository structure
+### Simple example
 
-For an example, the snakemake pipeline can be run on some example data (mcr-1) with the following command:
-
-```
-snakemake --cores 1 \
-          --configfile configs/default_config.yaml \
-          -r prepare_DB run_pangraph calculate_distances make_plots
-```
-
-Equivalently you can call the full pipeline on a config file with:
+Example data for n=52 chromosomes and plasmids containing *bla*IMP-4 is included in `input`. This can be run with either of the following commands:
 
 ```
-python run_full_pipeline.py --config-file configs/default_config.yaml
+python analyze-flanking-regions.py \
+        --contigs input/contigs/IMP-4_contigs.fa \
+        --gene_fasta input/focal_genes/IMP-4.fa \
+        --focal_gene_name IMP-4 \
+        --output_dir output
 ```
 
+Using default parameters, this will extract the +/- 5kb flanking regions, orient the contigs so *bla*IMP-4 is on the positive strand, run pangraph, and produce plots. It should take about one minute to run. 
 
-## Obtaining your input files
+Output will be placed in `output/IMP-4`.
+
+
+### Running the pipeline for multiple genes
+
+The snakemake pipeline enables analysis of multiple focal genes with the same parameters from a single command. 
+
+For each focal gene, your two input files should be put in the following places (from the main directory):
+
+* `input/focal_genes/{focal_gene}.fa`
+* `input/contigs/{focal_gene}_contigs.fa`
+
+You should then create a config file (see e.g. `configs/example_config.yaml` in the main repo) and specify 
+
+```
+FOCAL_GENES = ["gene1", "gene2", "gene3"]
+``` 
+
+This means the pipeline will assume that the following files exist for each gene:
+
+* `input/focal_genes/gene1.fa`
+* `input/contigs/gene1_contigs.fa`
+
+The snakemake pipeline is split up into different rules. You can run the full pipeline with:
+
+```
+snakemake --cores 1 --configfile your_config.yaml -r prepare_DB run_pangraph calculate_distances make_plots
+```
+
+The `beta-lactamases` folder contains a version of the pipeline specifically for twelve-betalactamase genes, run with a single command like this using the `betalactamases_config.yaml` file there. 
+
+## Generating your own input files
 
 The first thing you need to do is obtain two input files: a fasta file containing a focal gene of interest (`{gene}.fa`), and a set of contigs that contain the gene (`{gene}_contigs.fa`). 
 
-You may already have these prepared for your own dataset. If so, you can run the pipeline with the helper script `analyze-flanking-regions.py`. 
+You may already have these prepared for your own dataset. If so, you can run the pipeline with the helper script `analyze-flanking-regions.py`. Or, if you have multiple files, you can do so with snakemake and editing the config file as specified above. 
 
 Alternatively, you may be interested in downloading some existing fasta files from NCBI. Here, we walk through the process of how to download contigs containing a particular antimicrobial resistance (AMR) gene.  
 
@@ -92,46 +120,6 @@ do
 done < locations.csv
 ``` 
 
-## Preparing the pipeline
-
-The snakemake pipeline enables analysis of multiple focal genes at the same time with the same parameters. 
-
-For each focal gene, your two input files should be put in the following places (from the main directory):
-
-* `input/focal_genes/{focal_gene}.fa`
-* `input/contigs/{focal_gene_search}_contigs.fa`
-
-In the config file, 
-
-means the pipeline will assume that the following files exist:
-
-* `input/focal_genes/mcr-1.1.fa`
-* `input/focal_genes/mcr1.1_contigs.fa`
-
-The snakemake pipeline is split up into different rules. You can run the full pipeline with:
-
-```
-snakemake --cores 1 --configfile configs/default_config.yaml -r run_pangraph calculate_distances make_plots
-```
-
-Various other options can be specific in the config file e.g. `configs/laptop_config.yaml`
-
-
-```
-version: "default"
-bandage : True # whether to plot Bandage plot
-snp_threshold : "25" # threshold of SNP differences wrt input/{gene}.fa in instance of focal gene in contig in order to include
-region_upstream : "5000" # upstream bases flanking gene (shorter discarded)
-region_downstream : "5000" # downstream bases flanking gene (shorter discarded)
-panx_export : False # whether to export panX visualisation (block alignments)
-pangraph_polish : False # whether to polish the pangraph alignments (recommended with panx_export)
-pangraph_aligner : "minimap2" # aligner for pangraph. alternative: mmseqs (much slower but more accurate)
-pangraph_minblocklength : "100" # minimum blocklength of pangraph
-pangraph_edgeminlength : "0" # minimum edge length to include in bandage plot
-DB: ["CARD"] # could be NCBI (AMRFinderPlus, but currently not include
-include_gff: False # whether a gff is included for linear blocks plot
-```
-
 ### Optional: providing GFF files
 
 The pipeline runs without annotation files by default, because pangraph uses only sequence similarity and no annotation information. However, it can be useful and interesting to see how the pangraph blocks correspond to the annotation information for the final plot of linear blocks. Only `CDS` features are used. 
@@ -155,26 +143,21 @@ python scripts/plot_linear_blocks_altair.py --flanking_width {flanking_width} \
                                             --output gff_plot.html
 ```
 
-### Parameters
 
+### Outputs
 
+All output files are put into the `output_dir/{gene}` folder. 
 
-## Outputs
+Outputs to do with extracting the variation in the focal gene are put in `output_dir/{gene}/gene_diversity`. This is mainly relevant for SNV comparisons to the focal gene (TO DO: add integration with CARD or custom database.).
 
-All output files are put into the `output` folder. 
-
-Outputs to do with extracting the variation in the focal gene are put in `output/gene_variants` - for each sequence with a hit to the focal gene, one gets the name of the variant (based on amino acid sequence) if a named variant exists in CARD. Otherwise 'unnamed' (if valid variant, but not named) or 'truncated' (if premature stop codon). This is used for the NJ tree of the variation in the central gene. 
-
-All other outputs for the pangraph part of the pipeline are in `output/pangraph/{gene}`. A list of them is given below. 
-
-Pangraph outputs in `output/pangraph/{gene}`:
+Pangraph outputs in `output_dir/{gene}/pangraph/`:
 * `{gene}_pangraph.json` - pangraph of the flanking regions in all sequences
-* `mcr-1.1_pangraph.gfa` - gfa of pangraph. Can be inspected in Bandage
-* `mcr-1.1_pangraph.json.blocks.csv` - csv of block start/end positions in each sequence with colours assigned to show homology
-* `mcr-1.1.output_dists.csv` - breakpoint distances upstream/downstream between every pair of sequences
+* `{gene}_pangraph.gfa` - gfa of pangraph. Can be inspected in Bandage
+* `{gene}_pangraph.json.blocks.csv` - csv of block start/end positions in each sequence with colours assigned to show homology
+* `{gene}.output_dists.csv` - breakpoint distances upstream/downstream between every pair of sequences
 * `positional_entropies.txt` - block positional entropy at each position
 
-Plots are outputted in `output/pangraph/{gene}/plots`:
+Plots are outputted in `output_dir/{gene}/plots`:
 * `NJ_tree_central_gene.pdf` - NJ tree of the focal gene
 * `{gene}_pangraph.bandage_plot.png` - Bandage plot of pangraph
 * `linear_blocks.pdf` - linear representation of pangraph 
@@ -187,16 +170,7 @@ Plots are outputted in `output/pangraph/{gene}/plots`:
 
 ![](images/linear_blocks_screenshot.png)
 
-*To add*: more information about how to interact with linear blocks plot, with an interesting example. 
-
-
-
-
-## Beta-lactamase gene data
-
-*To include:*  is a focus on beta-lactamase genes as an example: for the beta-lactamases, using CARD prevalence data, we obtain sequences containing twelve beta-lactamases from clinically important beta-lactamase families. 
-*To include:* list of available accessions for download for each gene and their other metadata. 
-
+*To add*: more information about how to interact with linear blocks plot.
 
 
 

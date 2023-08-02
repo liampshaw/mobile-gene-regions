@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
     if args.gene_fasta==gene_file:
         with open(args.gene_fasta, "r") as f:
-            header = f.readline().split(" ")[0]
+            header = f.readline().split(" ")[0][1:]
             if header!=args.focal_gene_name:
                 print("Warning: your focal gene fasta does not have the same name as the focal gene. Please amend.")
                 sys.exit(1)
