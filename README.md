@@ -4,7 +4,7 @@ __Liam P. Shaw__
 
 This repository contains a pipeline to analyse the flanking regions of genes using [pangraph](https://github.com/neherlab/pangraph). 
 
-It was developed for the analysis of mobile AMR genes, but can be used for any input gene. 
+It was developed for the analysis of mobile AMR genes, but in principle can be used for any input gene. 
 
 For more details, see the paper:
 
