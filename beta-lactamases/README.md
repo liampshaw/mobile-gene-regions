@@ -17,7 +17,7 @@ tar -xzvf betalactamase_dataset.tar.gz
 snakemake --cores 1 --configfile betalactamases_config.yaml -r prepare_DB run_pangraph calculate_distances make_plots
 ```
 
-(may take some time)
+(may take some time. Note that it should be possible to specify more cores, but currently this isn't working due to some error with calling blast at one point - I hope to fix soon)
 
 ### Further analysis
 
