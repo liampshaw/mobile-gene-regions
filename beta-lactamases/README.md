@@ -2,8 +2,7 @@ This folder contains a version of the pipeline specifically for analysing the tw
 
 ### Getting the input data
 
-The input data files are large and so must first be downloaded from Zenodo: doi-link-to-be-added 
-
+The input data files are large and so must first be downloaded from Zenodo: [https://doi.org/10.5281/zenodo.8208376](https://doi.org/10.5281/zenodo.8208376).
 
 ### Running the pipeline
 
