@@ -4,6 +4,13 @@ This folder contains a version of the pipeline specifically for analysing the tw
 
 The input data files are large and so must first be downloaded from Zenodo: [https://doi.org/10.5281/zenodo.8208376](https://doi.org/10.5281/zenodo.8208376).
 
+The compressed archive should then be extracted within `input` in this folder:
+
+```
+cd input
+tar -xzvf betalactamase_dataset.tar.gz
+```
+
 ### Running the pipeline
 
 ```
