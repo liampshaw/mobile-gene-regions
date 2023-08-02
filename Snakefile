@@ -2,7 +2,7 @@
 import calendar
 import time
 
-output_folder = config["output_prefix"]
+output_folder = config["output_dir"]
 
 FOCAL_GENES = config["focal_genes"] # 
 # each focal gene requires two input files:
@@ -15,7 +15,7 @@ FOCAL_GENES = config["focal_genes"] #
 # if gene name is not in CARD / does not match 
 # (to make optional)
 
-DB = config["DB"]
+#DB = config["DB"]
 
 rule prepare_DB:
 	input:
