@@ -1,4 +1,4 @@
-name: flanking-regions-2 
+name: flanking-regions 
 channels:
   - bioconda
   - conda-forge
