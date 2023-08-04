@@ -231,7 +231,7 @@ def main():
                 if v is not None and v['seq'] is not None:
                     if int(v['diffs'])<int(args.threshold):
                         #print(k+',', len(v)-gene_length, 'bases extracted around gene', '('+str(len(v))+' total)')
-                        region_string = str(v["region"][0])+"-"+str(v["region"][1])
+                        region_string = str(v["region"][0]+1)+"-"+str(v["region"][1])
                         if v['strand']=='negative':
                             region_string = "complement("+region_string+")"
                         if args.complete==False:
