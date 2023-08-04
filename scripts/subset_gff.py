@@ -6,16 +6,17 @@ import re
 
 def get_options():
 	parser = argparse.ArgumentParser(description='Subset a big gff')
-	parser.add_argument("--gff_file", help='GFF of annotations (can be concatenated files)', type=str, default='')
-	parser.add_argument("--fasta_file", help='Fasta file (example header: >NZ_CP033439.1 10801bp 6694854-6705655 0 diffs)', type=str, default='')
+	parser.add_argument("--gff_file", help='GFF of annotations (can be concatenated files)', type=str, required=True)
+	parser.add_argument("--fasta_file", help='Fasta file (example header: >NZ_CP033439.1 10801bp 6694854-6705655 0 diffs)', type=str, required=True)
 	parser.add_argument("--padding", help='size of buffer zone (bases) to pad', type=str, default=1000)
+	parser.add_argument("--output_gff", help='output gff to write to', type=str, required=True)
 	return parser.parse_args()
 
 def main():
 	args = get_options()
 	gff_df = pd.read_csv(args.gff_file, comment='#', sep='\t', header=None)
 	gff_df.columns = ['seqid', 'source', 'type', 'start', 'end', 'score', 'strand', 'phase', 'attributes']
-	print(gff_df)
+	#print(gff_df)
 	genome_locations = {}
 	with open(args.fasta_file, 'r') as f:
 		for line in f.readlines():
@@ -38,10 +39,10 @@ def main():
 		# Append the filtered rows to the new DataFrame
 		filtered_gff_df = pd.concat([filtered_gff_df, filtered_rows], ignore_index=True)
 
-	print(len(gff_df))
-	print(len(filtered_gff_df))
-	print(filtered_gff_df)
-	filtered_gff_df.to_csv("test.gff", sep="\t", header=None, index=False)
+	#print(len(gff_df))
+	#print(len(filtered_gff_df))
+	#print(filtered_gff_df)
+	filtered_gff_df.to_csv(args.output_gff, sep="\t", header=None, index=False)
 
 
 
