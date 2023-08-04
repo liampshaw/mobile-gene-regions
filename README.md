@@ -29,6 +29,13 @@ mamba env create -f flanking-regions.yaml
 conda activate flanking-regions
 ```
 
+There are also R packages required for some plots. These can be installed with:
+
+```
+Rscript scripts/install_libraries.R
+```
+
+
 ### Usage
 
 Basic usage (run from the current directory):
