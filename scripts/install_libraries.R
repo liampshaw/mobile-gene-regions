@@ -1,5 +1,5 @@
 regular.packages = c("ape", "cowplot", "docopt", "ggdendro", "gridExtra",
-             "gggenes", "reshape2", "RColorBrewer", "vegan")
+             "gggenes", "ggrepel", "reshape2", "RColorBrewer", "vegan")
 
 for (p in regular.packages){
   if (!require(p, quietly = TRUE))
