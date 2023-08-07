@@ -1,5 +1,6 @@
 
 mkdir -p curves
+mkdir -p entropies
 
 while read gene;
 do
