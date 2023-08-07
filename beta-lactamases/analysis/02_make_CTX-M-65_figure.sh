@@ -19,3 +19,5 @@ python ../../scripts/plot_linear_blocks_altair.py --block_csv ../output/CTX-M-65
 python ../../scripts/plot_linear_blocks_altair.py --block_csv ../output/CTX-M-65/pangraph/CTX-M-65_pangraph.json.blocks.csv --output CTX-M-65-figure/plot_ctxm65_1diff_ctxm24_subset.html --strain_list tmp_ctxm65_1diff_ctxm24.txt
 python ../../scripts/plot_linear_blocks_altair.py --block_csv ../output/CTX-M-65/pangraph/CTX-M-65_pangraph.json.blocks.csv --output CTX-M-65-figure/plot_ctxm65_2diff_ctxm14_subset.html --strain_list tmp_ctxm65_2diff_ctxm14.txt
 
+# Deduplicated version
+python ../../scripts/plot_output_dists_altair.py --dist_csv ../output/CTX-M-65/pangraph/CTX-M-65.output_dists.csv --output_html CTX-M-65-figure/figS1_deduplicated.html --gene_of_interest CTX-M-65 --strain_list breakpoint_plots/CTX-M-65_accs_deduplicated.txt 
