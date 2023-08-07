@@ -1,3 +1,6 @@
+
+mkdir -p curves
+
 while read gene;
 do
 	echo $gene

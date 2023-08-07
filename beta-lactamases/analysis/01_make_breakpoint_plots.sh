@@ -1,3 +1,7 @@
+
+mkdir -p breakpoint_plots
+mkdir -p AUCs
+
 while read gene;
 do
 	echo $gene
