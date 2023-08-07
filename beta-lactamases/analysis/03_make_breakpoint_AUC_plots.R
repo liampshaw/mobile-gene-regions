@@ -71,7 +71,7 @@ p.auc.combined = cowplot::plot_grid(p.auc.overall+ggtitle("(a)")+theme(title=ele
                                     axis='v')
 
 ggsave(p.auc.combined, 
-       file='../manuscript/figs/FINAL-figure-AUC-top-bl-final.pdf',
+       file='../../manuscript/figs/FINAL-figure-AUC-top-bl-final.pdf',
        width=9.5, height=5)
 # 
 cor.test(all_results$auc.total, as.numeric(all_results$snvs), method="spearman")
@@ -105,7 +105,7 @@ p.down = ggplot(all_results_top, aes(snvs, down, fill=gene))+
   guides(colour=FALSE)
 
 p.combined = cowplot::plot_grid(p.up, p.down, rel_widths = c(1,2))
-ggsave(p.combined, filename="../manuscript/figs/FINAL-figure-breakpoint-AUCs-top-genes.pdf",
+ggsave(p.combined, filename="../../manuscript/figs/FINAL-figure-breakpoint-AUCs-top-genes.pdf",
        width=8, height=5)
 
 p.up = ggplot(all_results, aes(snvs, up))+
@@ -131,7 +131,7 @@ p.down = ggplot(all_results, aes(snvs, down))+
   theme(legend.position = "none")
 
 p.combined = cowplot::plot_grid(p.up, p.down, rel_widths = c(1,1.1))
-ggsave(p.combined, filename="../manuscript/figs/FINAL-figure-breakpoint-AUCs-all.pdf",
+ggsave(p.combined, filename="../../manuscript/figs/FINAL-figure-breakpoint-AUCs-all.pdf",
        width=8, height=5)
 
 
@@ -149,7 +149,7 @@ p.auc.upstream.downstream =ggplot(all_results[all_results$snvs==0,], aes(down, u
   theme_basic()+
   xlab("Downstream AUC")+
   ylab("Upstream AUC")
-ggsave(p.auc.upstream.downstream, filename="../manuscript/figs/FINAL-figure-AUC-upstream-downstream.pdf",
+ggsave(p.auc.upstream.downstream, filename="../../manuscript/figs/FINAL-figure-AUC-upstream-downstream.pdf",
        width=6, height=6)
 # 
 wilcox.test(all_results[all_results$snvs==0,"down"]-all_results[all_results$snvs==0,"up"])
