@@ -10,7 +10,7 @@ For more details, see the paper:
 
 Visualizing and quantifying structural diversity around mobile AMR genes  
 Liam P. Shaw and Richard A. Neher, *biorxiv* (2023)  
-doi: []()
+doi: [10.1101/2023.08.07.551646](https://doi.org/10.1101/2023.08.07.551646)
 
 ### Dependencies
 
