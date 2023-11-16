@@ -231,7 +231,7 @@ def main():
         with open(output_fasta, 'w') as output_file:
             for k, v in extractions.items():
                 if v is not None and v['seq'] is not None:
-                    if int(v['diffs'])<int(args.threshold):
+                    if int(v['diffs'])<int(args.snv_threshold):
                         #print(k+',', len(v)-gene_length, 'bases extracted around gene', '('+str(len(v))+' total)')
                         region_string = str(v["region"][0]+1)+"-"+str(v["region"][1])
                         if v['strand']=='negative':
