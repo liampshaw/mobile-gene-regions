@@ -71,7 +71,10 @@ options:
   --panx_export         whether to export panX output from pangraph. Default: False
   --bandage             whether to run Bandage on pangraph. Default: False
   --snv_threshold SNV_THRESHOLD
-                        SNV threshold for focal gene. Default: 25
+                        Nucleotide-level difference threshold for focal gene (1 SNV = 1
+                        diff, Xbp indel = X diffs). Default: 25
+  --gene_length_threshold GENE_LENGTH_THRESHOLD
+                        Lateral coverage required of focal gene (0-1). Default: 0.99
   --pangraph_polish     whether to polish the pangraph. Default: False
   --pangraph_aligner {minimap2,mmseqs}
                         aligner to use for building pangraph. Default: minimap2
@@ -89,8 +92,7 @@ options:
                         minimum edge length for pangraph when exporting gfa. Default: 0
   --breakpoint_minimap2
                         whether to also calculate breakpoint distances using minimap2.
-                        Default: False
-
+                        Default: False                        
 ```
 
 `analyze-flanking-regions.py` is just a helper script that creates a config file and calls the pipeline for a single gene. However, the pipeline is written in [snakemake](https://snakemake.readthedocs.io/en/stable/index.html), so as to potentially enable analysis of multiple genes in a single command once the input files have been formatted correctly and put in the `input` directory.

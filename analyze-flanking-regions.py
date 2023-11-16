@@ -32,8 +32,11 @@ def get_options():
                         help="whether to run Bandage on pangraph. Default: False",
                         action="store_true")
     parser.add_argument("--snv_threshold", required=False,
-                        help="SNV threshold for focal gene. Default: 25",
+                        help="Nucleotide-level difference threshold for focal gene (1 SNV = 1 diff, Xbp indel = X diffs). Default: 25",
                         default="25")
+    parser.add_argument("--gene_length_threshold", required=False,
+                        help="Lateral coverage required of focal gene (0-1). Default: 0.99",
+                        default="0.99")
     parser.add_argument("--pangraph_polish", required=False,
                         help="whether to polish the pangraph. Default: False",
                         action="store_true")
@@ -132,6 +135,7 @@ if __name__ == "__main__":
                     "panx_export": args.panx_export,
                     "bandage": args.bandage,
                     "snv_threshold": args.snv_threshold,
+                    "gene_length_threshold": args.gene_length_threshold,
                     "region_upstream": args.flanking_region, 
                     "region_downstream": args.flanking_region,
                     "pangraph_polish": args.pangraph_polish,
