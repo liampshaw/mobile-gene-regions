@@ -90,7 +90,8 @@ rule extract_genes_from_contigs:
 												--output_fasta {output} \
 												--upstream 0 \
 												--downstream 0 \
-												--threshold {params.snv_threshold}"
+												--snv_threshold {params.snv_threshold} \
+												--gene_length_threshold {params.gene_length_threshold}"
 
 rule assign_variants:
 	input:
