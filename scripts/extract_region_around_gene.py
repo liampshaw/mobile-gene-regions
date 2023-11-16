@@ -24,6 +24,7 @@ def get_options():
     parser.add_argument('--complete', help='only keep contigs with all requested region', action='store_true')
     parser.add_argument('--circular', help='whether input contigs are circular', action='store_true')
     parser.add_argument('--threshold', help='maximum number of allowed SNVs/diffs in central gene', required=False, default=25)
+    parser.add_argument('--gene_length_threshold', help='lateral coverage required of central gene', required=False, default=0.99)
     parser.add_argument('--smh', help='extract contigs with multiple hits into separate file', type=str, required=False, default='')
     return parser.parse_args()
 
@@ -223,7 +224,8 @@ def main():
                                     gene_length=gene_length,
                                     is_circular=args.circular,
                                     upstream_bases=int(args.upstream),
-                                    downstream_bases=int(args.downstream))
+                                    downstream_bases=int(args.downstream),
+                                    length_threshold=float(args.gene_length_threshold))
         N_seqs_written = 0
         seqs_written = []
         with open(output_fasta, 'w') as output_file:
