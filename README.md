@@ -46,7 +46,7 @@ If you have followed all of these steps, you should have the pipeline installed 
 
 ### Test
 
-You can test whether it's working with data in the `test_data` directory, running the following command from within the cloned repository:
+You can test whether it's working with data in the `test_data` directory (33 sequences containing GES-1 variants), running the following command from within the cloned repository:
 
 ```
 python analyze-flanking-regions.py \
