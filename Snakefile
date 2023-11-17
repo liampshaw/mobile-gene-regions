@@ -81,11 +81,12 @@ rule extract_genes_from_contigs:
 		gene_fasta="input/focal_genes/{gene}.fa",
 		input_fasta="input/contigs/{gene}_contigs.fa"
 	params:
-		snv_threshold=int(config["snv_threshold"])
+		snv_threshold=int(config["snv_threshold"]),
+		gene_length_threshold=float(config["gene_length_threshold"])
 	output:
 		output_folder+"/{gene}/gene_diversity/{gene}_seqs.fa"
 	shell:
-		"python scripts/extract_region_around_gene.py --gene {input.gene_fasta} \
+		"python scripts/extract_region_around_gene.py --gene_fasta {input.gene_fasta} \
 												--input_fasta {input.input_fasta} \
 												--output_fasta {output} \
 												--upstream 0 \
@@ -114,16 +115,17 @@ rule extract_region_around_focal_gene:
 		prefix=output_folder+"/{gene}/pangraph/{gene}_extracted",
 		upstream=config["region_upstream"],
 		downstream=config["region_downstream"],
-		threshold=int(config["snv_threshold"])
+		snv_threshold=int(config["snv_threshold"]),
+		gene_length_threshold=float(config["gene_length_threshold"])
 	output:
 		output_folder+"/{gene}/pangraph/{gene}_extracted.fa"
 	shell: 
-		"python scripts/extract_region_around_gene.py --gene {params.gene} --input {input.input_fasta} \
+		"python scripts/extract_region_around_gene.py --gene_fasta {params.gene} --input {input.input_fasta} \
 		--upstream {params.upstream} --downstream {params.upstream} --complete --output_fasta {params.prefix}.fa\
-		--threshold {params.threshold}" if config["complete"]==True else
-		"python scripts/extract_region_around_gene.py --gene {params.gene} --input {input.input_fasta} \
+		--snv_threshold {params.snv_threshold} --gene_length_threshold {params.gene_length_threshold}" if config["complete"]==True else
+		"python scripts/extract_region_around_gene.py --gene_fasta {params.gene} --input {input.input_fasta} \
 		--upstream {params.upstream} --downstream {params.upstream} --output_fasta {params.prefix}.fa\
-		--threshold {params.threshold}"
+		--snv_threshold {params.snv_threshold} --gene_length_threshold {params.gene_length_threshold}"
 
 rule calculate_snv_dists_extracted_seqs:
 	input:

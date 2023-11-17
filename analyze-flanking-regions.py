@@ -80,6 +80,7 @@ default_options =  {"version":"default",
                     "panx_export": "False",
                     "bandage": "True",
                     "snv_threshold": "25",
+                    "gene_length_threshold": "0.99",
                     "region_upstream": "5000",
                     "region_downstream": "5000",
                     "pangraph_polish": "False",
@@ -147,9 +148,8 @@ if __name__ == "__main__":
                     "pangraph_minblocklength": args.pangraph_minblocklength,
                     "pangraph_edgeminlength": args.pangraph_edgeminlength,
                     "breakpoint_minimap2": args.breakpoint_minimap2}
-
     if not os.path.exists(args.output_dir):
-        print("doesn't exist")
+        print("Making output dir: ", args.output_dir)
         os.makedirs(args.output_dir)
 
     if os.path.exists(args.output_dir+"/"+args.focal_gene_name):
