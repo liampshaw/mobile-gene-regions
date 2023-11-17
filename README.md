@@ -12,7 +12,7 @@ Visualizing and quantifying structural diversity around mobile AMR genes
 Liam P. Shaw and Richard A. Neher, *biorxiv* (2023)  
 doi: [10.1101/2023.08.07.551646](https://doi.org/10.1101/2023.08.07.551646)
 
-### Dependencies
+### Installation
 
 The pipeline requires [pangraph](https://github.com/neherlab/pangraph) to be installed first. Currently it uses the `feat/unbalanced-tree` branch which can be installed with:
 
@@ -20,25 +20,48 @@ The pipeline requires [pangraph](https://github.com/neherlab/pangraph) to be ins
 git clone -b feat/unbalanced-tree https://github.com/neherlab/pangraph.git && cd pangraph
 ```
 
-And then follow the installation instructions from the pangraph github as normal.
+Then follow the installation instructions from the pangraph github as normal. Note that because pangraph was written in a specific version of Julia, you'll currently need to install **Julia v1.7.2** which you can download [here](https://julialang.org/downloads/oldreleases/). 
 
-Other dependencies can be installed with conda or mamba (recommended: mamba):
+Then you will need to clone this repository:
+
+```
+git clone https://github.com/liampshaw/mobile-gene-regions.git
+``` 
+
+Other dependencies can be installed with conda or mamba (recommended: mamba). From inside this directory (`cd mobile-gene-regions`):
 
 ```
 mamba env create -f flanking-regions.yaml 
 conda activate flanking-regions
 ```
 
-There are also R packages required for some plots. These can be installed with:
+There are also R packages required for some plots. (If you don't have R, you can download it [here](https://www.r-project.org/).) These R packages can be installed with a helper script in this repository:
 
 ```
+# cd mobile-gene-regions
 Rscript scripts/install_libraries.R
 ```
 
+If you have followed all of these steps, you should have the pipeline installed and ready to run. 
+
+### Test
+
+You can test whether it's working with data in the `test_data` directory, running the following command from within the cloned repository:
+
+```
+python analyze-flanking-regions.py \
+	--contigs test_data/GES-1_contigs.fa \
+	--gene_fasta test_data/GES-1.fa \ 
+	--output test_data_output \
+	--gff test_data/GES-1_annotations.gff \
+	--focal_gene_name GES-1	
+```
+
+If this runs well, you should be able to inspect the plots in `test_data_output/plots`. If it doesn't, the installation may not have worked.   
 
 ### Usage
 
-Basic usage (run from the current directory):
+Basic usage (run from within this directory):
 
 ```
 python analyze-flanking-regions.py \
