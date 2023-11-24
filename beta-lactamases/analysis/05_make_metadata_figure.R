@@ -54,12 +54,13 @@ for (i in seq(1, length(genes))){
   plot_name =  paste0("p.", i)
    p = ggplot(d, aes(Year, n, fill=TaxGenus.simple))+
     geom_bar(stat="identity")+
-    ggtitle(gene)+
+    ggtitle(paste0(gene, " (n=", nrow(metadata_df_gene), ")"))+
     scale_fill_manual(values=c("grey", RColorBrewer::brewer.pal(n=11, name="Paired")),
                       drop=FALSE)+
     theme_basic()+
      theme(legend.position = "none")+
      ylab("")+
+     xlab("")+
      xlim(c(2000,2022))
    assign(plot_name,p)
    contig_df = metadata_df_gene %>% group_by(Contig)%>%summarise(count=length(Contig))
@@ -89,7 +90,7 @@ combined_plot = cowplot::plot_grid(p.1, p.2, p.3, p.4,
                    p.5, p.6, p.7, p.8,
                    p.9, p.10, p.11, p.12, nrow=4, ncol=3, align='hv')
   
-ggsave(cowplot::plot_grid(combined_plot), width=10,
+ggsave(cowplot::plot_grid(combined_plot), width=10,height=9,
        file="../../manuscript/figs/supp_fig_genus_counts.pdf")
 
 combined_plot_pie = cowplot::plot_grid(p.pie.1, p.pie.2, p.pie.3, p.pie.4, 
