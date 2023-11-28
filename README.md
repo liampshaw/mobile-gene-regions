@@ -120,9 +120,9 @@ options:
 
 `analyze-flanking-regions.py` is just a helper script that creates a config file and calls the pipeline for a single gene. However, the pipeline is written in [snakemake](https://snakemake.readthedocs.io/en/stable/index.html), so as to potentially enable analysis of multiple genes in a single command once the input files have been formatted correctly and put in the `input` directory.
 
-Outputs for a given gene are saved in `{output_dir}/{focal_gene_name}`. They include output data files as well as interactive html plots (generated with [altair](https://altair-viz.github.io/) in Python). 
+Outputs for a given gene are saved in `{output_dir}/{focal_gene_name}`. They include output data files as well as interactive html plots (generated with [altair](https://altair-viz.github.io/) in Python). N.B. In the manuscript we talk about 'uninterrupted shared distance' - this is referred to as 'breakpoint distance' in the code and documentation, but it is the same quantity.
 
-A tutorial on how to prepare data and use the pipeline to explore flanking regions is available in `tutorial/Tutorial.md`.
+A tutorial on how to prepare data and use the pipeline to explore flanking regions is available in `tutorial/Tutorial.md`. 
 
 ### Beta-lactamases example
 
