@@ -159,11 +159,17 @@ if __name__ == "__main__":
             print("You used --force! Removing previous results and rerunning pipeline.")
             shutil.rmtree(args.output_dir+"/"+args.focal_gene_name)
 
-
+    if not os.path.exists("configs"):
+        os.makedirs("configs")
     config_file = "configs/"+"config_"+args.focal_gene_name+".yaml"
 
     # copy files into input directory if needed 
     # (wasteful, but because of how I've written snakemake pipeline to function with multiple genes)
+    if not os.path.exists("input"):
+        os.makedirs("input")
+    for subdir in ["gffs", "contigs", "focal_genes"]:
+        if not os.path.exists("input/"+subdir):
+            os.makedirs("input/"+subdir)
     contigs_file = "input/contigs/"+args.focal_gene_name+"_contigs.fa"
     gene_file = "input/focal_genes/"+args.focal_gene_name+".fa"
 
