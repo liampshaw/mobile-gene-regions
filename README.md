@@ -31,7 +31,7 @@ git clone https://github.com/liampshaw/mobile-gene-regions.git
 Other dependencies can be installed with conda or mamba (recommended: mamba). From inside this directory (`cd mobile-gene-regions`):
 
 ```
-mamba env create -f flanking-regions.yaml 
+mamba env create -f flanking-regions.yaml # Note that snakemake v7 is required, not v8
 conda activate flanking-regions
 ```
 
