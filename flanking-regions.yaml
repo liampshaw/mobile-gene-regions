@@ -16,7 +16,7 @@ dependencies:
   - mmseqs2
   - treetime==0.9.4
 #  - pairsnp
-  - snakemake
+  - snakemake==7.32
 #  - ca-certificates
 #  - certifi
 #  - openssl
