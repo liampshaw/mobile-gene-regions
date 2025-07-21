@@ -52,8 +52,8 @@ def extractPaths(extracted_json):
     grouped = {}
     for node, node_details in nodes.items():
         #print(node, node_details)
-        genome_name = path_id_to_name[str(node_details["path_id"])]
-        block_info = [node_details["block_id"], node_details["strand"], node_details["position"][0], node_details["position"][1]]
+        genome_name = path_id_to_name[str(node_details["path_id"])] # Positions are always in 0-based numbering with right extreme excluded. 
+        block_info = [node_details["block_id"], node_details["strand"], node_details["position"][0]+1, node_details["position"][1]]
         grouped.setdefault(genome_name, []).append(block_info)
     #print(grouped)
     return(grouped)
