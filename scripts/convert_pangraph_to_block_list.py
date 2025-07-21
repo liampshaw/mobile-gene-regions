@@ -23,7 +23,7 @@ def strand(value): # converts True/False to +/- strand
 
 
 def colourBlocks(blocks, colour_all=False, colour_seed=1234):
-    block_count_dict = {x['id']:len(x['positions']) for x in blocks}
+    block_count_dict = {str(block):len(details['alignments']) for block,details in blocks.items()}
     # Create random colours
     block_colour_dict = {}
     if colour_all==False:
@@ -43,21 +43,35 @@ def colourBlocks(blocks, colour_all=False, colour_seed=1234):
             i += 1
     return(block_colour_dict)
 
-def extractPaths(paths):
+def extractPaths(extracted_json):
     genome_dict = {}
-    for path in paths:
-        genome = path['name']
-        positions = path['position'] # N.B. already 1-indexed
-        blocks = [x['id'] for x in path['blocks']]
-        strands = [strand(x['strand']) for x in path['blocks']]
-        genome_dict[genome] = []
-        for i, b in enumerate(blocks):
-            if i==len(blocks)-1:
-                offset = 0 # From documentation: If N is the number of nodes this list has N+1 entries. The last entry is the position of the right edge of the last block in the path.
-            else:
-                offset = -1
-            genome_dict[genome].append([b, strands[i], positions[i], positions[i+1]+offset])
-    return(genome_dict)
+    paths = extracted_json['paths'] 
+    path_id_to_name = {k: v["name"] for k,v in paths.items() }
+    nodes = extracted_json['nodes']
+    # to group nodes by path_id
+    grouped = {}
+    for node, node_details in nodes.items():
+        #print(node, node_details)
+        genome_name = path_id_to_name[str(node_details["path_id"])]
+        block_info = [node_details["block_id"], node_details["strand"], node_details["position"][0], node_details["position"][1]]
+        grouped.setdefault(genome_name, []).append(block_info)
+    #print(grouped)
+    return(grouped)
+    #for path_entry in paths.items():
+    #    path = path_entry[1] # to handle pangraph v1.2.0 json output
+    #    print(path)
+    #    genome = path['name']
+    #    positions = path['position'] # N.B. already 1-indexed
+    #    blocks = [x['id'] for x in path['blocks']]
+    #    strands = [strand(x['strand']) for x in path['blocks']]
+    #    genome_dict[genome] = []
+    #    for i, b in enumerate(blocks):
+    #        if i==len(blocks)-1:
+    #            offset = 0 # From documentation: If N is the number of nodes this list has N+1 entries. The last entry is the position of the right edge of the last block in the path.
+    #        else:
+    #            offset = -1
+    #        genome_dict[genome].append([b, strands[i], positions[i], positions[i+1]+offset])
+    #return(genome_dict)
 
 def rewriteGFA(gfa_file, colour_file, new_gfa_file):
     """Rewrites a GFA with colours."""
@@ -84,14 +98,14 @@ def main():
     # Get blocks and colour
     # see function above
 
-    genome_dict = extractPaths(pangraph_json['paths'])
+    genome_dict = extractPaths(pangraph_json)
     block_colour_dict = colourBlocks(pangraph_json['blocks'])
 
     with open(output_blocks, 'w') as output_f:
         output_f.write("genome,block,strand,start,end,colour\n")
         for g, values in genome_dict.items():
             for v in values:
-                block = v[0]
+                block = str(v[0])
                 output_f.write("%s\n" % (g+","+','.join([str(x) for x in v])+","+block_colour_dict[block]))
     with open(block_colour_file, 'w') as output_f_colours:
         output_f_colours.write("block,colour\n")

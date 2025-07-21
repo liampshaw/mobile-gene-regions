@@ -1,4 +1,4 @@
-# See configfile in e.g. configs/laptop_config.yaml for parameters
+#**Note: repository currently undergoing streamlining** See configfile in e.g. configs/laptop_config.yaml for parameters
 import calendar
 import time
 
@@ -45,7 +45,7 @@ rule make_plots:
 		#expand(output_folder+"/{gene}/plots/{gene}_breakpoint_distances-all.pdf", 
 	#		gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/bandage.log_file", gene=FOCAL_GENES),
-		expand(output_folder+"/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENES),
+		#expand(output_folder+"/{gene}/plots/{gene}_positional_entropies_consensus_relative.pdf", gene=FOCAL_GENES),
 		#expand(output_folder+"/{gene}/plots/NJ_tree_central_gene.pdf", gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/{gene}_linear_blocks.html", gene=FOCAL_GENES),
 		expand(output_folder+"/{gene}/plots/{gene}_linear_blocks_deduplicated.html", gene=FOCAL_GENES),
@@ -156,15 +156,15 @@ rule build_pangraph:
 	params:
 		aligner=config["pangraph_aligner"],
 		minlength=config["pangraph_minblocklength"],
-		seed=config["pangraph_seed"],
+		#seed=config["pangraph_seed"],
 		alpha=config["pangraph_alpha"],
 		beta=config["pangraph_beta"],
 		dist_backend=config["pangraph_dist_backend"]
 	output:
 		output_folder+"/{gene}/pangraph/{gene}_pangraph.json"
 	shell:
-		"pangraph build -n --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} > {output}" if config["pangraph_polish"]==False 
-		else "pangraph build -n --random-seed {params.seed} --distance-backend {params.dist_backend} --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} | pangraph polish > {output}"
+		"pangraph build --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} > {output}" if config["pangraph_polish"]==False 
+		else "pangraph build --alignment-kernel {params.aligner} --len {params.minlength} --alpha {params.alpha} --beta {params.beta} {input} | pangraph polish > {output}"
 
 
 rule export_pangraph:
@@ -173,19 +173,17 @@ rule export_pangraph:
 	params:
 		prefix="{gene}_pangraph",
 		outdir=output_folder+"/{gene}/pangraph/",
-		edgeminlength=config["pangraph_edgeminlength"]
+		edgeminlength=config["pangraph_edgeminlength"],
+		outpath_gfa=output_folder+"/{gene}/pangraph/{gene}_pangraph.gfa",
+		outpath_fa=output_folder+"/{gene}/pangraph/{gene}_pangraph.fa"
 	output:
 		output_folder+"/{gene}/pangraph/{gene}_pangraph.gfa",
 		output_folder+"/{gene}/pangraph/{gene}_pangraph.fa"
-	shell:
-		"pangraph export --edge-minimum-length {params.edgeminlength} {input} \
-							-p {params.prefix} \
-							-o {params.outdir}" if config["panx_export"]==False else
-		"pangraph export --edge-minimum-length {params.edgeminlength} {input} \
-							-p {params.prefix} \
-							-o {params.outdir} \
-							--export-panX"
-
+	run:
+		shell("pangraph export gfa --minimum-length {params.edgeminlength} {input} \
+							-o {params.outpath_gfa}"),
+		shell("pangraph export block-consensus {input} \
+                                                        -o {params.outpath_fa}")
 
 rule convert_pangraph_to_block_list:
 	input:

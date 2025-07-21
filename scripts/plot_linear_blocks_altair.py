@@ -131,7 +131,7 @@ def main():
   # If unique plot requested, subset to unique genome block paths
   if args.unique==True:
     # definitely this is very slow and could be made faster (encode blocks as ints and use array)
-    genome_block_paths = {x:','.join(block_df['block'][(block_df['genome']==x)]) for x in set(block_df['genome'])}
+    genome_block_paths = {x:','.join(str(block_df['block'][(block_df['genome']==x)])) for x in set(block_df['genome'])}
     # invert genome
     inverted_genome_block_paths = {}
     for k, v in genome_block_paths.items():

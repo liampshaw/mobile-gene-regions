@@ -39,14 +39,14 @@ def main():
     with open(json_file, 'r') as f:
       pangraph_json = json.load(f)
 
-    genome_dict_original = cp.extractPaths(pangraph_json['paths'])
+    genome_dict_original = cp.extractPaths(pangraph_json)
     # Don't care about exact lengths of blocks, will just use the consensus (average?) length
-    block_dict = {x['id']:len(x['sequence']) for x in pangraph_json['blocks']}
-    block_nums = {x['id']:i for i, x in enumerate(pangraph_json['blocks'])}
-    block_dict_num = {block_nums[x['id']]:len(x['sequence']) for x in pangraph_json['blocks']}
-
- 
-    possible_paths = [[block_nums[x[0]] for x in genome_dict_original[y]] for y in genome_dict_original.keys()]
+    block_dict = {str(block):len(details['consensus']) for block, details in pangraph_json['blocks'].items()}
+    block_nums = {str(block):i for i, block in enumerate(block_dict.keys())}
+    #block_dict_num = {block_nums[x['id']]:len(x['sequence']) for x in pangraph_json['blocks']}
+    print(block_dict)
+    print(block_nums) 
+    possible_paths = [[block_nums[str(x[0])] for x in genome_dict_original[y]] for y in genome_dict_original.keys()]
 
     # If we have a subset, use it
     if args.subset!='':
@@ -104,7 +104,7 @@ def main():
                 #print(g)
                 #genome_as_int = [None] * max([p[3] for p in path])
 
-                genome_as_int = [item for sublist in [[block_nums[p[0]]]*(p[3]-p[2]) for p in path ] for item in sublist]
+                genome_as_int = [item for sublist in [[str(block_nums[p[0]])]*(p[3]-p[2]) for p in path ] for item in sublist]
 
                 genomes_as_int[genome_i] = genome_as_int
                 genome_i += 1
