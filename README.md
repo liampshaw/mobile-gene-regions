@@ -2,6 +2,9 @@
 
 __Liam P. Shaw__
 
+> [!WARNING]
+> 21 July 2025: since this repository was written in late 2023, pangraph has undergone a major migration between v0 and v1. This repository was written to    work with pangraph v0.7.0 and has not been updated for the newer versions of pangraph. A test version for pangraph v1.2.0 is available on the `pangraph_1.2.  0` branch. This has not been validated, but seems to work on the GES-1 test dataset with all aspects apart from plotting positional entropies, which have     been removed temporarily from the Snakefile.
+
 This repository contains a pipeline to analyse the flanking regions of genes using [pangraph](https://github.com/neherlab/pangraph). 
 
 It was developed for the analysis of mobile AMR genes, but in principle can be used for any input gene. 
